@@ -1,6 +1,6 @@
 # NCM Refinement Viewer
 
-An interactive, plain-language story about [Next-Concept Modeling (NCM)](https://arxiv.org/abs/2610.14162), a way of generating text developed by researchers at Stanford. Instead of writing one word at a time, NCM sketches a whole passage and sharpens it in about a dozen passes.
+An illustrated, interactive, plain-language story about [Next-Concept Modeling (NCM)](https://arxiv.org/abs/2610.14162), a way of generating text developed by researchers at Stanford. Instead of writing one word at a time, NCM sketches a whole passage and sharpens it in about a dozen passes.
 
 **Read it:** https://kbroadie.github.io/ncm-viewer/
 
@@ -8,20 +8,21 @@ An interactive, plain-language story about [Next-Concept Modeling (NCM)](https:/
 
 Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. The research, models and examples are theirs, published in [HazyResearch/ncm](https://github.com/HazyResearch/ncm) under the MIT license.
 
-The story and interactive graphics are an independent project by Kevin Broadie and are not affiliated with the authors.
+The story, illustrations and interactive graphics are an independent project by Kevin Broadie and are not affiliated with the authors.
 
 ## What's in the story
 
-- **A story that writes itself as you scroll.** The opener follows one of the researchers' models writing a children's story, pass by pass.
-- **Same sentence, three ways.** A typewriter (word by word), a scratch-off card (diffusion) and a sketch artist (NCM) translate the same German sentence. Only the NCM lane uses real model output; the other two are simulations.
-- **The zoom levels.** How many layers each model uses, and how much detail each layer adds, read from the researchers' configuration files.
-- **Try it yourself.** Step through the published story, summary and translation examples, with each input shown above its output.
-- **The blooper reel.** Funny mid-draft mistakes, such as "Stekampkamp" and "Mexican Mexican," each linked to the pass where it happens.
-- **Every square is one step.** A unit chart of step counts reported in the paper, followed by measured speedups, the Sudoku results, limits and why the research matters.
+The page is a single long scroll. In each major section a graphic sticks in place while short notes scroll past and change it.
+
+- **A story that writes itself as you scroll.** One of the researchers' models writes a children's story, pass by pass.
+- **A typewriter, a scratch-off card and a sketch artist.** Word-by-word, diffusion and NCM generation translate the same German sentence, one at a time and then as a race. Only the NCM lane uses real model output.
+- **How do you sketch with words?** Map zoom levels illustrate the layers, alongside each model's real layer sizes from the researchers' configuration files.
+- **Three models, three jobs.** The published story, summary and translation examples, with their inputs, stepping through the funniest mid-draft mistakes before handing the controls to the reader.
+- **Every square is one step.** A unit chart of step counts reported in the paper, then measured speedups, a 16-drafts illustration, a Sudoku illustration, limits and a highway illustration of why parallel work matters.
 
 ## How the data was prepared
 
-The NCM repository doesn't publish pass-by-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser by comparing each pass with the one before it, word by word. Speed, quality, Sudoku and training figures are quoted from the paper.
+The NCM repository doesn't publish pass-by-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser by comparing each pass with the one before it, word by word. Speed, quality, Sudoku and training figures are quoted from the paper. The Sudoku and highway graphics illustrate ideas and aren't model output.
 
 ## Data file
 

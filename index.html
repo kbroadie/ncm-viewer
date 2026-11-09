@@ -3,259 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFFFFF">
 <title>NCM Refinement Viewer</title>
-<meta name="description" content="Most AI writes one word at a time. Researchers at Stanford built one that sketches a whole passage and sharpens it in a dozen passes. An interactive story by Kevin Broadie.">
+<meta name="description" content="Most AI writes one word at a time. Researchers at Stanford built one that sketches a whole passage and sharpens it in about a dozen passes. An illustrated, interactive story by Kevin Broadie.">
 <meta name="author" content="Kevin Broadie">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230F1218'/%3E%3Crect x='3' y='3' width='2' height='2' fill='%23fff'/%3E%3Crect x='3' y='7' width='6' height='2' fill='%23fff'/%3E%3Crect x='3' y='11' width='10' height='2' fill='%23FFE14D'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%233557E0'/%3E%3Crect x='3' y='4' width='3' height='2' rx='1' fill='%23fff'/%3E%3Crect x='3' y='7.5' width='7' height='2' rx='1' fill='%23fff'/%3E%3Crect x='3' y='11' width='10' height='2' rx='1' fill='%23FFE27A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap">
 <style>
-/* Layout: long-form story. A centered reading column for prose; graphics break out into wider tinted bands. The highlighter yellow that marks changed words is also the motif for headings. */
+/* Layout: long-form scrollytelling. Prose sits in a centered column. Each idea gets a tinted band where a graphic sticks in place while short notes scroll past it. Light theme only, soft fills instead of outlines, humanist type. */
 :root {
+  color-scheme: light;
   --bg: #FFFFFF;
-  --ink: #0F1218;
-  --sub: #5D6371;
-  --hair: #E2E4EA;
-  --wash: #F3F4F7;
-  --accent: #2B3FE0;
-  --mark: #FFE14D;
-  --on-ink: #FFFFFF;
-  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-ui: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --ink: #1F2430;
+  --sub: #5F6675;
+  --line: #DFE4EC;
+  --band: #F1F5FB;
+  --panel: #FFFFFF;
+  --accent: #3557E0;
+  --accent-soft: #E3E9FF;
+  --coral: #EE6B4D;
+  --coral-soft: #FDE7E1;
+  --mint: #2E9E78;
+  --mint-soft: #DFF3EA;
+  --mark: #FFE27A;
+  --shadow: 0 10px 30px rgba(31, 36, 48, .09), 0 2px 6px rgba(31, 36, 48, .05);
+  --f-sans: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  --f-serif: "Alegreya", Georgia, "Times New Roman", serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0C0E13; --ink: #ECEEF3; --sub: #9298A5; --hair: #262A33; --wash: #151820;
-    --accent: #8193FF; --mark: #6A5800; --on-ink: #0C0E13; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0C0E13; --ink: #ECEEF3; --sub: #9298A5; --hair: #262A33; --wash: #151820;
-  --accent: #8193FF; --mark: #6A5800; --on-ink: #0C0E13; color-scheme: dark;
-}
-
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-ui); }
-a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-a:hover { color: var(--accent); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--f-sans); }
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
 .gutter { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .col { max-width: 660px; margin: 0 auto; }
-.wide { max-width: 1040px; margin: 0 auto; }
+.wide { max-width: 1080px; margin: 0 auto; }
 
 /* Header */
-.masthead { padding-block: 16px 0; display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; color: var(--sub); }
-.masthead b { color: var(--ink); font-weight: 700; font-variation-settings: "wdth" 112; }
-.hed { padding-block: clamp(40px, 9vw, 96px) 36px; display: grid; gap: 22px; }
-.hed h1 {
-  margin: 0; font-family: var(--f-display); font-weight: 850; font-variation-settings: "wdth" 104;
-  font-size: clamp(38px, 7.4vw, 76px); line-height: 1.02; letter-spacing: -.03em; text-wrap: balance;
-}
-.hed h1 mark { padding: 0 .06em; }
-.dek { margin: 0; font-family: var(--f-text); font-size: clamp(19px, 2.6vw, 23px); line-height: 1.45; color: var(--sub); max-width: 34em; }
-.byline { font-size: 14px; line-height: 1.5; display: grid; gap: 2px; }
-.byline span { color: var(--sub); }
+.masthead { display: flex; justify-content: space-between; gap: 12px; padding-block: 18px 0; font-size: 15px; color: var(--sub); }
+.masthead b { color: var(--ink); font-weight: 800; }
+.hed { padding-block: clamp(36px, 8vw, 84px) 24px; display: grid; gap: 20px; }
+.hed h1 { margin: 0; font-weight: 800; font-size: clamp(40px, 7.6vw, 78px); line-height: 1; letter-spacing: -.02em; text-wrap: balance; }
+.hed h1 mark { padding: 0 .08em; border-radius: .2em; }
+.dek { margin: 0; font-family: var(--f-serif); font-size: clamp(20px, 2.7vw, 24px); line-height: 1.45; color: var(--sub); max-width: 34em; }
+.byline { font-size: 15.5px; line-height: 1.5; color: var(--sub); }
+.byline b { color: var(--ink); }
+.hero-art { margin: 8px auto 0; max-width: 820px; }
+.hero-art svg { width: 100%; height: auto; display: block; }
+.hero-cap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; text-align: center; font-size: 14.5px; font-weight: 700; color: var(--sub); line-height: 1.25; margin-top: 4px; }
+@media (max-width: 520px) { .hero-cap { font-size: 12.5px; } }
 
 /* Prose */
-.story { display: grid; gap: 0; }
-.prose { padding-block: 8px; }
-.prose p { margin: 0 0 1.05em; font-family: var(--f-text); font-size: 20px; line-height: 1.62; }
+.prose { padding-block: 10px; }
+.prose p { margin: 0 0 1.05em; font-family: var(--f-serif); font-size: 21px; line-height: 1.6; }
 .prose p:last-child { margin-bottom: 0; }
-.prose em { font-style: italic; }
-.prose strong { font-weight: 600; }
-.prose h2 {
-  margin: 56px 0 18px; font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 104;
-  font-size: clamp(27px, 4.4vw, 36px); line-height: 1.1; letter-spacing: -.02em; text-wrap: balance;
-}
-.prose h2 span { background: linear-gradient(transparent 58%, var(--mark) 58%, var(--mark) 92%, transparent 92%); padding: 0 .08em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-@media (max-width: 600px) { .prose p { font-size: 18.5px; } }
+.prose strong { font-weight: 700; }
+.prose h2 { margin: 64px 0 18px; font-weight: 800; font-size: clamp(30px, 4.6vw, 40px); line-height: 1.08; letter-spacing: -.015em; text-wrap: balance; }
+.prose h2 span { background: linear-gradient(transparent 60%, var(--mark) 60%, var(--mark) 92%, transparent 92%); padding: 0 .1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+@media (max-width: 600px) { .prose p { font-size: 19px; } }
 
-mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08em; border-radius: 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08em; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .animate mark { animation: arrive .45s ease-out; }
 @keyframes arrive { from { background: transparent; } }
 
-/* Graphic band */
-.band { background: var(--wash); padding-block: 32px 28px; margin-block: 28px; }
-.gtitle { font-family: var(--f-display); font-weight: 750; font-size: 18px; font-variation-settings: "wdth" 106; margin: 0 0 4px; }
-.gsub { font-size: 14px; color: var(--sub); margin: 0 0 18px; max-width: 60ch; }
-.caption { font-size: 13px; color: var(--sub); line-height: 1.45; margin-top: 16px; max-width: 70ch; }
-
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
-.tab {
-  appearance: none; cursor: pointer; padding: 7px 12px 6px; border: 1.5px solid var(--ink); background: var(--bg);
-  font-size: 14px; font-weight: 600; display: grid; text-align: left; line-height: 1.2;
-}
-.tab small { font-size: 11.5px; font-weight: 500; color: var(--sub); }
-.tab:hover { background: var(--wash); }
-.tab[aria-selected="true"] { background: var(--ink); color: var(--on-ink); }
-.tab[aria-selected="true"] small { color: var(--on-ink); opacity: .75; }
-
-.btn {
-  appearance: none; cursor: pointer; height: 40px; min-width: 40px; padding: 0 14px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--bg); border: 1.5px solid var(--ink); border-radius: 0; font-size: 14px; font-weight: 600;
-}
-.btn:hover { background: var(--wash); }
-.btn:disabled { opacity: .3; cursor: default; }
-.btn.solid { background: var(--ink); color: var(--on-ink); padding: 0 18px; }
-.btn.solid:hover { background: var(--accent); border-color: var(--accent); }
+/* Shared controls */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { appearance: none; border: 0; cursor: pointer; padding: 7px 14px; border-radius: 999px; background: var(--band); font-size: 15px; font-weight: 700; line-height: 1.15; display: grid; text-align: left; }
+.chip small { font-size: 12.5px; font-weight: 500; color: var(--sub); }
+.chip:hover { background: var(--accent-soft); }
+.chip[aria-selected="true"] { background: var(--accent); color: #fff; }
+.chip[aria-selected="true"] small { color: #fff; opacity: .8; }
+.btn { appearance: none; border: 0; cursor: pointer; height: 40px; min-width: 40px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--band); font-size: 15px; font-weight: 700; }
+.btn:hover { background: var(--accent-soft); }
+.btn:disabled { opacity: .35; cursor: default; }
+.btn.solid { background: var(--accent); color: #fff; }
+.btn.solid:hover { background: #2443BD; }
 .btn svg { width: 13px; height: 13px; fill: currentColor; }
+.caption { font-size: 14.5px; color: var(--sub); line-height: 1.45; max-width: 72ch; }
+.tag { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--sub); letter-spacing: .02em; }
 
-/* Scrollytelling opener */
-.scrolly { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; max-width: 1040px; margin: 24px auto 0; }
-.sgraphic { position: sticky; top: 8vh; height: 84vh; display: flex; align-items: center; order: 2; }
-.sbox { width: 100%; background: var(--bg); border: 1.5px solid var(--ink); padding: 20px 22px 22px; display: grid; gap: 12px; }
-.shead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.shead .k { font-size: 13px; font-weight: 600; color: var(--sub); }
-.shead .p { font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.shead .p small { font-size: 15px; font-weight: 600; color: var(--sub); letter-spacing: 0; }
-.mini { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; align-items: end; height: 40px; }
-.mini i { display: block; background: var(--hair); min-height: 3px; transition: background .2s; }
-.mini i.done { background: var(--ink); opacity: .5; }
-.mini i.cur { background: var(--accent); opacity: 1; }
-.stext { font-family: var(--f-text); font-size: 18px; line-height: 1.55; min-height: 10em; overflow-wrap: anywhere; }
-.steps { order: 1; padding-block: 10vh 30vh; }
-.step { min-height: 78vh; display: flex; align-items: center; }
-.step .card { background: var(--bg); border: 1.5px solid var(--ink); padding: 16px 18px; max-width: 440px; font-family: var(--f-text); font-size: 18.5px; line-height: 1.5; transition: opacity .25s; }
-.step .card b { font-family: var(--f-ui); font-size: 13px; font-weight: 700; display: block; margin-bottom: 4px; color: var(--accent); }
-.step:not(.active) .card { opacity: .45; }
-@media (max-width: 820px) {
-  .scrolly { display: block; margin-top: 8px; }
-  .sgraphic { top: 0; height: auto; align-items: flex-start; padding-block: 8px; z-index: 1; }
-  .sbox { padding: 12px 14px 14px; gap: 8px; }
-  .shead .p { font-size: 24px; }
-  .mini { height: 28px; }
-  .stext { font-size: 14.5px; line-height: 1.5; min-height: 4.5em; }
-  .steps { position: relative; z-index: 2; padding-block: 0 20vh; margin-top: 0; }
-  .step { min-height: 100vh; align-items: flex-end; padding-bottom: 4vh; }
-  .step .card { font-size: 17px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+/* Scrollytelling */
+.band { background: var(--band); padding-block: 40px; margin-block: 36px; }
+.scrolly { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; }
+.sticky { position: sticky; top: 8vh; height: 84vh; display: flex; align-items: center; order: 2; min-width: 0; }
+.panel { width: 100%; background: var(--panel); border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px; display: grid; gap: 14px; min-width: 0; }
+.steps { order: 1; padding-block: 18vh 34vh; min-width: 0; }
+.step { min-height: 72vh; display: flex; align-items: center; }
+.step:first-child { min-height: 50vh; }
+.card { background: var(--panel); border-radius: 18px; box-shadow: var(--shadow); padding: 18px 20px; font-family: var(--f-serif); font-size: 19px; line-height: 1.5; transition: opacity .3s; max-width: 380px; }
+.card b.k { display: block; font-family: var(--f-sans); font-size: 14px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+.card .btn { margin-top: 12px; font-family: var(--f-sans); }
+.step:not(.active) .card { opacity: .38; }
+.band-foot { margin-top: 8px; }
+@media (max-width: 860px) {
+  .band { padding-block: 0 24px; }
+  .scrolly { display: block; }
+  .sticky { top: 0; height: auto; align-items: flex-start; padding-block: 10px; z-index: 1; }
+  .panel { padding: 14px 16px; gap: 10px; border-radius: 18px; }
+  .steps { position: relative; z-index: 2; padding-block: 0 24vh; }
+  .step { min-height: 100vh; align-items: flex-end; padding-bottom: 5vh; }
+  .step:first-child { min-height: 100vh; }
+  .card { font-size: 17.5px; max-width: none; }
   .step:not(.active) .card { opacity: 1; }
+  .band-foot { padding-top: 4px; }
 }
+
+/* Panel header */
+.phead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.phead .t { font-size: 15px; font-weight: 700; color: var(--sub); }
+.phead .n { font-size: 34px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.phead .n small { font-size: 16px; color: var(--sub); font-weight: 700; }
+@media (max-width: 860px) { .phead .n { font-size: 26px; } }
+
+/* Opener */
+.mini { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; align-items: end; height: 42px; }
+.mini i { display: block; background: var(--line); border-radius: 4px 4px 2px 2px; min-height: 4px; transition: background .25s; }
+.mini i.done { background: #AEB8D6; }
+.mini i.cur { background: var(--accent); }
+.stext { font-family: var(--f-serif); font-size: 19px; line-height: 1.55; min-height: 9em; overflow-wrap: anywhere; }
+@media (max-width: 860px) { .mini { height: 28px; } .stext { font-size: 15.5px; line-height: 1.5; min-height: 4.5em; } }
 
 /* Race */
-.input-card { background: var(--bg); padding: 12px 14px; display: grid; gap: 4px; border-left: 3px solid var(--ink); }
-.input-card .l { font-size: 12.5px; font-weight: 700; }
-.input-card .l span { font-weight: 500; color: var(--sub); }
-.input-card .s { font-family: var(--f-text); font-size: 16px; line-height: 1.5; }
-.input-card .s[lang="de"] { font-style: italic; }
-.input-card .n { font-size: 13px; color: var(--sub); }
-.race { display: grid; margin-top: 16px; border-top: 1px solid var(--hair); }
-.lane { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
-.lane-head { display: grid; gap: 2px; align-content: start; }
-.lane-head h3 { margin: 0; font-size: 16px; font-weight: 750; }
-.lane-head small { font-size: 13px; color: var(--sub); line-height: 1.35; }
-.count { font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; margin-top: 6px; }
-.count em { font-style: normal; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--sub); font-family: var(--f-ui); margin-left: 6px; }
-.lane.ncm .count { color: var(--accent); }
-.lane-text { font-family: var(--f-text); font-size: 17.5px; line-height: 1.55; min-width: 0; overflow-wrap: anywhere; min-height: 3.1em; }
-.slot { display: inline-block; width: 2.2em; height: .62em; background: var(--hair); }
-.lane-track { grid-column: 2; height: 4px; background: var(--hair); position: relative; }
-.lane-track span { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
-.lane.ncm .lane-track span { background: var(--accent); }
-@media (max-width: 640px) {
-  .lane { grid-template-columns: minmax(0, 1fr); }
-  .lane-head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
-  .count { margin: 0; grid-row: 1 / span 2; grid-column: 2; }
-  .lane-track { grid-column: 1; }
-}
+.lane { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; padding: 12px 0; transition: opacity .3s; }
+.lane + .lane { border-top: 1px solid var(--line); }
+.lane.dim { opacity: .32; }
+.lane .ic { width: 44px; height: 44px; grid-row: span 3; }
+.lane h3 { margin: 0; font-size: 17px; font-weight: 800; line-height: 1.2; }
+.lane h3 small { display: block; font-size: 13.5px; font-weight: 500; color: var(--sub); }
+.lane .count { font-size: 30px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; }
+.lane .count em { display: block; font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--mint); text-align: right; }
+.lane .txt { grid-column: 2 / -1; font-family: var(--f-serif); font-size: 17px; line-height: 1.5; min-height: 3em; overflow-wrap: anywhere; }
+.lane .bar { grid-column: 2 / -1; height: 6px; background: var(--band); border-radius: 99px; overflow: hidden; }
+.lane .bar span { display: block; height: 100%; width: 0; background: var(--sub); border-radius: 99px; }
+.lane.ar .bar span { background: #7C869B; }
+.lane.df .bar span { background: var(--coral); }
+.lane.nc .bar span { background: var(--accent); }
+.lane.nc .count { color: var(--accent); }
+.slot { display: inline-block; width: 2em; height: .6em; background: var(--line); border-radius: 99px; }
+.de { font-family: var(--f-serif); font-style: italic; font-size: 16px; line-height: 1.45; color: var(--sub); background: var(--band); border-radius: 12px; padding: 10px 12px; }
+.de b { font-family: var(--f-sans); font-style: normal; font-size: 13.5px; color: var(--ink); display: block; }
+@media (max-width: 860px) { .lane { padding: 8px 0; } .lane .txt { font-size: 15px; min-height: 2.6em; } .lane .count { font-size: 24px; } .lane .ic { width: 36px; height: 36px; } .lane { grid-template-columns: 36px minmax(0, 1fr) auto; } .de { font-size: 14.5px; } }
 
-/* Zoom levels */
-.zfacts { display: flex; flex-wrap: wrap; gap: 6px 26px; margin: 16px 0 12px; font-size: 14px; color: var(--sub); }
-.zfacts b { font-family: var(--f-display); font-size: 26px; font-weight: 800; color: var(--ink); margin-right: 6px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+/* Zoom */
+.zoomart { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.zoomart figure { margin: 0; display: grid; gap: 4px; justify-items: center; padding: 8px 6px 6px; border-radius: 14px; transition: background .3s, opacity .3s; opacity: .45; }
+.zoomart figure.on { background: var(--accent-soft); opacity: 1; }
+.zoomart svg { width: 100%; max-width: 120px; height: auto; }
+.zoomart figcaption { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; }
 .sched { display: grid; gap: 3px; }
-.srow { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) 3.6em; gap: 10px; align-items: center; font-variant-numeric: tabular-nums; }
-.srow .l { font-size: 12px; color: var(--sub); text-align: right; }
-.srow .track { height: 12px; position: relative; }
-.srow .w { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
-.srow .add { position: absolute; top: 0; bottom: 0; background: var(--accent); }
-.srow .v { font-size: 12.5px; font-weight: 600; text-align: right; }
+.srow { display: grid; grid-template-columns: 2em minmax(0, 1fr) 3.4em; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; transition: opacity .3s; }
+.srow.off { opacity: .14; }
+.srow .l { font-size: 12.5px; color: var(--sub); text-align: right; }
+.srow .track { height: 11px; position: relative; }
+.srow .w { position: absolute; inset: 0 auto 0 0; background: #AEB8D6; border-radius: 3px 0 0 3px; }
+.srow .add { position: absolute; top: 0; bottom: 0; background: var(--accent); border-radius: 0 3px 3px 0; }
+.srow .v { font-size: 13px; font-weight: 700; text-align: right; }
 .sched.dense { gap: 2px; }
-.sched.dense .srow .track { height: 7px; }
+.sched.dense .srow .track { height: 6px; }
 .sched.dense .srow .l, .sched.dense .srow .v { font-size: 10.5px; line-height: 1; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--sub); margin-top: 10px; }
-.legend i { display: inline-block; width: 14px; height: 10px; margin-right: 7px; vertical-align: -1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13.5px; color: var(--sub); }
+.legend i { display: inline-block; width: 14px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+@media (max-width: 860px) { .zoomart svg { max-width: 76px; } .zoomart figcaption { font-size: 12px; } }
 
 /* Viewer */
-.viewer { display: grid; gap: 16px; }
-.vcontrols { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.vcontrols input[type="range"] { flex: 1 1 200px; accent-color: var(--accent); min-width: 0; height: 28px; }
-.vread { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--sub); white-space: nowrap; }
-.vread b { font-family: var(--f-display); font-weight: 800; font-size: 24px; color: var(--ink); }
-.vlabel { font-size: 12.5px; font-weight: 700; }
-.vlabel span { font-weight: 500; color: var(--sub); }
-.vout { margin: 6px 0 0; font-family: var(--f-text); font-size: clamp(19px, 3vw, 23px); line-height: 1.55; overflow-wrap: anywhere; min-height: 3.2em; background: var(--bg); padding: 14px 16px; }
+.vin { background: var(--band); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; }
+.vin .l { font-size: 14px; font-weight: 800; }
+.vin .s { font-family: var(--f-serif); font-size: 16px; line-height: 1.45; }
+.vin .s[lang="de"] { font-style: italic; }
+.vin .nt { font-size: 14px; color: var(--sub); line-height: 1.4; }
+.vctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.vctrl input[type="range"] { flex: 1 1 160px; min-width: 0; accent-color: var(--accent); height: 28px; }
+.vread { font-size: 15px; color: var(--sub); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vread b { font-size: 24px; font-weight: 800; color: var(--ink); }
+.vlab { font-size: 14px; font-weight: 800; }
+.vlab span { font-weight: 500; color: var(--sub); }
+.vout { margin: 4px 0 0; font-family: var(--f-serif); font-size: 21px; line-height: 1.5; overflow-wrap: anywhere; min-height: 3em; }
 .vout .empty { color: var(--sub); font-style: italic; font-size: .8em; }
-.vnote { font-size: 14.5px; line-height: 1.5; padding: 10px 14px; background: var(--bg); border-left: 3px solid var(--accent); max-width: 64ch; }
-.arrow { font-size: 13px; color: var(--sub); font-weight: 600; }
+.vnote { font-size: 15px; line-height: 1.45; background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; }
+@media (max-width: 860px) { .vin .s { font-size: 14.5px; } .vout { font-size: 17.5px; } .vnote { font-size: 14px; } }
 
-/* Bloopers */
-.bloopers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px auto; }
-.blooper { background: var(--wash); padding: 16px 16px 14px; display: grid; gap: 6px; align-content: start; }
-.blooper .w { font-family: var(--f-display); font-weight: 800; font-size: 26px; letter-spacing: -.02em; line-height: 1.05; }
-.blooper .w mark { padding: 0 .1em; }
-.blooper .m { font-size: 12.5px; color: var(--sub); font-weight: 600; }
-.blooper p { margin: 0; font-family: var(--f-text); font-size: 16px; line-height: 1.5; }
-.blooper button { justify-self: start; appearance: none; background: none; border: 0; padding: 4px 0; cursor: pointer; font-size: 13.5px; font-weight: 650; color: var(--accent); }
-.blooper button:hover { text-decoration: underline; }
-@media (max-width: 560px) { .bloopers { grid-template-columns: minmax(0, 1fr); } }
+/* Units */
+.ugroup { display: grid; gap: 6px; }
+.ugroup .h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.ugroup .h b { font-size: 16px; font-weight: 800; }
+.ugroup .h span { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ugroup.df .h span { color: var(--coral); }
+.ugroup.nc .h span { color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(32, minmax(0, 1fr)); gap: 2px; }
+.grid i { display: block; aspect-ratio: 1; background: var(--band); border-radius: 2px; }
+.ugroup.df .grid i.on { background: var(--coral); }
+.ugroup.nc .grid i.on { background: var(--accent); }
+@media (max-width: 860px) { .ugroup .h span { font-size: 22px; } .grid { gap: 1.5px; } }
 
-/* Unit chart */
-.units { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 18px; }
-.ugroup { display: grid; gap: 8px; }
-.ugroup .h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.ugroup .h b { font-size: 15px; font-weight: 750; }
-.ugroup .h span { font-family: var(--f-display); font-weight: 800; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.ugroup.ncm .h span { color: var(--accent); }
-.grid { display: grid; grid-template-columns: repeat(32, minmax(0, 1fr)); gap: 2px; max-width: 560px; }
-.grid i { display: block; aspect-ratio: 1; background: var(--hair); }
-.grid i.on { background: var(--ink); }
-.ugroup.ncm .grid i.on { background: var(--accent); }
-.bignums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 26px auto 8px; }
-.bignum { padding: 4px 16px 4px 0; display: grid; gap: 4px; }
-.bignum + .bignum { padding-left: 16px; border-left: 1px solid var(--hair); }
-.bignum b { font-family: var(--f-display); font-weight: 850; font-size: clamp(40px, 9vw, 72px); line-height: .95; letter-spacing: -.04em; color: var(--accent); }
-.bignum span { font-size: 14px; color: var(--sub); line-height: 1.35; }
-
-/* Pull stat */
-.pull { margin: 30px auto; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: center; }
-.pull b { font-family: var(--f-display); font-weight: 850; font-size: clamp(56px, 13vw, 104px); line-height: .9; letter-spacing: -.05em; }
-.pull span { font-family: var(--f-text); font-size: 18px; line-height: 1.45; color: var(--sub); }
+/* Static illustrations */
+.art { margin: 28px auto; display: grid; gap: 10px; }
+.art svg { width: 100%; height: auto; display: block; }
+.art .btn svg { width: 13px; height: 13px; display: inline; }
+.bignums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 28px auto; }
+.bignum { background: var(--accent-soft); border-radius: 18px; padding: 16px 16px 14px; display: grid; gap: 4px; }
+.bignum b { font-size: clamp(40px, 8.5vw, 66px); font-weight: 800; line-height: .95; letter-spacing: -.02em; color: var(--accent); }
+.bignum span { font-size: 15.5px; color: var(--ink); line-height: 1.3; font-weight: 500; }
+@media (max-width: 520px) { .bignums { grid-template-columns: minmax(0, 1fr); } .bignum { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 14px; } }
+.drafts { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 3fr); gap: 20px; align-items: center; background: var(--band); border-radius: 20px; padding: 18px 20px; }
+.drafts .one, .drafts .many { display: grid; gap: 8px; justify-items: center; text-align: center; font-size: 14.5px; font-weight: 700; }
+.drafts .vs { font-weight: 800; color: var(--sub); }
+.drafts .docs { display: grid; grid-template-columns: repeat(8, 26px); gap: 6px; }
+.art .drafts svg { width: 26px; height: 32px; }
+.art .drafts .one svg { width: 46px; height: 57px; }
+@media (max-width: 560px) { .drafts { grid-template-columns: minmax(0, 1fr); } .drafts .vs { text-align: center; } }
+.sudoku { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; background: var(--band); border-radius: 20px; padding: 18px 20px; }
+.sudoku .s { display: grid; gap: 8px; justify-items: center; text-align: center; }
+.sudoku .s b { font-size: 16px; font-weight: 800; }
+.sudoku .s span { font-size: 13.5px; color: var(--sub); }
+.sudoku svg { max-width: 220px; }
+.pull { margin: 28px auto; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: center; }
+.pull b { font-size: clamp(60px, 13vw, 104px); font-weight: 800; line-height: .9; letter-spacing: -.03em; color: var(--mint); }
+.pull span { font-family: var(--f-serif); font-size: 19px; line-height: 1.45; }
 @media (max-width: 520px) { .pull { grid-template-columns: minmax(0, 1fr); } }
+.road { background: var(--band); border-radius: 20px; padding: 18px 20px; display: grid; gap: 14px; }
+.road .r { display: grid; gap: 6px; }
+.road .r b { font-size: 15px; font-weight: 800; }
+.road .r span { font-weight: 500; color: var(--sub); }
+.car { animation: drive 3.2s linear infinite; }
+@keyframes drive { from { transform: translateX(-60px); } to { transform: translateX(660px); } }
 
 /* Notes */
-.notes { border-top: 3px solid var(--ink); margin-top: 64px; padding-block: 18px 72px; }
-.notes h2 { font-family: var(--f-display); font-weight: 800; font-size: 20px; margin: 0 0 14px; }
-.notes h3 { font-size: 14.5px; font-weight: 700; margin: 20px 0 6px; }
-.notes p, .notes li { font-size: 14.5px; line-height: 1.55; color: var(--ink); margin: 0 0 8px; max-width: 70ch; }
+.notes { margin-top: 72px; padding-block: 24px 80px; border-top: 1px solid var(--line); }
+.notes h2 { font-size: 24px; font-weight: 800; margin: 0 0 12px; }
+.notes h3 { font-size: 16.5px; font-weight: 800; margin: 22px 0 6px; }
+.notes p, .notes li { font-size: 16px; line-height: 1.55; margin: 0 0 8px; max-width: 70ch; }
 .notes ul { margin: 0; padding-left: 1.1em; }
 .notes .muted { color: var(--sub); }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate mark { animation: none; }
-  .mini i, .step .card { transition: none; }
+  .animate mark, .car { animation: none; }
+  .mini i, .card, .lane, .srow, .zoomart figure { transition: none; }
 }
 </style>
 </head>
 <body>
-<header class="gutter">
-  <div class="wide masthead"><b>NCM Refinement Viewer</b><span>November 2026</span></div>
-</header>
+<header class="gutter"><div class="wide masthead"><b>NCM Refinement Viewer</b><span>November 2026</span></div></header>
 
-<main class="story">
+<main>
   <section class="gutter">
     <div class="col hed">
       <h1>An AI that writes the whole thing at once, then <mark>fixes it</mark></h1>
       <p class="dek">Most AI writes one word at a time. Researchers at Stanford built one that sketches an entire passage first and sharpens it in about a dozen passes. Here’s how it works, and why that matters.</p>
-      <div class="byline">
-        <div>Story and interactive graphics by <b>Kevin Broadie</b></div>
-        <div><span>Based on research by Hermann Kumbong and colleagues at Stanford. <a href="#notes">Full credits and notes</a></span></div>
-      </div>
+      <div class="byline">Story and illustrations by <b>Kevin Broadie</b>. Based on research by Hermann Kumbong and colleagues at Stanford. <a href="#notes">Credits and notes</a></div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 820 210">
+        <defs><filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1F2430" flood-opacity=".10"/></filter></defs>
+        <g filter="url(#sh)">
+          <rect x="20" y="20" width="220" height="180" rx="18" fill="#fff"/>
+          <rect x="300" y="20" width="220" height="180" rx="18" fill="#fff"/>
+          <rect x="580" y="20" width="220" height="180" rx="18" fill="#fff"/>
+        </g>
+        <g fill="#E3E8F1">
+          <rect x="44" y="52" width="26" height="12" rx="6"/><rect x="138" y="52" width="18" height="12" rx="6"/>
+          <rect x="80" y="82" width="34" height="12" rx="6"/><rect x="170" y="82" width="22" height="12" rx="6"/>
+          <rect x="44" y="112" width="14" height="12" rx="6"/><rect x="110" y="142" width="40" height="12" rx="6"/>
+        </g>
+        <g>
+          <rect x="324" y="52" width="40" height="12" rx="6" fill="#B9C3DC"/><rect x="372" y="52" width="30" height="12" rx="6" fill="#FFE27A"/><rect x="410" y="52" width="58" height="12" rx="6" fill="#B9C3DC"/>
+          <rect x="324" y="82" width="70" height="12" rx="6" fill="#E3E8F1"/><rect x="402" y="82" width="36" height="12" rx="6" fill="#FFE27A"/><rect x="446" y="82" width="44" height="12" rx="6" fill="#B9C3DC"/>
+          <rect x="324" y="112" width="30" height="12" rx="6" fill="#FFE27A"/><rect x="362" y="112" width="80" height="12" rx="6" fill="#B9C3DC"/>
+          <rect x="324" y="142" width="54" height="12" rx="6" fill="#E3E8F1"/><rect x="386" y="142" width="40" height="12" rx="6" fill="#FFE27A"/>
+        </g>
+        <g fill="#5F6675">
+          <rect x="604" y="52" width="172" height="12" rx="6"/><rect x="604" y="82" width="150" height="12" rx="6"/>
+          <rect x="604" y="112" width="166" height="12" rx="6"/><rect x="604" y="142" width="96" height="12" rx="6"/>
+        </g>
+        <g fill="none" stroke="#3557E0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M252 110h34m-10-10 10 10-10 10"/><path d="M532 110h34m-10-10 10 10-10 10"/>
+        </g>
+      </svg>
+      <div class="hero-cap"><span>First pass: a rough sketch</span><span>Middle passes: taking shape</span><span>Last pass: finished</span></div>
     </div>
   </section>
 
@@ -263,28 +292,28 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
     <div class="col prose">
       <p>Ask a chatbot a question and watch the answer appear. It arrives one word at a time, left to right, like someone typing. That isn’t a stylistic choice. Under the hood, the AI really does write one word, reread everything so far, and then write the next one.</p>
       <p>A team of researchers at Stanford tried something different. Their method, called Next-Concept Modeling, or NCM for short, doesn’t start at the beginning of the sentence. It starts everywhere at once.</p>
-      <p>Here’s what that looks like. Below, one of their models is writing a short children’s story from scratch. Scroll slowly.</p>
+      <p>Here’s what that looks like. One of their models is about to write a short children’s story from scratch. Scroll slowly.</p>
     </div>
   </section>
 
-  <!-- Scrollytelling opener -->
-  <section class="gutter" aria-label="A story being written, pass by pass">
-    <div class="scrolly" id="scrolly">
-      <div class="sgraphic">
-        <div class="sbox">
-          <div class="shead"><span class="k">NCM writing a story</span><span class="p">pass <span id="sPass">1</span><small> of 12</small></span></div>
+  <!-- Scrolly 1: story opener -->
+  <section class="band gutter" aria-label="A story being written, pass by pass">
+    <div class="wide scrolly" id="s-story">
+      <div class="sticky">
+        <div class="panel">
+          <div class="phead"><span class="t">NCM writing a story</span><span class="n">pass <span id="sPass">1</span><small> of 12</small></span></div>
           <div class="mini" id="sMini" aria-hidden="true"></div>
           <div class="stext" id="sText">.</div>
         </div>
       </div>
-      <div class="steps" id="steps">
-        <div class="step" data-pass="1"><div class="card"><b>Pass 1</b>This is the model’s first draft of the entire story. Yes, all of it. It’s a period.</div></div>
-        <div class="step" data-pass="2"><div class="card"><b>Pass 2</b>“was” and “the.” Not much of a story yet. But notice that the model isn’t working on the first line. It’s working on the whole page.</div></div>
-        <div class="step" data-pass="4"><div class="card"><b>Pass 4</b>Sixteen words, scattered. Look closely and you’ll spot “day” and “something.” The model is blocking in the shape of the story, the way an artist roughs in a sketch.</div></div>
-        <div class="step" data-pass="5"><div class="card"><b>Pass 5</b>A name appears: Tim. So do “wind” and “unexpected.” The story has a main character and a plot twist before it has a single complete sentence.</div></div>
-        <div class="step" data-pass="7"><div class="card"><b>Pass 7</b>Now there’s a kite, something blowing away, and “something unexpected.” The plot is all there. The grammar isn’t.</div></div>
-        <div class="step" data-pass="9"><div class="card"><b>Pass 9</b>“upon time there was little named Tim.” It reads like someone talking in their sleep. Close, though.</div></div>
-        <div class="step" data-pass="12"><div class="card"><b>Pass 12</b>Done: a complete story about Tim, his kite and a helpful bird, in 12 passes. A typical chatbot would have needed more than a hundred, one for every word or piece of a word.</div></div>
+      <div class="steps">
+        <div class="step" data-pass="1"><div class="card"><b class="k">Pass 1</b>This is the model’s first draft of the entire story. Yes, all of it. It’s a period.</div></div>
+        <div class="step" data-pass="2"><div class="card"><b class="k">Pass 2</b>“was” and “the.” Not much of a story yet. But notice that the model isn’t working on the first line. It’s working on the whole page.</div></div>
+        <div class="step" data-pass="4"><div class="card"><b class="k">Pass 4</b>Sixteen words, scattered. Look closely and you’ll spot “day” and “something.” The model is blocking in the shape of the story, the way an artist roughs in a sketch.</div></div>
+        <div class="step" data-pass="5"><div class="card"><b class="k">Pass 5</b>A name appears: Tim. So do “wind” and “unexpected.” The story has a hero and a plot twist before it has a single complete sentence.</div></div>
+        <div class="step" data-pass="7"><div class="card"><b class="k">Pass 7</b>Now there’s a kite, something blowing away, and “something unexpected.” The plot is all there. The grammar isn’t.</div></div>
+        <div class="step" data-pass="9"><div class="card"><b class="k">Pass 9</b>“upon time there was little named Tim.” It reads like someone talking in their sleep. Close, though.</div></div>
+        <div class="step" data-pass="12"><div class="card"><b class="k">Pass 12</b>Done: a complete story about Tim, his kite and a helpful bird, in 12 passes. A typical chatbot would have needed more than a hundred, one for every word or piece of a word.</div></div>
       </div>
     </div>
   </section>
@@ -293,141 +322,163 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
     <div class="col prose">
       <p>That’s the whole trick. Instead of writing a sentence the way a typewriter does, NCM writes it the way a painter paints: rough first, then a little sharper, then sharper still, with every part of the canvas getting attention on every pass.</p>
       <p>It sounds like a small change. It turns out to make a big difference in speed.</p>
-
       <h2><span>A typewriter, a scratch-off card and a sketch artist</span></h2>
-      <p>There are roughly three ways an AI can produce text, and they map neatly onto three familiar things.</p>
-      <p><strong>The typewriter</strong> is how most chatbots work. One word per step, in order, and the steps can’t overlap, because each word depends on the ones before it. A long answer means a long wait.</p>
-      <p><strong>The scratch-off card</strong> is a newer approach called diffusion. It starts with every word hidden and reveals a few at a time, in any order. It works on the whole page at once, which is good, but it usually needs a lot of scratching, often more than a hundred steps.</p>
-      <p><strong>The sketch artist</strong> is NCM. It roughs in the whole passage, then refines all of it in a handful of passes.</p>
-      <p>Press play to watch all three translate the same German sentence into English. Each tick is one step.</p>
+      <p>There are roughly three ways an AI can produce text, and they map neatly onto three familiar things. Let’s watch each one translate the same German sentence into English.</p>
     </div>
   </section>
 
+  <!-- Scrolly 2: three ways -->
   <section class="band gutter" aria-label="Three ways to write the same sentence">
-    <div class="wide">
-      <p class="gtitle">Same sentence, three ways</p>
-      <p class="gsub">One step every 80 milliseconds. The bar under each lane shows progress toward 128 steps.</p>
-      <div class="input-card">
-        <div class="l">Input: a German sentence</div>
-        <div class="s" lang="de" id="raceSrc"></div>
-        <div class="n">In English: “Both the US authorities and the Mexican security forces are engaged in a continuous battle against drug cartels.”</div>
+    <div class="wide scrolly" id="s-race">
+      <div class="sticky">
+        <div class="panel">
+          <div class="de"><b>The German sentence</b><span id="raceSrc"></span></div>
+          <div class="lane ar" id="lAR">
+            <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="16" rx="3" fill="#fff" stroke="#1F2430" stroke-width="2.5"/><path d="M15 12h18M15 17h12" stroke="#B9C3DC" stroke-width="2.5" stroke-linecap="round"/><rect x="4" y="20" width="40" height="22" rx="7" fill="#7C869B"/><g fill="#fff"><circle cx="13" cy="28" r="2.4"/><circle cx="20" cy="28" r="2.4"/><circle cx="27" cy="28" r="2.4"/><circle cx="34" cy="28" r="2.4"/><rect x="14" y="34" width="20" height="4" rx="2"/></g></svg>
+            <h3>Typewriter<small>one word per step, in order</small></h3>
+            <div class="count" id="cAR">0</div>
+            <div class="txt" id="tAR"></div>
+            <div class="bar"><span id="bAR"></span></div>
+          </div>
+          <div class="lane df" id="lDF">
+            <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="9" width="38" height="30" rx="6" fill="#FDE7E1"/><rect x="11" y="15" width="26" height="18" rx="3" fill="#EE6B4D"/><path d="M12 30c3-3 5 1 8-2s5 1 8-2 5 1 8-2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="38" cy="37" r="7" fill="#F2C94C" stroke="#1F2430" stroke-width="2"/></svg>
+            <h3>Scratch-off card<small>diffusion: reveal a little at a time</small></h3>
+            <div class="count" id="cDF">0</div>
+            <div class="txt" id="tDF"></div>
+            <div class="bar"><span id="bDF"></span></div>
+          </div>
+          <div class="lane nc" id="lNC">
+            <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="8" width="30" height="34" rx="5" fill="#E3E9FF"/><path d="M9 18c4-3 8 2 12-1M9 26c5-2 9 2 14 0M9 34c3-2 6 1 9 0" stroke="#3557E0" stroke-width="2.5" fill="none" stroke-linecap="round"/><g transform="rotate(40 34 22)"><rect x="30" y="4" width="8" height="30" rx="2" fill="#F2C94C" stroke="#1F2430" stroke-width="2"/><path d="M30 34l4 8 4-8z" fill="#fff" stroke="#1F2430" stroke-width="2" stroke-linejoin="round"/></g></svg>
+            <h3>Sketch artist<small>NCM: rough in everything, then refine</small></h3>
+            <div class="count" id="cNC">0</div>
+            <div class="txt" id="tNC"></div>
+            <div class="bar"><span id="bNC"></span></div>
+          </div>
+        </div>
       </div>
-      <div style="margin-top:16px"><button class="btn solid" id="raceRun" type="button"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg><span id="raceText">Play</span></button></div>
-      <div class="race">
-        <div class="lane">
-          <div class="lane-head"><h3>Typewriter</h3><small>one word per step, in order</small><div class="count" id="cAR">0</div></div>
-          <div class="lane-text" id="tAR"></div>
-          <div class="lane-track"><span id="bAR"></span></div>
-        </div>
-        <div class="lane">
-          <div class="lane-head"><h3>Scratch-off card</h3><small>diffusion, 128 steps</small><div class="count" id="cDF">0</div></div>
-          <div class="lane-text" id="tDF"></div>
-          <div class="lane-track"><span id="bDF"></span></div>
-        </div>
-        <div class="lane ncm">
-          <div class="lane-head"><h3>Sketch artist</h3><small>NCM, one pass per layer</small><div class="count" id="cNC">0</div></div>
-          <div class="lane-text" id="tNC"></div>
-          <div class="lane-track"><span id="bNC"></span></div>
-        </div>
+      <div class="steps">
+        <div class="step" data-lanes="ar"><div class="card"><b class="k">The typewriter</b>This is how most chatbots work. One word per step, in order. The steps can’t overlap, because each word depends on the ones before it. A long answer means a long wait.</div></div>
+        <div class="step" data-lanes="df"><div class="card"><b class="k">The scratch-off card</b>A newer approach called diffusion starts with every word hidden and reveals a few at a time, in any order. It works on the whole page at once, which is nice, but it needs a lot of scratching: 128 steps here.</div></div>
+        <div class="step" data-lanes="nc"><div class="card"><b class="k">The sketch artist</b>This is NCM. It roughs in the whole sentence, then refines all of it at once. These are the real drafts from the researchers’ translation model.</div></div>
+        <div class="step" data-lanes="ar,df,nc"><div class="card"><b class="k">All three at once</b>Now the race. The sketch artist finishes in 11 steps and the typewriter in 18, which flatters it. The scratch-off card is still scratching long after both are done.<br><button class="btn solid" type="button" id="raceAgain"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>Race again</button></div></div>
       </div>
-      <p class="caption">The sketch artist lane shows the real drafts from the researchers’ translation model. The typewriter and scratch-off lanes are simulations of the same sentence. Real chatbots type in word fragments, so a real typewriter lane would take more steps than shown. The 128-step scratch-off matches the diffusion models the researchers compared against.</p>
     </div>
+    <div class="wide band-foot"><p class="caption">The sketch artist shows the real drafts from the researchers’ model. The typewriter and scratch-off card are simulations of the same sentence. Real chatbots type in word fragments, so a real typewriter would take more steps. The 128-step scratch-off matches the diffusion models the researchers compared against.</p></div>
   </section>
 
   <section class="gutter">
     <div class="col prose">
-      <p>The sketch artist finishes in 11 steps. The typewriter needs 18, and that’s flattering it. The scratch-off card is still scratching long after both are done.</p>
-
       <h2><span>How do you sketch with words?</span></h2>
       <p>Sketching a picture is easy to imagine. Sketching a sentence is stranger. What is a “rough” sentence, exactly?</p>
-      <p>NCM’s answer is a clever kind of compression. Before it writes anything, the system learns to squeeze text into a stack of layers, a bit like the zoom levels on a map. The top layer is the view from space: a tiny code that sums up the whole passage. Each layer below zooms in, adding detail and correcting whatever the layer above got wrong. Think of tuning a guitar: get it roughly in tune first, then make smaller and smaller adjustments.</p>
-      <p>The squeezing is remarkably faithful. When the researchers unpacked the layers for their web-text model, they got back 99.99% of the original words exactly.</p>
-      <p>To write something new, NCM generates those layers from the top down. Each layer takes one pass, and every spot in a layer gets filled in at the same moment. That’s why the story above appeared everywhere at once.</p>
-      <p>Each model has its own set of zoom levels. Pick one to see how its layers grow.</p>
+      <p>NCM’s answer is a clever kind of compression. Before it writes anything, the system learns to squeeze text into a stack of layers, a lot like the zoom levels on a map.</p>
     </div>
   </section>
 
-  <section class="band gutter" aria-label="Zoom levels for each model">
-    <div class="wide">
-      <p class="gtitle">The zoom levels</p>
-      <p class="gsub">Each bar is one layer, and so one pass. Blue is the detail that layer adds.</p>
-      <div class="tabs" role="tablist" aria-label="Model" id="stabs"></div>
-      <div class="zfacts">
-        <span><b id="zLevels">0</b>layers, so this many passes</span>
-        <span><b id="zLen">0</b>slots of detail at the bottom layer</span>
+  <!-- Scrolly 3: zoom levels -->
+  <section class="band gutter" aria-label="Zoom levels">
+    <div class="wide scrolly" id="s-zoom">
+      <div class="sticky">
+        <div class="panel">
+          <div class="zoomart" aria-hidden="true">
+            <figure data-z="0">
+              <svg viewBox="0 0 120 90"><circle cx="60" cy="44" r="34" fill="#BFD7F5"/><path d="M38 30c8-6 16 2 22-3s14 4 10 11-12 2-16 8-14 4-16-4 0-12 0-12zM62 58c6-3 14 0 16 5s-8 8-13 5-5-8-3-10z" fill="#7BC59F"/><circle cx="60" cy="44" r="34" fill="none" stroke="#1F2430" stroke-width="2.5"/></svg>
+              <figcaption>First layer:<br>the view from space</figcaption>
+            </figure>
+            <figure data-z="1">
+              <svg viewBox="0 0 120 90"><rect x="14" y="10" width="92" height="70" rx="10" fill="#EEF1F6"/><g fill="#B9C3DC"><rect x="22" y="18" width="20" height="16" rx="3"/><rect x="48" y="18" width="24" height="16" rx="3"/><rect x="78" y="18" width="20" height="16" rx="3"/><rect x="22" y="40" width="34" height="16" rx="3"/><rect x="62" y="40" width="36" height="16" rx="3"/><rect x="22" y="62" width="20" height="10" rx="3"/><rect x="48" y="62" width="50" height="10" rx="3"/></g><path d="M14 37h92M14 59h92M45 10v70M75 10v28" stroke="#fff" stroke-width="3"/><rect x="14" y="10" width="92" height="70" rx="10" fill="none" stroke="#1F2430" stroke-width="2.5"/></svg>
+              <figcaption>Middle layers:<br>the city</figcaption>
+            </figure>
+            <figure data-z="2">
+              <svg viewBox="0 0 120 90"><rect x="8" y="66" width="104" height="14" rx="4" fill="#C8CFDC"/><path d="M14 73h12M36 73h12M58 73h12M80 73h12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><g stroke="#1F2430" stroke-width="2.5" stroke-linejoin="round"><path d="M14 66V40l14-12 14 12v26z" fill="#FFE27A"/><path d="M48 66V34l16-12 16 12v32z" fill="#FDE7E1"/><path d="M86 66V44l12-10 12 10v22z" fill="#E3E9FF"/></g><g fill="#1F2430"><rect x="23" y="46" width="10" height="8" rx="1.5"/><rect x="58" y="40" width="12" height="9" rx="1.5"/><rect x="60" y="54" width="8" height="12" rx="1.5"/><rect x="94" y="48" width="8" height="7" rx="1.5"/></g></svg>
+              <figcaption>Last layers:<br>the street</figcaption>
+            </figure>
+          </div>
+          <div class="chips" role="tablist" aria-label="Model" id="stabs"></div>
+          <div class="phead"><span class="t" id="zTitle">Web pages</span><span class="n"><span id="zLevels">32</span><small> layers</small></span></div>
+          <div class="sched" id="sched" role="img"></div>
+          <div class="legend"><span><i style="background:#AEB8D6"></i>detail from the layers above</span><span><i style="background:var(--accent)"></i>detail this layer adds</span></div>
+        </div>
       </div>
-      <div class="sched" id="sched" role="img"></div>
-      <div class="legend"><span><i style="background:var(--ink)"></i>detail from the layers above</span><span><i style="background:var(--accent)"></i>new detail added at this layer</span></div>
-      <p class="caption">Layer sizes come from the configuration files the researchers published with their models.</p>
+      <div class="steps">
+        <div class="step" data-show="1" data-z="0"><div class="card"><b class="k">The view from space</b>The top layer is a single code that sums up the whole passage. Think of it as the planet seen from orbit: you can tell land from sea, and not much else.</div></div>
+        <div class="step" data-show="8" data-z="1"><div class="card"><b class="k">Zooming in</b>Each layer below adds detail and corrects whatever the layer above got wrong. It’s like tuning a guitar: get it roughly in tune, then make smaller and smaller adjustments.</div></div>
+        <div class="step" data-show="32" data-z="2"><div class="card"><b class="k">Street level</b>The model trained on web pages uses 32 layers to reach 1,024 slots of detail. A typewriter would need 1,024 steps to fill the same slots. NCM needs 32, one per layer.</div></div>
+        <div class="step" data-show="all" data-z="2"><div class="card"><b class="k">Every model is different</b>The squeezing is remarkably faithful: unpacking the web-page model’s layers gives back 99.99% of the original words exactly. Tap the buttons to compare other models’ layers.</div></div>
+      </div>
     </div>
+    <div class="wide band-foot"><p class="caption">Layer sizes come from the configuration files the researchers published with their models. To write something new, NCM generates the layers from the top down, filling every spot in a layer at the same moment.</p></div>
   </section>
 
   <section class="gutter">
     <div class="col prose">
-      <p id="zoomLine">The model trained on web pages uses 32 layers to reach 1,024 slots. A typewriter would need 1,024 steps to fill those same slots.</p>
-
-      <h2><span>Try it yourself</span></h2>
+      <h2><span>Three models, three jobs</span></h2>
       <p>The researchers published three examples, each from a different model with a different job. One writes stories from nothing. One reads a news article and sums it up in a single sentence. One translates German into English.</p>
-      <p>None of them is a chatbot, so there’s no prompt to type. The story model gets no input at all. The other two get the text they’re working on, shown in the gray box.</p>
-      <p>Pick one and drag through the drafts. Yellow marks the words that changed since the previous pass.</p>
+      <p>None of them is a chatbot, so there’s no prompt to type. The story model gets no input at all, and the other two get only the text they’re working on. Along the way, their rough drafts make some wonderfully strange mistakes.</p>
     </div>
   </section>
 
-  <section class="band gutter" id="viewerBand" aria-label="Step through the published examples">
-    <div class="wide viewer" id="viewer">
-      <div class="tabs" role="tablist" aria-label="Example" id="tabs"></div>
-      <div class="input-card">
-        <div class="l" id="inLabel">Input</div>
-        <div class="s" id="src"></div>
-        <div class="n" id="inNote"></div>
+  <!-- Scrolly 4: examples and bloopers -->
+  <section class="band gutter" id="viewerBand" aria-label="The published examples">
+    <div class="wide scrolly" id="s-view">
+      <div class="sticky">
+        <div class="panel">
+          <div class="chips" role="tablist" aria-label="Example" id="tabs"></div>
+          <div class="vin">
+            <div class="l" id="inLabel">Input</div>
+            <div class="s" id="src"></div>
+            <div class="nt" id="inNote"></div>
+          </div>
+          <div class="vctrl">
+            <button class="btn" id="prev" type="button" aria-label="Previous pass"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
+            <button class="btn solid" id="play" type="button"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
+            <button class="btn" id="next" type="button" aria-label="Next pass"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
+            <input type="range" id="slider" min="1" max="12" value="12" aria-label="Pass">
+            <span class="vread">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></span>
+          </div>
+          <div>
+            <div class="vlab" id="outLabel">Output</div>
+            <p class="vout" id="out"></p>
+          </div>
+          <div class="vnote" id="note" hidden></div>
+        </div>
       </div>
-      <div class="arrow">↓ NCM writes the output in passes</div>
-      <div class="vcontrols">
-        <button class="btn" id="prev" type="button" aria-label="Previous pass"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
-        <button class="btn solid" id="play" type="button"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
-        <button class="btn" id="next" type="button" aria-label="Next pass"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
-        <input type="range" id="slider" min="1" max="12" value="12" aria-label="Pass">
-        <span class="vread">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></span>
+      <div class="steps">
+        <div class="step" data-task="tinystories" data-pass="12"><div class="card"><b class="k">The storyteller</b>The story model starts from a blank page every time. No input, no prompt. Just “write me a story,” built into the model itself.</div></div>
+        <div class="step" data-task="xsum" data-pass="9"><div class="card"><b class="k">The summarizer</b>This one reads a news article and boils it down to one sentence. Its input is the article itself.</div></div>
+        <div class="step" data-task="xsum" data-pass="7"><div class="card"><b class="k">Blooper: “Stekampkamp”</b>Two passes before the end, the model knows the name is long and ends in “kamp.” It just can’t decide how many times. And “Pist Pist” is half of “Pistorius,” twice.</div></div>
+        <div class="step" data-task="wmt14" data-pass="11"><div class="card"><b class="k">The translator</b>The third model reads one German sentence and writes it in English.</div></div>
+        <div class="step" data-task="wmt14" data-pass="8"><div class="card"><b class="k">Blooper: “drugels”</b>“Drug” and “cartels” collided. All the pieces are there; they just haven’t been sorted yet.</div></div>
+        <div class="step" data-task="wmt14" data-pass="9"><div class="card"><b class="k">Blooper: “Mexican Mexican”</b>Plus a bonus “battle battle.” This draft is arguably worse than the one before it, and the researchers found that’s normal: quality can dip in the middle before the last pass cleans it up. Anyone who has tidied a room knows the feeling.</div></div>
+        <div class="step" data-free="1"><div class="card"><b class="k">Your turn</b>Pick any example and drag the slider to scrub through the drafts. Yellow marks the words that changed since the previous pass.</div></div>
       </div>
-      <div>
-        <div class="vlabel" id="outLabel">Output</div>
-        <p class="vout" id="out"></p>
-      </div>
-      <div class="vnote" id="note" hidden></div>
     </div>
   </section>
 
   <section class="gutter">
     <div class="col prose">
-      <h2><span>The blooper reel</span></h2>
-      <p>The in-between drafts are where the fun is. Because NCM works on everything at once, its rough drafts make mistakes no human writer would.</p>
-    </div>
-    <div class="col bloopers" id="bloopers">
-      <div class="blooper"><div class="w"><mark>Stekampkamp</mark></div><div class="m">Summary, passes 7 and 8</div><p>The model knows the name is long and ends in “kamp.” It just can’t decide how many times.</p><button type="button" data-jump="xsum:7">See it in the draft →</button></div>
-      <div class="blooper"><div class="w"><mark>Pist Pist</mark></div><div class="m">Summary, passes 7 and 8</div><p>Half of “Pistorius,” twice. The full name only shows up at the end.</p><button type="button" data-jump="xsum:8">See it in the draft →</button></div>
-      <div class="blooper"><div class="w"><mark>drugels</mark></div><div class="m">Translation, pass 8</div><p>“Drug” and “cartels” collided. All the pieces are there; they just haven’t been sorted.</p><button type="button" data-jump="wmt14:8">See it in the draft →</button></div>
-      <div class="blooper"><div class="w"><mark>Mexican Mexican</mark></div><div class="m">Translation, passes 9 and 10</div><p>Plus a bonus “battle battle.” This draft is arguably worse than the one before it.</p><button type="button" data-jump="wmt14:9">See it in the draft →</button></div>
-    </div>
-    <div class="col prose">
-      <p>That last one is worth a second look. The translation’s ninth draft really is messier than its eighth, and that isn’t a quirk of this page. The researchers measured it: quality can dip in the middle drafts before the final pass cleans everything up.</p>
-      <p>Anyone who has tidied a room knows the feeling. It always looks worst right before it’s done.</p>
-
       <h2><span>So how much faster is it?</span></h2>
-      <p>Steps are the expensive part of running an AI, so fewer steps should mean faster answers. Here’s how many steps NCM needed compared with the best scratch-off model of the same size, according to the paper. Every square is one step.</p>
+      <p>Steps are the expensive part of running an AI, so fewer steps should mean faster answers. The researchers counted how many steps NCM needed compared with the best scratch-off model of the same size.</p>
     </div>
   </section>
 
+  <!-- Scrolly 5: steps -->
   <section class="band gutter" aria-label="Steps per sample">
-    <div class="wide">
-      <p class="gtitle">Every square is one step</p>
-      <div class="tabs" role="tablist" aria-label="Task" id="utabs"></div>
-      <div style="margin-top:14px"><button class="btn solid" id="uRun" type="button"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg><span id="uText">Count the steps</span></button></div>
-      <div class="units">
-        <div class="ugroup"><div class="h"><b id="uBaseName">Scratch-off model</b><span id="uBaseN">0</span></div><div class="grid" id="uBase"></div></div>
-        <div class="ugroup ncm"><div class="h"><b>NCM</b><span id="uNcmN">0</span></div><div class="grid" id="uNcm"></div></div>
+    <div class="wide scrolly" id="s-units">
+      <div class="sticky">
+        <div class="panel">
+          <div class="phead"><span class="t">Every square is one step</span><span class="t" id="uTask">Web pages</span></div>
+          <div class="ugroup df"><div class="h"><b id="uBaseName">Scratch-off model</b><span id="uBaseN">0</span></div><div class="grid" id="uBase"></div></div>
+          <div class="ugroup nc"><div class="h"><b>NCM</b><span id="uNcmN">0</span></div><div class="grid" id="uNcm"></div></div>
+        </div>
       </div>
-      <p class="caption">Step counts per sample as reported in the paper, against the strongest diffusion model of the same size: DUO for news sentences and web pages, AURORA-LM for summaries.</p>
+      <div class="steps">
+        <div class="step" data-unit="owt" data-fill="base"><div class="card"><b class="k">Writing a web page</b>To write a passage the length of a short web page, the best scratch-off model took 1,024 steps. Every square is one.</div></div>
+        <div class="step" data-unit="owt" data-fill="ncm"><div class="card"><b class="k">NCM: 32 steps</b>NCM did it in 32. That little blue row is the whole job.</div></div>
+        <div class="step" data-unit="lm1b" data-fill="both"><div class="card"><b class="k">News sentences</b>For single sentences from news stories: 128 steps against NCM’s 12.</div></div>
+        <div class="step" data-unit="xsum" data-fill="both"><div class="card"><b class="k">Summaries</b>For one-sentence news summaries: 128 steps against just 8.</div></div>
+      </div>
     </div>
+    <div class="wide band-foot"><p class="caption">Step counts per sample as reported in the paper, against the strongest diffusion model of the same size: DUO for web pages and news sentences, AURORA-LM for summaries.</p></div>
   </section>
 
   <section class="gutter">
@@ -441,43 +492,65 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
     </div>
     <div class="col prose">
       <p>And it didn’t trade quality for that speed. NCM’s writing scored better than the competition on news sentences, about as well on web pages, and just as well on summaries.</p>
-      <p>The researchers also found a clever use for the time they saved. In the number of steps a scratch-off model spends writing one summary, NCM can write 16 and keep the best one. When they tried exactly that, their summaries scored about 7% better.</p>
+      <p>The researchers also found a clever use for the time they saved. In the number of steps a scratch-off model spends writing one summary, NCM can write 16 and keep the best one.</p>
+    </div>
+    <div class="col art">
+      <div class="drafts" id="drafts"></div>
+      <p class="caption">When they tried exactly that, their summaries scored about 7% better.</p>
+    </div>
 
+    <div class="col prose">
       <h2><span>It’s also weirdly good at Sudoku</span></h2>
       <p>One of the more surprising results has nothing to do with writing. The team trained NCM to solve Sudoku puzzles, treating the grid like a very short, very strict sentence made of digits.</p>
     </div>
     <div class="col pull"><b>99.5%</b><span>of easy puzzles solved, in just 12 passes. NCM beat the typewriter-style and scratch-off models it was tested against at every difficulty level.</span></div>
     <div class="col prose">
-      <p>One way to think about why: Sudoku punishes you for committing to a square before you’ve looked at the whole board. A typewriter has to commit square by square, in order, with no going back. A sketch artist gets to rough in the whole grid and then fix the conflicts. The paper doesn’t claim that’s the reason, but it fits.</p>
+      <p>One way to think about why: Sudoku punishes you for committing to a square before you’ve looked at the whole board. A typewriter has to commit square by square, in order, with no going back. A sketch artist can rough in the whole grid and then fix the clashes.</p>
+    </div>
+    <div class="col art">
+      <div class="sudoku" id="sudoku">
+        <div class="s"><b>One square at a time</b><svg viewBox="0 0 182 182" id="sgA" aria-label="Grid filling one square at a time, in order"></svg><span>commits to each digit in order</span></div>
+        <div class="s"><b>Rough in, then fix</b><svg viewBox="0 0 182 182" id="sgB" aria-label="Grid filled all at once, with clashes fixed over a few passes"></svg><span>fills everything, then repairs clashes</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center"><button class="btn solid" type="button" id="sgRun"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>Play the idea</button><span class="caption">An illustration of the intuition, not the model’s actual output. The paper doesn’t claim this is why NCM does well.</span></div>
+    </div>
 
+    <div class="col prose">
       <h2><span>What it can’t do yet</span></h2>
       <p>Before anyone gets carried away: NCM is a research project, not a product. Its models are small, around 100 million parameters, which is far smaller than the AI behind today’s chatbots. They’ve been tested on research datasets, not on open-ended conversation.</p>
       <p>It also gives every job the same number of passes, so an easy sentence gets just as much effort as a hard one. And the compression step occasionally trips over names, numbers and accented letters, which matters when the output has to be exactly right. Stekampkamp, again.</p>
 
       <h2><span>Why this matters</span></h2>
-      <p>Every word an AI writes costs a burst of computing on a powerful and expensive chip. Multiply that by millions of people asking questions all day, and it adds up to one of the biggest costs, and energy bills, in tech.</p>
-      <p>Here’s the irony. Those chips are built to do thousands of things at the same time, but typewriter-style writing makes them do one word at a time, in a line. It’s like owning a 12-lane highway and only ever using one lane. NCM puts the other lanes to work: fewer steps, each doing a lot of work in parallel.</p>
-      <p>It may be thriftier to train, too. The researchers report that NCM learned from roughly a quarter to a fifth as much text as comparable scratch-off models, not counting the training of its compression step.</p>
+      <p>Every word an AI writes costs a burst of computing on a powerful, expensive chip. Multiply that by millions of people asking questions all day, and it adds up to one of the biggest costs, and energy bills, in tech.</p>
+      <p>Here’s the irony. Those chips are built to do thousands of things at the same time, but typewriter-style writing makes them work through one word at a time, in a line. It’s like owning a 12-lane highway and only ever using one lane.</p>
+    </div>
+    <div class="col art">
+      <div class="road" aria-hidden="true">
+        <div class="r"><b>Typewriter <span>one lane busy, eleven idle</span></b><svg viewBox="0 0 600 120" id="roadA"></svg></div>
+        <div class="r"><b>Sketch artist <span>every lane working at once</span></b><svg viewBox="0 0 600 120" id="roadB"></svg></div>
+      </div>
+    </div>
+    <div class="col prose">
+      <p>NCM puts the other lanes to work: fewer steps, each doing lots of work side by side. It may be thriftier to train, too. The researchers report that NCM learned from roughly a quarter to a fifth as much text as comparable scratch-off models, not counting the training of its compression step.</p>
       <p>And there’s something satisfying about the idea itself. People rarely write left to right in one go. We outline, draft and revise. AI image generators already work this way, starting blurry and sharpening the picture. NCM is a serious attempt to bring the same habit to words.</p>
       <p>The big open question is whether it holds up at the scale of today’s chatbots. So far the team has tested models up to 725 million parameters, and the results kept improving as the models grew. That’s the part to keep an eye on.</p>
     </div>
-  </section>
 
-  <section class="gutter">
     <div class="col notes" id="notes">
       <h2>Notes</h2>
       <h3>The research</h3>
       <p>Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. Read their paper, <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">“Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation”</a> (2026), and find their code, models and examples at <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">github.com/HazyResearch/ncm</a>, released under the MIT license.</p>
       <h3>This page</h3>
-      <p>This story and its interactive graphics were made by Kevin Broadie as an independent project. It isn’t affiliated with the researchers, and the research, models and examples are theirs. The page’s source code is published at <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">github.com/kbroadie/ncm-viewer</a> under the MIT license, so anyone can reuse or adapt it with attribution.</p>
+      <p>This story and its illustrations were made by Kevin Broadie as an independent project. It isn’t affiliated with the researchers, and the research, models and examples are theirs. The page’s source code is published at <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">github.com/kbroadie/ncm-viewer</a> under the MIT license, so anyone can reuse or adapt it with attribution.</p>
       <h3>Data and methods</h3>
       <ul>
         <li>The pass-by-pass text for the story, summary and translation was transcribed from an animation in the researchers’ code repository.</li>
         <li>Yellow highlights are computed by comparing each pass with the one before it, word by word, so they approximate the researchers’ own highlighting.</li>
-        <li>Layer sizes in “The zoom levels” come from the model configuration files in the repository.</li>
-        <li>In “Same sentence, three ways,” only the sketch artist lane uses real model output. The other lanes are simulations.</li>
+        <li>Layer sizes in the zoom section come from the model configuration files in the repository.</li>
+        <li>In the typewriter, scratch-off and sketch artist race, only the sketch artist uses real model output. The other two are simulations.</li>
+        <li>The Sudoku and highway graphics illustrate ideas; they are not model output or measurements.</li>
         <li>Speed, quality, Sudoku and training figures are as reported in the paper.</li>
-        <li class="muted">The typewriter, scratch-off card, map and guitar comparisons are simplifications meant to give the right intuition, not exact descriptions of how the models work.</li>
+        <li class="muted">The typewriter, scratch-off card, map, guitar and highway comparisons are simplifications meant to give the right intuition, not exact descriptions of how the models work.</li>
       </ul>
     </div>
   </section>
@@ -489,6 +562,7 @@ const tok = s => s.replace(/\n/g, " \n ").split(/ +/).filter(Boolean);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt = n => n.toLocaleString("en-US");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SVGNS = "http://www.w3.org/2000/svg";
 
 function changed(a, b) {
   const n = a.length, m = b.length;
@@ -525,11 +599,26 @@ function renderText(t, i, marks = true) {
 }
 const TASKS = {};
 
-/* ---------- Scrollytelling opener ---------- */
-function setupScrolly() {
+/* Generic scrollytelling: activates the step crossing the middle of the screen. */
+function scrolly(root, onStep) {
+  const steps = [...root.querySelectorAll(".step")];
+  let active = null;
+  const activate = el => {
+    if (el === active) return;
+    active = el;
+    steps.forEach(s => s.classList.toggle("active", s === el));
+    onStep(el.dataset, el);
+  };
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) activate(e.target); }), { rootMargin: "-50% 0px -50% 0px" });
+  steps.forEach(s => io.observe(s));
+}
+
+/* 1. Story opener */
+function setupStory() {
   const t = TASKS.tinystories; if (!t) return;
   const max = Math.max(...t.words);
-  $("sMini").innerHTML = t.words.map(w => `<i style="height:${Math.max(6, Math.round(w / max * 100))}%"></i>`).join("");
+  $("sMini").innerHTML = t.words.map(w => `<i style="height:${Math.max(8, Math.round(w / max * 100))}%"></i>`).join("");
   const setPass = p => {
     const i = p - 1;
     $("sPass").textContent = p;
@@ -537,25 +626,12 @@ function setupScrolly() {
     $("sText").innerHTML = renderText(t, i);
     [...$("sMini").children].forEach((el, k) => { el.className = k === i ? "cur" : (k < i ? "done" : ""); });
   };
-  const steps = [...document.querySelectorAll(".step")];
-  let active = null;
-  const activate = el => {
-    if (el === active) return;
-    active = el;
-    steps.forEach(s => s.classList.toggle("active", s === el));
-    setPass(+el.dataset.pass);
-  };
-  activate(steps[0]);
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) activate(e.target); });
-    }, { rootMargin: "-48% 0px -48% 0px" });
-    steps.forEach(s => io.observe(s));
-  }
+  setPass(1);
+  scrolly($("s-story"), d => setPass(+d.pass));
 }
 
-/* ---------- Race ---------- */
-const DIFF_STEPS = 128, TICK = 80;
+/* 2. Race */
+const DIFF_STEPS = 128;
 let race = null;
 function setupRace() {
   const wmt = TASKS.wmt14; if (!wmt) return;
@@ -564,61 +640,71 @@ function setupRace() {
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const reveal = words.map(() => 1 + Math.floor(rnd() * (DIFF_STEPS - 1)));
   reveal[Math.floor(rnd() * reveal.length)] = DIFF_STEPS;
-  race = { wmt, words, reveal, nAR: words.length, nNC: wmt.levels.length, tick: 0, timer: null };
+  race = { wmt, words, reveal, total: { ar: words.length, df: DIFF_STEPS, nc: wmt.levels.length }, mask: ["ar", "df", "nc"], timer: null };
   $("raceSrc").textContent = (wmt.src || []).join(" ");
-  drawRace(DIFF_STEPS);
-  $("raceText").textContent = "Play again";
+  drawRace(DIFF_STEPS, ["ar", "df", "nc"]);
+  scrolly($("s-race"), d => runRace(d.lanes.split(",")));
+  $("raceAgain").addEventListener("click", () => runRace(["ar", "df", "nc"]));
 }
-function drawRace(tick) {
+function drawRace(tick, mask) {
   const r = race, w = r.words;
-  const ar = Math.min(tick, r.nAR), df = Math.min(tick, DIFF_STEPS), nc = Math.min(tick, r.nNC);
-  $("cAR").innerHTML = ar + (ar === r.nAR ? "<em>done</em>" : "");
-  $("cDF").innerHTML = df + (df === DIFF_STEPS ? "<em>done</em>" : "");
-  $("cNC").innerHTML = nc + (nc === r.nNC ? "<em>done</em>" : "");
+  const t = k => mask.includes(k) ? Math.min(tick, r.total[k]) : 0;
+  const ar = t("ar"), df = t("df"), nc = t("nc");
+  $("lAR").classList.toggle("dim", !mask.includes("ar"));
+  $("lDF").classList.toggle("dim", !mask.includes("df"));
+  $("lNC").classList.toggle("dim", !mask.includes("nc"));
+  $("cAR").innerHTML = ar + (ar === r.total.ar ? "<em>done</em>" : "");
+  $("cDF").innerHTML = df + (df === r.total.df ? "<em>done</em>" : "");
+  $("cNC").innerHTML = nc + (nc === r.total.nc ? "<em>done</em>" : "");
   $("tAR").innerHTML = ar ? esc(w.slice(0, ar).join(" ")) : '<span class="slot"></span>';
   $("tDF").innerHTML = w.map((x, i) => r.reveal[i] <= df ? esc(x) : '<span class="slot"></span>').join(" ");
-  $("tNC").innerHTML = nc ? renderText(r.wmt, nc - 1, nc < r.nNC) : '<span class="slot"></span>';
+  $("tNC").innerHTML = nc ? renderText(r.wmt, nc - 1, nc < r.total.nc) : '<span class="slot"></span>';
   $("bAR").style.width = ar / DIFF_STEPS * 100 + "%";
   $("bDF").style.width = df / DIFF_STEPS * 100 + "%";
   $("bNC").style.width = nc / DIFF_STEPS * 100 + "%";
 }
-$("raceRun").addEventListener("click", () => {
-  if (!race) return;
+function runRace(mask) {
   clearInterval(race.timer);
-  if (reduced) { drawRace(DIFF_STEPS); return; }
-  race.tick = 0; drawRace(0);
-  $("raceText").textContent = "Running";
-  race.timer = setInterval(() => {
-    race.tick++; drawRace(race.tick);
-    if (race.tick >= DIFF_STEPS) { clearInterval(race.timer); $("raceText").textContent = "Play again"; }
-  }, TICK);
-});
+  const end = Math.max(...mask.map(k => race.total[k]));
+  if (reduced) { drawRace(end, mask); return; }
+  let tick = 0;
+  const speed = mask.length === 1 && mask[0] === "df" ? 45 : 80;
+  drawRace(0, mask);
+  race.timer = setInterval(() => { tick++; drawRace(tick, mask); if (tick >= end) clearInterval(race.timer); }, speed);
+}
 
-/* ---------- Zoom levels ---------- */
-let SCHED = [];
+/* 3. Zoom levels */
+let SCHED = [], zShow = "all";
 function selectSchedule(id) {
   const s = SCHED.find(x => x.id === id) || SCHED[0];
-  document.querySelectorAll("#stabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === s.id ? "true" : "false"));
+  document.querySelectorAll("#stabs .chip").forEach(b => b.setAttribute("aria-selected", b.dataset.k === s.id ? "true" : "false"));
   const L = s.levels, max = L[L.length - 1];
+  $("zTitle").textContent = `${s.label}: ${fmt(max)} slots`;
   $("zLevels").textContent = L.length;
-  $("zLen").textContent = fmt(max);
   $("sched").classList.toggle("dense", L.length > 16);
   $("sched").setAttribute("aria-label", `${s.label}: ${L.length} layers growing from ${L[0]} to ${fmt(max)} slots`);
   $("sched").innerHTML = L.map((n, i) => {
     const prev = i ? L[i - 1] : 0;
     return `<div class="srow"><span class="l">${i + 1}</span><span class="track"><span class="w" style="width:${prev / max * 100}%"></span><span class="add" style="left:${prev / max * 100}%;width:${(n - prev) / max * 100}%"></span></span><span class="v">${fmt(n)}</span></div>`;
   }).join("");
+  applyShow();
 }
-$("stabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectSchedule(b.dataset.k); });
+function applyShow() {
+  const rows = [...$("sched").children];
+  const n = zShow === "all" ? rows.length : +zShow;
+  rows.forEach((r, i) => r.classList.toggle("off", i >= n));
+}
+function setZoomArt(z) { document.querySelectorAll(".zoomart figure").forEach(f => f.classList.toggle("on", +f.dataset.z === +z)); }
+$("stabs").addEventListener("click", e => { const b = e.target.closest(".chip"); if (b) { zShow = "all"; selectSchedule(b.dataset.k); } });
 
-/* ---------- Viewer ---------- */
+/* 4. Viewer */
 let key = null, level = 0, timer = null;
 function selectTask(k) {
   if (!TASKS[k]) k = "tinystories";
   stopPlay();
   key = k;
   const t = TASKS[k];
-  document.querySelectorAll("#tabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
+  document.querySelectorAll("#tabs .chip").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
   $("inLabel").textContent = t.inputLabel;
   $("src").hidden = !t.src;
   if (t.src) { $("src").setAttribute("lang", t.srcLang); $("src").innerHTML = t.src.map(esc).join("<br>"); }
@@ -658,57 +744,116 @@ $("play").addEventListener("click", () => {
 $("prev").addEventListener("click", () => { stopPlay(); setLevel(level - 1); });
 $("next").addEventListener("click", () => { stopPlay(); setLevel(level + 1); });
 $("slider").addEventListener("input", e => { stopPlay(); setLevel(+e.target.value - 1); });
-$("tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectTask(b.dataset.k); });
-$("bloopers").addEventListener("click", e => {
-  const b = e.target.closest("[data-jump]"); if (!b) return;
-  const [k, p] = b.dataset.jump.split(":");
-  selectTask(k); setLevel(+p - 1);
-  $("viewerBand").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-});
+$("tabs").addEventListener("click", e => { const b = e.target.closest(".chip"); if (b) selectTask(b.dataset.k); });
 
-/* ---------- Unit chart ---------- */
-const UNITS = [
-  { id: "owt", label: "Web pages", base: "DUO", b: 1024, n: 32 },
-  { id: "lm1b", label: "News sentences", base: "DUO", b: 128, n: 12 },
-  { id: "xsum", label: "Summaries", base: "AURORA-LM", b: 128, n: 8 }
-];
-let unit = UNITS[0], uTimer = null;
-$("utabs").innerHTML = UNITS.map(u => `<button class="tab" role="tab" type="button" data-k="${u.id}">${u.label}</button>`).join("");
-function drawUnits(stepNo) {
-  const b = Math.min(stepNo, unit.b), n = Math.min(stepNo, unit.n);
+/* 5. Unit chart */
+const UNITS = {
+  owt: { label: "Web pages", base: "DUO", b: 1024, n: 32 },
+  lm1b: { label: "News sentences", base: "DUO", b: 128, n: 12 },
+  xsum: { label: "Summaries", base: "AURORA-LM", b: 128, n: 8 }
+};
+let unitId = null, uFrame = null;
+function buildUnit(id) {
+  if (unitId === id) return;
+  unitId = id;
+  const u = UNITS[id];
+  $("uTask").textContent = u.label;
+  $("uBaseName").textContent = `Scratch-off model (${u.base})`;
+  $("uBase").innerHTML = "<i></i>".repeat(u.b);
+  $("uNcm").innerHTML = "<i></i>".repeat(u.n);
+}
+function paintUnits(b, n) {
+  const u = UNITS[unitId];
+  b = Math.min(b, u.b); n = Math.min(n, u.n);
   [...$("uBase").children].forEach((c, i) => c.classList.toggle("on", i < b));
   [...$("uNcm").children].forEach((c, i) => c.classList.toggle("on", i < n));
   $("uBaseN").textContent = fmt(b) + " steps";
   $("uNcmN").textContent = n + " steps";
 }
-function selectUnit(id) {
-  cancelAnimationFrame(uTimer); uTimer = null;
-  unit = UNITS.find(u => u.id === id) || UNITS[0];
-  document.querySelectorAll("#utabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === unit.id ? "true" : "false"));
-  $("uBaseName").textContent = `Scratch-off model (${unit.base})`;
-  $("uBase").innerHTML = "<i></i>".repeat(unit.b);
-  $("uNcm").innerHTML = "<i></i>".repeat(unit.n);
-  drawUnits(unit.b);
-  $("uText").textContent = "Count the steps";
-}
-$("utabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectUnit(b.dataset.k); });
-$("uRun").addEventListener("click", () => {
-  cancelAnimationFrame(uTimer);
-  if (reduced) { drawUnits(unit.b); return; }
-  const perSec = unit.b > 200 ? 160 : 40;
+function runUnits(id, fill) {
+  cancelAnimationFrame(uFrame);
+  buildUnit(id);
+  const u = UNITS[id];
+  const from = { b: fill === "ncm" ? u.b : 0, n: 0 };
+  const goal = { b: u.b, n: fill === "base" ? 0 : u.n };
+  if (reduced) { paintUnits(goal.b, goal.n); return; }
+  const perSec = fill === "base" && u.b > 200 ? 420 : (fill === "ncm" ? 28 : 64);
   const t0 = performance.now();
-  $("uText").textContent = "Counting";
   const tick = now => {
     const s = Math.floor((now - t0) / 1000 * perSec);
-    drawUnits(s);
-    if (s < unit.b) uTimer = requestAnimationFrame(tick);
-    else { uTimer = null; $("uText").textContent = "Count again"; }
+    paintUnits(fill === "ncm" ? u.b : Math.min(s, goal.b), fill === "base" ? 0 : s);
+    if (s < Math.max(fill === "ncm" ? 0 : goal.b, goal.n)) uFrame = requestAnimationFrame(tick);
   };
-  uTimer = requestAnimationFrame(tick);
-});
-selectUnit("owt");
+  paintUnits(from.b, from.n);
+  uFrame = requestAnimationFrame(tick);
+}
+buildUnit("owt"); paintUnits(1024, 32);
+scrolly($("s-units"), d => runUnits(d.unit, d.fill));
 
-/* ---------- Boot ---------- */
+/* 16 summaries illustration */
+(function () {
+  const doc = (fill, star) => `<svg viewBox="0 0 26 32" width="26" height="32" aria-hidden="true"><path d="M3 2h14l6 6v21a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="${fill}"/><path d="M6 12h12M6 17h12M6 22h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>${star ? '<circle cx="20" cy="26" r="6" fill="#FFE27A" stroke="#1F2430" stroke-width="1.5"/><path d="M20 22.6l1 2 2.2.3-1.6 1.5.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.5 2.2-.3z" fill="#1F2430"/>' : ""}</svg>`;
+  $("drafts").innerHTML = `
+    <div class="one">${doc("#EE6B4D")}<span>Scratch-off model<br>1 summary in 128 steps</span></div>
+    <div class="vs">vs</div>
+    <div class="many"><div class="docs">${Array.from({length: 16}, (_, i) => doc("#3557E0", i === 5)).join("")}</div><span>NCM: 16 summaries in the same 128 steps, then keep the best</span></div>`;
+})();
+
+/* Sudoku illustration */
+const SOL = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
+const WRONG = { 3: "1", 12: "8", 20: "4", 31: "2", 40: "9", 47: "6", 52: "7", 60: "3", 67: "5", 76: "2", 79: "8" };
+function drawGrid(svg, cells) {
+  const c = 20, o = 1;
+  let h = `<rect x="0" y="0" width="182" height="182" rx="8" fill="#fff"/>`;
+  cells.forEach((cell, i) => {
+    const x = o + (i % 9) * c, y = o + Math.floor(i / 9) * c;
+    if (cell.bg) h += `<rect x="${x + 1}" y="${y + 1}" width="${c - 2}" height="${c - 2}" rx="3" fill="${cell.bg}"/>`;
+    if (cell.d) h += `<text x="${x + c / 2}" y="${y + 14.5}" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="12.5" font-weight="700" fill="${cell.color || "#1F2430"}">${cell.d}</text>`;
+  });
+  for (let k = 0; k <= 9; k++) {
+    const w = k % 3 === 0 ? 2 : .75, col = k % 3 === 0 ? "#1F2430" : "#C8CFDC", p = o + k * c;
+    h += `<path d="M${p} ${o}V${o + 9 * c}M${o} ${p}H${o + 9 * c}" stroke="${col}" stroke-width="${w}"/>`;
+  }
+  svg.innerHTML = h;
+}
+const sgState = { a: null, b: null };
+function sudokuA(n) { drawGrid($("sgA"), [...SOL].map((d, i) => i < n ? { d, bg: i === n - 1 ? "#E3E9FF" : null } : {})); }
+function sudokuB(stage) {
+  const keys = Object.keys(WRONG).map(Number);
+  const still = stage === 0 ? keys : stage === 1 ? keys.filter((_, i) => i % 3 === 0) : [];
+  drawGrid($("sgB"), [...SOL].map((d, i) => still.includes(i) ? { d: WRONG[i], bg: "#FDE7E1", color: "#B8442B" } : { d, bg: stage > 0 && keys.includes(i) ? "#DFF3EA" : null }));
+}
+function runSudoku() {
+  clearInterval(sgState.a); clearInterval(sgState.b);
+  if (reduced) { sudokuA(81); sudokuB(2); return; }
+  let n = 0, s = 0;
+  sudokuA(0); sudokuB(0);
+  sgState.a = setInterval(() => { n++; sudokuA(n); if (n >= 81) clearInterval(sgState.a); }, 55);
+  sgState.b = setInterval(() => { s++; sudokuB(s); if (s >= 2) clearInterval(sgState.b); }, 1300);
+}
+sudokuA(81); sudokuB(2);
+$("sgRun").addEventListener("click", runSudoku);
+if ("IntersectionObserver" in window) {
+  let played = false;
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !played) { played = true; runSudoku(); } }), { threshold: .6 }).observe($("sudoku"));
+}
+
+/* Highway illustration */
+function drawRoad(svg, busy) {
+  const lanes = 12, lh = 120 / lanes;
+  let h = `<rect x="0" y="0" width="600" height="120" rx="10" fill="#C8CFDC"/>`;
+  for (let i = 1; i < lanes; i++) h += `<path d="M10 ${i * lh}H590" stroke="#fff" stroke-width="1.2" stroke-dasharray="12 10" opacity=".9"/>`;
+  const colors = ["#3557E0", "#EE6B4D", "#2E9E78", "#F2C94C"];
+  for (let i = 0; i < lanes; i++) {
+    if (i >= busy) continue;
+    const delay = -(i * 0.37 % 3.2).toFixed(2);
+    h += `<g class="car" style="animation-delay:${delay}s"><rect x="0" y="${i * lh + 2}" width="40" height="${lh - 4}" rx="3" fill="${colors[i % 4]}"/></g>`;
+  }
+  svg.innerHTML = h;
+}
+drawRoad($("roadA"), 1); drawRoad($("roadB"), 12);
+
+/* Boot */
 async function boot() {
   try {
     const res = await fetch("samples.json", { cache: "no-cache" });
@@ -721,15 +866,18 @@ async function boot() {
         src: d.source || null, srcLang: d.sourceLang || "en", outputLabel: d.outputLabel || "Output"
       });
     }
-    $("tabs").innerHTML = data.samples.map(d => `<button class="tab" role="tab" type="button" data-k="${esc(d.id)}">${esc(d.name)}<small>${esc(d.task || "")}</small></button>`).join("");
+    $("tabs").innerHTML = data.samples.map(d => `<button class="chip" role="tab" type="button" data-k="${esc(d.id)}">${esc(d.name)}<small>${esc(d.task || "")}</small></button>`).join("");
     SCHED = data.schedules || [];
-    const order = ["tinystories", "lm1b", "owt", "xsum", "wmt14", "sudoku"];
+    const order = ["owt", "tinystories", "lm1b", "xsum", "wmt14", "sudoku"];
     SCHED.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-    $("stabs").innerHTML = SCHED.map(s => `<button class="tab" role="tab" type="button" data-k="${esc(s.id)}">${esc(s.label || s.name)}</button>`).join("");
-    setupScrolly();
+    $("stabs").innerHTML = SCHED.map(s => `<button class="chip" role="tab" type="button" data-k="${esc(s.id)}">${esc(s.label || s.name)}</button>`).join("");
+
+    setupStory();
     setupRace();
-    if (SCHED.length) selectSchedule("owt");
+    selectSchedule("owt"); setZoomArt(2);
+    scrolly($("s-zoom"), d => { setZoomArt(d.z); zShow = d.show; if (d.show !== "all") selectSchedule("owt"); else applyShow(); });
     selectTask("tinystories");
+    scrolly($("s-view"), d => { if (d.free) return; selectTask(d.task); setLevel(+d.pass - 1); });
   } catch (err) {
     $("sText").innerHTML = '<span class="empty">Couldn’t load samples.json (' + esc(err.message || err) + '). If you opened this file directly, serve the folder instead, for example with python3 -m http.server.</span>';
   }
