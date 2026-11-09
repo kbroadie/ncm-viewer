@@ -12,17 +12,20 @@ The story, illustrations and interactive graphics are an independent project by 
 
 ## What's in the story
 
-The page is a single long scroll. In each major section a graphic sticks in place while short notes scroll past and change it.
+The page is a single long scroll built from pinned scenes. Each scene holds still while scrolling advances its animation, then releases when it's done. Every scene has its own color.
 
-- **A story that writes itself as you scroll.** One of the researchers' models writes a children's story, pass by pass.
-- **A typewriter, a scratch-off card and a sketch artist.** Word-by-word, diffusion and NCM generation translate the same German sentence, one at a time and then as a race. Only the NCM lane uses real model output.
-- **How do you sketch with words?** Map zoom levels illustrate the layers, alongside each model's real layer sizes from the researchers' configuration files.
-- **Three models, three jobs.** The published story, summary and translation examples, with their inputs, stepping through the funniest mid-draft mistakes before handing the controls to the reader.
-- **Every square is one step.** A unit chart of step counts reported in the paper, then measured speedups, a 16-drafts illustration, a Sudoku illustration, limits and a highway illustration of why parallel work matters.
+- **Pictures first.** A pixel picture sharpens from one block to full detail, the image-generation idea the story is built on.
+- **A story that writes itself.** One of the researchers' models writes a children's story, pass by pass, centered on screen.
+- **Three ways to write a sentence.** An LLM (typewriter), a diffusion model (scratch-off card) and NCM (sketch artist) translate the same German sentence. Only the NCM lane uses real model output.
+- **What does a rough sentence look like?** The translation's slots fill pass by pass, with the draft each set of slots unpacks into. Slot counts come from the researchers' configuration files.
+- **Try it yourself.** Scrub through the published examples and jump to the bloopers.
+- **So how much faster is it?** A unit chart of step counts reported in the paper, measured speedups and a 16-drafts illustration.
+- **Sudoku.** An LLM-style model writing a well-known puzzle's answer cell by cell, beside NCM's 12 passes and slot counts.
+- **Why your graphics card cares.** Memory trips per short story for an LLM and for NCM, followed by the memory shortage and what it means for data centers and local AI.
 
 ## How the data was prepared
 
-The NCM repository doesn't publish pass-by-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser by comparing each pass with the one before it, word by word. Speed, quality, Sudoku and training figures are quoted from the paper. The Sudoku and highway graphics illustrate ideas and aren't model output.
+The NCM repository doesn't publish pass-by-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser by comparing each pass with the one before it, word by word. Speed, quality, Sudoku and training figures are quoted from the paper. The pixel picture, Sudoku scene and memory scene illustrate ideas and aren't model output; see the Notes on the page for details.
 
 ## Data file
 
