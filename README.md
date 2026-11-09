@@ -1,36 +1,38 @@
-# Watching Text Resolve
+# NCM Refinement Viewer
 
-**An Interactive Companion to Next-Concept Modeling**
+An interactive explainer for [Next-Concept Modeling (NCM)](https://arxiv.org/abs/2610.14162), a coarse-to-fine text generation method developed by researchers at Stanford.
 
-A paper-format web page with interactive figures for [Next-Concept Modeling (NCM)](https://github.com/HazyResearch/ncm). It decodes the published samples level by level, charts the level schedules of six released models, and compares pass counts with autoregressive and diffusion generation.
+**View it:** https://kbroadie.github.io/ncm-viewer/
 
-**Read it:** https://kbroadie.github.io/ncm-viewer/
+## Credit
 
-## What NCM does
+Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. The research, models and samples are theirs, published in [HazyResearch/ncm](https://github.com/HazyResearch/ncm) under the MIT license.
 
-Most language models write left to right, one token per forward pass. NCM, from Stanford's HazyResearch lab, works coarse to fine instead. A tokenizer compresses text into a stack of codes, coarse on top and fine at the bottom, and a transformer predicts that stack from the top down. Every position within a level is predicted at once, so the whole output takes one forward pass per level.
+This visualizer is an independent project by Kevin Broadie and is not affiliated with the authors.
 
-The page follows the structure of an ML paper (abstract, background with equations, results, limitations and references) and has three interactive figures:
+## What the page covers
 
-1. **A sample, level by level.** Step or play through each level of a published sample. Highlights mark the words that changed since the previous level, and the level strip charts word count per level. Tap a bar to jump to it, or open "All levels at once" to see every pass stacked.
-2. **The level schedule.** How many code positions each level holds, for six of the released models (TinyStories, XSum, WMT14, Sudoku, LM1B and OpenWebText), read straight from the NCM repo's `config/eval` files.
-3. **Counting passes.** The WMT14 translation produced three ways: autoregressive, diffusion and NCM. The NCM lane plays the real sample; the other two are simulations of the same sentence. Below it, pass counts and wall-clock speedups reported in the paper.
+The page explains NCM in four sections, each written at three depths:
 
-## Samples
+- **Overview:** plain language, for any reader.
+- **Technical:** how the method works, for engineers and the technically curious.
+- **Expert:** equations, ablations and caveats, for machine learning researchers.
 
-Three samples from the NCM repo are included:
+A reading-depth control opens every technical or expert layer at once, and each layer can also be expanded on its own.
 
-| Sample | Task | Levels |
-| --- | --- | --- |
-| TinyStories | Unconditional story generation | 12 |
-| XSum | News summarization | 9 |
-| WMT14 | German to English translation | 11 |
+Three interactive figures support the text:
 
-The NCM repo doesn't publish per-level text as data, so I transcribed each level from the coarse-to-fine animation in that repo (`assets/coarse_to_fine.gif`). Highlights are computed in the browser with a word-level diff against the previous level, so they approximate the original animation's highlighting rather than reproduce it exactly.
+1. **A sample, pass by pass.** The published TinyStories, XSum and WMT14 samples, decoded after every pass, with changed words highlighted.
+2. **Level schedules.** Positions per level for six released models, read from the NCM repository's `config/eval` files.
+3. **Counting passes.** The WMT14 translation produced word by word, by diffusion and by NCM. The NCM lane replays the real sample; the other two are simulations.
+
+## How the data was prepared
+
+The NCM repository doesn't publish per-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser with a word-level diff against the previous pass, so they approximate the original animation's highlighting. Speed figures are quoted from the paper.
 
 ## Adding samples
 
-All sample data lives in [`samples.json`](samples.json). Each entry looks like this:
+All data lives in [`samples.json`](samples.json). Each sample looks like this:
 
 ```json
 {
@@ -42,11 +44,11 @@ All sample data lives in [`samples.json`](samples.json). Each entry looks like t
   "sourceLabel": "Article (excerpt)",
   "sourceLang": "en",
   "source": ["First paragraph of the input.", "Second paragraph."],
-  "levels": ["text at level 1", "text at level 2", "..."]
+  "levels": ["text after pass 1", "text after pass 2", "..."]
 }
 ```
 
-`source`, `sourceLabel` and `sourceLang` are optional; leave them out for unconditional samples. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by level number, shows a callout under that level. New entries show up as tabs automatically.
+`source`, `sourceLabel` and `sourceLang` are optional; leave them out for unconditional samples. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by pass number, shows a callout under that pass. New samples show up as tabs automatically.
 
 Level schedules live in the same file under `schedules`, one entry per model with its `levels` (positions per level), `codebook` size and source `config` path.
 
@@ -60,13 +62,6 @@ python3 -m http.server
 
 Then open http://localhost:8000.
 
-## Credits
-
-- NCM and the original samples: [HazyResearch/ncm](https://github.com/HazyResearch/ncm), MIT license.
-- Paper: Kumbong et al., *Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation*, 2026. [arXiv:2610.14162](https://arxiv.org/abs/2610.14162)
-
-This viewer is an independent project and isn't affiliated with the NCM authors.
-
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The visualizer code is MIT licensed. See [LICENSE](LICENSE).
