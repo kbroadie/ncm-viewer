@@ -62,11 +62,11 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 
 /* Hero */
 .hero { padding-block: clamp(28px, 7vw, 72px) clamp(24px, 5vw, 44px); display: grid; gap: 22px; }
+.hero .eyebrow { font-size: 14px; font-weight: 600; color: var(--sub); margin-bottom: -10px; }
 .hero h1 {
-  margin: 0; font-family: var(--f-display); font-weight: 850; font-variation-settings: "wdth" 118;
-  font-size: clamp(44px, 10.5vw, 112px); line-height: .92; letter-spacing: -.035em; text-wrap: balance;
+  margin: 0; max-width: 18ch; font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 108;
+  font-size: clamp(36px, 7vw, 72px); line-height: 1.02; letter-spacing: -.03em; text-wrap: balance;
 }
-.hero h1 .ghost { color: var(--sub); opacity: .55; font-weight: 500; }
 .hero .lede { margin: 0; max-width: 60ch; font-family: var(--f-text); font-size: clamp(17px, 2.3vw, 20px); line-height: 1.5; color: var(--sub); }
 .hero .lede b { color: var(--ink); font-weight: 600; }
 .credit {
@@ -301,7 +301,8 @@ footer p { margin: 0; max-width: 90ch; }
   </header>
 
   <section class="hero">
-    <h1>Coarse first.<br><span class="ghost">Then</span> fine.</h1>
+    <div class="eyebrow">Interactive explainer</div>
+    <h1>How Next&#8209;Concept Modeling generates text</h1>
     <p class="lede">Next-Concept Modeling (NCM) is a method for generating text developed by researchers at Stanford. Rather than writing one word after another, it produces a rough draft of the entire passage and then refines that draft in a small, fixed number of passes. <b>This page explains how the method works and lets you watch it happen.</b></p>
     <dl class="credit">
       <dt>Research</dt><dd>Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré, <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">“Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation”</a> (2026)</dd>
