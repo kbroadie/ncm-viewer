@@ -1,58 +1,31 @@
 # NCM Refinement Viewer
 
-An interactive explainer for [Next-Concept Modeling (NCM)](https://arxiv.org/abs/2610.14162), a coarse-to-fine text generation method developed by researchers at Stanford.
+An interactive, plain-language story about [Next-Concept Modeling (NCM)](https://arxiv.org/abs/2610.14162), a way of generating text developed by researchers at Stanford. Instead of writing one word at a time, NCM sketches a whole passage and sharpens it in about a dozen passes.
 
-**View it:** https://kbroadie.github.io/ncm-viewer/
+**Read it:** https://kbroadie.github.io/ncm-viewer/
 
 ## Credit
 
-Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. The research, models and samples are theirs, published in [HazyResearch/ncm](https://github.com/HazyResearch/ncm) under the MIT license.
+Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. The research, models and examples are theirs, published in [HazyResearch/ncm](https://github.com/HazyResearch/ncm) under the MIT license.
 
-This visualizer is an independent project by Kevin Broadie and is not affiliated with the authors.
+The story and interactive graphics are an independent project by Kevin Broadie and are not affiliated with the authors.
 
-## What the page covers
+## What's in the story
 
-The page explains NCM in four sections, each written at three depths:
-
-- **Overview:** plain language, for any reader.
-- **Technical:** how the method works, for engineers and the technically curious.
-- **Expert:** equations, ablations and caveats, for machine learning researchers.
-
-A reading-depth control opens every technical or expert layer at once, and each layer can also be expanded on its own.
-
-The page works like an app: one section per screen, with breadcrumbs at the top and a pager at the bottom. Swipe sideways or use the arrow keys to move between sections. Each section has its own link (`#drafts`, `#levels`, `#speed`, `#limits`, `#about`).
-
-Three interactive figures support the text:
-
-1. **A sample, pass by pass.** The published TinyStories, XSum and WMT14 samples, decoded after every pass, with changed words highlighted. Each sample shows its input above the output: none for the story model, a news article for summarization, and a German sentence for translation. These are single-task research models, so there is no written prompt. Swipe across the output to step through passes.
-2. **Level schedules.** Positions per level for six released models, read from the NCM repository's `config/eval` files.
-3. **Counting passes.** The WMT14 translation produced word by word, by diffusion and by NCM. The NCM lane replays the real sample; the other two are simulations.
+- **A story that writes itself as you scroll.** The opener follows one of the researchers' models writing a children's story, pass by pass.
+- **Same sentence, three ways.** A typewriter (word by word), a scratch-off card (diffusion) and a sketch artist (NCM) translate the same German sentence. Only the NCM lane uses real model output; the other two are simulations.
+- **The zoom levels.** How many layers each model uses, and how much detail each layer adds, read from the researchers' configuration files.
+- **Try it yourself.** Step through the published story, summary and translation examples, with each input shown above its output.
+- **The blooper reel.** Funny mid-draft mistakes, such as "Stekampkamp" and "Mexican Mexican," each linked to the pass where it happens.
+- **Every square is one step.** A unit chart of step counts reported in the paper, followed by measured speedups, the Sudoku results, limits and why the research matters.
 
 ## How the data was prepared
 
-The NCM repository doesn't publish per-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser with a word-level diff against the previous pass, so they approximate the original animation's highlighting. Speed figures are quoted from the paper.
+The NCM repository doesn't publish pass-by-pass text as data, so each pass was transcribed from the coarse-to-fine animation in that repository (`assets/coarse_to_fine.gif`). Highlights are computed in the browser by comparing each pass with the one before it, word by word. Speed, quality, Sudoku and training figures are quoted from the paper.
 
-## Adding samples
+## Data file
 
-All data lives in [`samples.json`](samples.json). Each sample looks like this:
-
-```json
-{
-  "id": "xsum",
-  "name": "XSum",
-  "task": "Summarization",
-  "inputLabel": "Input: a news article",
-  "inputNote": "The model condenses the article into one sentence.",
-  "sourceLang": "en",
-  "source": ["First paragraph of the input.", "Second paragraph."],
-  "outputLabel": "Output: a one-sentence summary",
-  "levels": ["text after pass 1", "text after pass 2", "..."]
-}
-```
-
-`source` and `sourceLang` are optional; leave them out for unconditional samples and use `inputNote` to say there is no input. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by pass number, shows a callout under that pass. New samples show up as tabs automatically.
-
-Level schedules live in the same file under `schedules`, one entry per model with its `levels` (positions per level), `codebook` size and source `config` path.
+Examples and layer schedules live in [`samples.json`](samples.json). Each example has a `task`, an `inputLabel` and `inputNote`, an optional `source` (the input text), an `outputLabel`, a `levels` array with the text after each pass, and optional `notes` keyed by pass number. Each schedule has a plain `label`, its `levels` (slots per layer), `codebook` size and source `config` path.
 
 ## Running locally
 
@@ -66,4 +39,4 @@ Then open http://localhost:8000.
 
 ## License
 
-The visualizer code is MIT licensed. See [LICENSE](LICENSE).
+The code in this repository is MIT licensed. See [LICENSE](LICENSE).

@@ -49,7 +49,11 @@
         "South African athlete Oscar Pistorius has been sentenced to six years in prison for killing his girlfriend Reeva Steenkamp."
       ],
       "inputLabel": "Input: a news article",
-      "inputNote": "The model condenses the article into one sentence. Only the opening of the article is shown here, as in the NCM repository's animation."
+      "inputNote": "The model condenses the article into one sentence. Only the opening of the article is shown here, as in the NCM repository's animation.",
+      "notes": {
+        "7": "“Stekampkamp” and a stuttering “Pist Pist.” The model knows roughly what these names look like but hasn’t nailed the spelling yet.",
+        "8": "Still “Stekampkamp.” The name gets spelled correctly only on the very last pass."
+      }
     },
     {
       "id": "wmt14",
@@ -74,8 +78,9 @@
         "Both the US authorities and the Mexican security forces are engaged in a continuous battle against drug cartels."
       ],
       "notes": {
-        "9": "Words repeat here (“Mexican Mexican”, “battle battle”). The paper notes that intermediate levels don’t improve steadily, and translation quality can dip before recovering.",
-        "10": "Still repeating. The final pass resolves it into a clean sentence."
+        "8": "“Drugels” is a mash-up of “drug” and “cartels.” The pieces are there; they just haven’t been sorted out.",
+        "9": "Now it’s “Mexican Mexican” and “battle battle.” This draft is arguably worse than the last one, and that’s normal: drafts can get messier before they get better.",
+        "10": "Still stuttering. One more pass cleans it up."
       },
       "inputLabel": "Input: a German sentence",
       "inputNote": "The model translates the sentence into English."
@@ -100,7 +105,8 @@
         108,
         128
       ],
-      "codebook": 4096
+      "codebook": 4096,
+      "label": "Stories"
     },
     {
       "id": "xsum",
@@ -117,7 +123,8 @@
         40,
         48
       ],
-      "codebook": 4096
+      "codebook": 4096,
+      "label": "Summaries"
     },
     {
       "id": "wmt14",
@@ -136,7 +143,8 @@
         56,
         64
       ],
-      "codebook": 4096
+      "codebook": 4096,
+      "label": "Translation"
     },
     {
       "id": "sudoku",
@@ -156,7 +164,8 @@
         67,
         89
       ],
-      "codebook": 16
+      "codebook": 16,
+      "label": "Sudoku"
     },
     {
       "id": "lm1b",
@@ -176,7 +185,8 @@
         108,
         128
       ],
-      "codebook": 8192
+      "codebook": 8192,
+      "label": "News sentences"
     },
     {
       "id": "owt",
@@ -216,7 +226,8 @@
         961,
         1024
       ],
-      "codebook": 8192
+      "codebook": 8192,
+      "label": "Web pages"
     }
   ]
 }
