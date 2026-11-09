@@ -73,7 +73,149 @@
         "Both US authorities the Mexican Mexican are engaged engaged a battle battle drug cart.",
         "Both US authorities and the Mexican Mexican are engaged engaged in a battle battle drug cart..",
         "Both the US authorities and the Mexican security forces are engaged in a continuous battle against drug cartels."
-      ]
+      ],
+      "notes": {
+        "9": "Words repeat here (“Mexican Mexican”, “battle battle”). The paper notes that intermediate levels don’t improve steadily, and translation quality can dip before recovering.",
+        "10": "Still repeating. The final level resolves it into a clean sentence."
+      }
+    }
+  ],
+  "schedules": [
+    {
+      "id": "tinystories",
+      "name": "TinyStories",
+      "config": "config/eval/tinystories.yaml",
+      "levels": [
+        1,
+        8,
+        16,
+        24,
+        32,
+        40,
+        52,
+        64,
+        76,
+        92,
+        108,
+        128
+      ],
+      "codebook": 4096
+    },
+    {
+      "id": "xsum",
+      "name": "XSum",
+      "config": "config/eval/xsum.yaml",
+      "levels": [
+        4,
+        6,
+        10,
+        14,
+        20,
+        26,
+        32,
+        40,
+        48
+      ],
+      "codebook": 4096
+    },
+    {
+      "id": "wmt14",
+      "name": "WMT14",
+      "config": "config/eval/wmt14.yaml",
+      "levels": [
+        1,
+        4,
+        8,
+        14,
+        20,
+        26,
+        32,
+        40,
+        48,
+        56,
+        64
+      ],
+      "codebook": 4096
+    },
+    {
+      "id": "sudoku",
+      "name": "Sudoku",
+      "config": "config/eval/sudoku-hard.yaml",
+      "levels": [
+        1,
+        2,
+        4,
+        6,
+        9,
+        13,
+        18,
+        26,
+        37,
+        50,
+        67,
+        89
+      ],
+      "codebook": 16
+    },
+    {
+      "id": "lm1b",
+      "name": "LM1B",
+      "config": "config/eval/lm1b-small.yaml",
+      "levels": [
+        1,
+        8,
+        16,
+        24,
+        32,
+        40,
+        52,
+        64,
+        76,
+        92,
+        108,
+        128
+      ],
+      "codebook": 8192
+    },
+    {
+      "id": "owt",
+      "name": "OpenWebText",
+      "config": "config/eval/owt.yaml",
+      "levels": [
+        1,
+        4,
+        9,
+        16,
+        25,
+        36,
+        49,
+        64,
+        81,
+        100,
+        121,
+        144,
+        169,
+        196,
+        225,
+        256,
+        289,
+        324,
+        361,
+        400,
+        441,
+        484,
+        529,
+        576,
+        625,
+        676,
+        729,
+        784,
+        841,
+        900,
+        961,
+        1024
+      ],
+      "codebook": 8192
     }
   ]
 }

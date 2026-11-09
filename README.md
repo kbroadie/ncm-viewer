@@ -8,12 +8,11 @@ An interactive viewer for [Next-Concept Modeling (NCM)](https://github.com/HazyR
 
 Most language models write left to right, one token per forward pass. NCM, from Stanford's HazyResearch lab, works coarse to fine instead. A tokenizer compresses text into a stack of codes, coarse on top and fine at the bottom, and a transformer predicts that stack from the top down. Every position within a level is predicted at once, so the whole output takes one forward pass per level.
 
-The viewer makes that process visible:
+The page has three figures:
 
-- **Step or play** through each level of a sample.
-- **Highlights** mark the words that changed since the previous level.
-- **The level strip** charts word count per level, so you can see each level cover a longer sequence. Tap a bar to jump to it.
-- **All levels at once** stacks every pass in one list.
+1. **A sample, level by level.** Step or play through each level of a published sample. Highlights mark the words that changed since the previous level, and the level strip charts word count per level. Tap a bar to jump to it, or open "All levels at once" to see every pass stacked.
+2. **The level schedule.** How many code positions each level holds, for six of the released models (TinyStories, XSum, WMT14, Sudoku, LM1B and OpenWebText), read straight from the NCM repo's `config/eval` files.
+3. **Counting passes.** The WMT14 translation produced three ways: autoregressive, diffusion and NCM. The NCM lane plays the real sample; the other two are simulations of the same sentence. Below it, pass counts and wall-clock speedups reported in the paper.
 
 ## Samples
 
@@ -45,7 +44,9 @@ All sample data lives in [`samples.json`](samples.json). Each entry looks like t
 }
 ```
 
-`source`, `sourceLabel` and `sourceLang` are optional; leave them out for unconditional samples. Use `\n` inside a level for a paragraph break. New entries show up as tabs automatically.
+`source`, `sourceLabel` and `sourceLang` are optional; leave them out for unconditional samples. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by level number, shows a callout under that level. New entries show up as tabs automatically.
+
+Level schedules live in the same file under `schedules`, one entry per model with its `levels` (positions per level), `codebook` size and source `config` path.
 
 ## Running locally
 
