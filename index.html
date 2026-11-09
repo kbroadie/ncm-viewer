@@ -3,36 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NCM Refinement Viewer</title>
-<meta name="description" content="An interactive look at Next-Concept Modeling: watch samples resolve level by level, see each model's level schedule, and compare pass counts with autoregressive and diffusion generation.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230F1218'/%3E%3Crect x='3' y='3' width='2' height='2' fill='%23fff'/%3E%3Crect x='3' y='7' width='6' height='2' fill='%23fff'/%3E%3Crect x='3' y='11' width='10' height='2' fill='%23FFE14D'/%3E%3C/svg%3E">
+<title>Watching Text Resolve</title>
+<meta name="description" content="Watching Text Resolve: an interactive companion to Next-Concept Modeling. Published samples decoded level by level, level schedules of six released models, and a pass-count comparison with autoregressive and diffusion generation.">
+<meta name="author" content="Kevin Broadie">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111'/%3E%3Crect x='3' y='3' width='2' height='2' fill='%23fff'/%3E%3Crect x='3' y='7' width='6' height='2' fill='%23fff'/%3E%3Crect x='3' y='11' width='10' height='2' fill='%23FFE14D'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Archivo:wdth,wght@62..125,400..800&display=swap">
 <style>
-/* Layout: Swiss two-column grid. Each figure gets a heavy top rule, a big figure number on the left, the work on the right. Stacks to one column on phones. */
+/* Layout: single-column paper, about 70 characters wide. Serif text, sans figure internals, booktabs tables, captions below figures and above tables. */
 :root {
-  --bg: #FFFFFF;
-  --ink: #0F1218;
-  --sub: #5D6371;
-  --hair: #E2E4EA;
-  --wash: #F3F4F7;
-  --accent: #2B3FE0;
+  --paper: #FFFFFF;
+  --ink: #111111;
+  --sub: #5A5F69;
+  --rule: #111111;
+  --hair: #DCDEE3;
+  --wash: #F4F5F7;
+  --link: #1D3BB3;
+  --fig: #2B45D6;
   --mark: #FFE14D;
   --on-ink: #FFFFFF;
-  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-ui: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-text: "STIX Two Text", "Times New Roman", Times, serif;
+  --f-fig: "Archivo", "Helvetica Neue", Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0C0E13; --ink: #ECEEF3; --sub: #9298A5; --hair: #262A33; --wash: #151820;
-    --accent: #8193FF; --mark: #6A5800; --on-ink: #0C0E13; color-scheme: dark;
+    --paper: #111317; --ink: #E9EBEF; --sub: #9BA1AC; --rule: #E9EBEF; --hair: #2A2E36; --wash: #1A1D23;
+    --link: #93A6FF; --fig: #8396FF; --mark: #66560A; --on-ink: #111317; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0C0E13; --ink: #ECEEF3; --sub: #9298A5; --hair: #262A33; --wash: #151820;
-  --accent: #8193FF; --mark: #6A5800; --on-ink: #0C0E13; color-scheme: dark;
+  --paper: #111317; --ink: #E9EBEF; --sub: #9BA1AC; --rule: #E9EBEF; --hair: #2A2E36; --wash: #1A1D23;
+  --link: #93A6FF; --fig: #8396FF; --mark: #66560A; --on-ink: #111317; color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -40,216 +42,207 @@ html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
-  font: 400 15px/1.5 var(--f-ui);
-  font-variation-settings: "wdth" 100;
+  font: 400 18px/1.55 var(--f-text);
 }
-a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-a:hover { color: var(--accent); }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--fig); outline-offset: 2px; }
+code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .82em; }
 
-.page {
-  max-width: 1120px;
+.paper {
+  max-width: 760px;
   margin: 0 auto;
-  padding-block: 0 64px;
+  padding-block: 48px 72px;
   padding-left: max(20px, env(safe-area-inset-left, 0px));
   padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
 
-/* Top bar */
-.top {
-  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px;
-  padding-block: 18px 14px;
-}
-.wordmark { font-weight: 700; font-variation-settings: "wdth" 112; font-size: 15px; letter-spacing: .01em; }
-.top nav { display: flex; gap: 18px; font-size: 14px; color: var(--sub); }
-.top nav a { text-decoration: none; }
-.top nav a:hover { color: var(--ink); text-decoration: underline; }
+/* Title block */
+.titleblock { text-align: center; display: grid; gap: 14px; margin-bottom: 36px; }
+.titleblock h1 { margin: 0; font-size: clamp(26px, 5vw, 34px); line-height: 1.2; font-weight: 700; text-wrap: balance; }
+.authors { font-size: 18px; }
+.authors sup { font-size: .65em; }
+.affil { font-size: 15px; color: var(--sub); font-style: italic; margin-top: -8px; }
+.links { font: 500 14px/1.4 var(--f-fig); display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; }
+.links a { color: var(--ink); border-bottom: 1px solid var(--hair); }
+.links a:hover { border-bottom-color: var(--ink); text-decoration: none; }
+.date { font-size: 15px; color: var(--sub); }
 
-/* Hero */
-.hero { padding-block: clamp(28px, 7vw, 72px) clamp(28px, 6vw, 56px); display: grid; gap: 22px; }
-.hero h1 {
-  margin: 0;
-  font-family: var(--f-display);
-  font-weight: 850;
-  font-variation-settings: "wdth" 118;
-  font-size: clamp(44px, 10.5vw, 112px);
-  line-height: .92;
-  letter-spacing: -.035em;
-  text-wrap: balance;
-}
-.hero h1 .ghost { color: var(--sub); opacity: .55; font-weight: 500; }
-.hero p {
-  margin: 0; max-width: 58ch;
-  font-family: var(--f-text); font-size: clamp(17px, 2.3vw, 20px); line-height: 1.5; color: var(--sub);
-}
-.hero p b { color: var(--ink); font-weight: 600; }
+.abstract { margin: 0 auto 8px; max-width: 640px; font-size: 16.5px; line-height: 1.55; }
+.abstract h2 { text-align: center; font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+.abstract p { margin: 0; text-align: justify; hyphens: auto; }
 
-/* Figure sections */
-.fig {
-  border-top: 3px solid var(--ink);
+/* Body text */
+section { margin-top: 36px; }
+h2 { font-size: 21px; font-weight: 700; margin: 0 0 12px; line-height: 1.3; }
+h3 { font-size: 18px; font-weight: 700; margin: 24px 0 8px; }
+h2 .n, h3 .n { display: inline-block; min-width: 1.8em; }
+p { margin: 0 0 14px; text-align: justify; hyphens: auto; }
+p.flush { text-align: left; }
+ul.contrib { margin: 0 0 14px; padding-left: 1.4em; }
+ul.contrib li { margin-bottom: 6px; }
+.cite { white-space: nowrap; }
+.q { font-style: italic; }
+
+/* Equations */
+.eq { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin: 16px 0 18px; }
+.eq .m { text-align: center; font-size: 19px; overflow-x: auto; white-space: nowrap; padding: 2px 0; }
+.eq .no { font-size: 17px; }
+.m i { font-family: var(--f-text); font-style: italic; }
+.m .op { margin: 0 .28em; }
+.m .big { font-size: 1.35em; vertical-align: -.12em; }
+.m sub, .m sup { font-size: .68em; }
+
+/* Figures */
+figure { margin: 26px 0 30px; }
+.panel {
+  border-top: 1.5px solid var(--rule);
+  border-bottom: 1.5px solid var(--rule);
+  padding: 16px 0 18px;
   display: grid;
-  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
-  gap: 20px 48px;
-  padding-block: 18px 64px;
+  gap: 16px;
+  font: 400 14px/1.45 var(--f-fig);
+  min-width: 0;
 }
-.fig-head { display: grid; align-content: start; gap: 8px; }
-.fig-no {
-  font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 100;
-  font-size: 64px; line-height: .85; letter-spacing: -.04em;
-}
-.fig-head h2 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 700; font-variation-settings: "wdth" 108; text-wrap: balance; }
-.fig-head p { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--sub); max-width: 34ch; }
-.fig-body { display: grid; gap: 22px; min-width: 0; align-content: start; }
+figcaption { font-size: 15.5px; line-height: 1.5; margin-top: 10px; text-align: justify; hyphens: auto; }
+figcaption b, .tcap b { font-weight: 700; }
 
-@media (max-width: 760px) {
-  .fig { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 14px 48px; }
-  .fig-head { grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; align-items: end; }
-  .fig-no { font-size: 48px; grid-row: span 2; }
-  .fig-head p { grid-column: 1 / -1; max-width: none; }
-}
-
-/* Text tabs */
-.tabs { display: flex; flex-wrap: wrap; gap: 4px 22px; border-bottom: 1px solid var(--hair); }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px 18px; border-bottom: 1px solid var(--hair); }
 .tab {
-  appearance: none; background: none; border: 0; cursor: pointer;
-  padding: 6px 0 9px; margin-bottom: -1px;
-  font-size: 15px; font-weight: 500; color: var(--sub);
-  border-bottom: 3px solid transparent;
+  appearance: none; background: none; border: 0; cursor: pointer; padding: 4px 0 7px; margin-bottom: -1px;
+  font: 500 14px/1.3 var(--f-fig); color: var(--sub); border-bottom: 2px solid transparent;
 }
 .tab:hover { color: var(--ink); }
 .tab[aria-selected="true"] { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
 
-.kicker { font-size: 12.5px; font-weight: 600; color: var(--sub); letter-spacing: .02em; }
-.source { margin: 0; max-width: 64ch; font-family: var(--f-text); font-size: 15.5px; line-height: 1.5; color: var(--sub); }
-.source p { margin: 0 0 4px; }
-.source[lang="de"] { font-style: italic; }
+.kicker { font: 600 12px/1.3 var(--f-fig); color: var(--sub); letter-spacing: .02em; }
+.src { margin: 4px 0 0; font-family: var(--f-text); font-size: 15.5px; line-height: 1.5; color: var(--sub); }
+.src p { margin: 0 0 3px; text-align: left; }
+.src[lang="de"] { font-style: italic; }
 
-/* Controls */
-.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .btn {
-  appearance: none; cursor: pointer; height: 40px; min-width: 40px; padding: 0 14px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--bg); border: 1.5px solid var(--ink); border-radius: 0;
-  font-size: 14px; font-weight: 600;
+  appearance: none; cursor: pointer; height: 34px; min-width: 34px; padding: 0 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--paper); border: 1px solid var(--ink); border-radius: 0;
+  font: 600 13px/1 var(--f-fig);
 }
 .btn:hover { background: var(--wash); }
-.btn:disabled { opacity: .3; cursor: default; background: var(--bg); }
-.btn.solid { background: var(--ink); color: var(--on-ink); padding: 0 18px; }
-.btn.solid:hover { background: var(--accent); border-color: var(--accent); }
-.btn svg { width: 13px; height: 13px; fill: currentColor; }
-.readout {
-  margin-left: auto; font-variant-numeric: tabular-nums; font-size: 14px; color: var(--sub);
-}
-.readout b { font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 100; font-size: 28px; color: var(--ink); letter-spacing: -.02em; }
+.btn:disabled { opacity: .3; cursor: default; background: var(--paper); }
+.btn.solid { background: var(--ink); color: var(--on-ink); padding: 0 14px; }
+.btn.solid:hover { background: var(--fig); border-color: var(--fig); }
+.btn svg { width: 11px; height: 11px; fill: currentColor; }
+.readout { margin-left: auto; font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.readout b { color: var(--ink); font-size: 17px; font-weight: 700; }
 
-/* Level strip */
-.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; align-items: end; height: 84px; }
-.bar { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 5px; min-width: 0; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; align-items: end; height: 70px; }
+.bar { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 4px; min-width: 0; }
 .bar .fill { align-self: end; width: 100%; min-height: 3px; background: var(--hair); transition: background .15s; }
-.bar .n { font-size: 11px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.bar .n { font-size: 10.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .bar:hover .fill { background: var(--sub); }
-.bar.done .fill { background: var(--ink); opacity: .55; }
-.bar.cur .fill { background: var(--accent); opacity: 1; }
+.bar.done .fill { background: var(--ink); opacity: .5; }
+.bar.cur .fill { background: var(--fig); opacity: 1; }
 .bar.cur .n { color: var(--ink); font-weight: 700; }
 
-.stats { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 12.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 650; }
-.key { display: inline-flex; align-items: center; gap: 7px; }
-.key i { width: 16px; height: 10px; background: var(--mark); display: inline-block; }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 14px; height: 9px; background: var(--mark); display: inline-block; }
 
-.output {
-  margin: 0; max-width: 60ch; min-height: 3.4em;
-  font-family: var(--f-text); font-size: clamp(20px, 3.2vw, 25px); line-height: 1.55; overflow-wrap: anywhere;
-}
-.output .empty { color: var(--sub); font-style: italic; font-size: .8em; }
-mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08em; border-radius: 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.out { margin: 0; min-height: 3.2em; font-family: var(--f-text); font-size: 20px; line-height: 1.55; overflow-wrap: anywhere; text-align: left; }
+.out .empty { color: var(--sub); font-style: italic; font-size: .8em; }
+mark { background: var(--mark); color: inherit; padding: 0 .07em; margin: 0 -.07em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .animate mark { animation: arrive .4s ease-out; }
 @keyframes arrive { from { background: transparent; } }
 
-.note {
-  max-width: 60ch; font-size: 14px; line-height: 1.5; padding: 10px 0 10px 14px;
-  border-left: 3px solid var(--accent); color: var(--ink);
-}
+.inote { font-size: 13.5px; line-height: 1.5; color: var(--ink); background: var(--wash); padding: 10px 12px; }
+.inote b { font-weight: 700; }
 
 details.all { border-top: 1px solid var(--hair); }
-details.all > summary { cursor: pointer; list-style: none; padding: 14px 0; font-weight: 600; font-size: 14.5px; display: flex; gap: 8px; align-items: baseline; }
+details.all > summary { cursor: pointer; list-style: none; padding: 10px 0 2px; font-weight: 600; font-size: 13.5px; display: flex; gap: 6px; align-items: baseline; }
 details.all > summary::-webkit-details-marker { display: none; }
-details.all > summary::before { content: "+"; width: 1em; font-weight: 500; }
+details.all > summary::before { content: "+"; width: 1em; }
 details.all[open] > summary::before { content: "\2212"; }
 details.all > summary span { color: var(--sub); font-weight: 400; }
-.rows { display: grid; }
+.rows { display: grid; margin-top: 8px; }
 .row {
   appearance: none; background: none; border: 0; text-align: left; cursor: pointer; color: var(--sub);
-  display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--hair);
-  font-family: var(--f-text); font-size: 15.5px; line-height: 1.5;
+  display: grid; grid-template-columns: 2em minmax(0, 1fr); gap: 10px; padding: 6px 0; border-top: 1px solid var(--hair);
+  font-family: var(--f-text); font-size: 15px; line-height: 1.45;
 }
-.row .lv { font-family: var(--f-ui); font-size: 12.5px; font-weight: 700; line-height: 1.9; font-variant-numeric: tabular-nums; }
+.row .lv { font: 700 12px/1.9 var(--f-fig); font-variant-numeric: tabular-nums; }
 .row .tx { min-width: 0; overflow-wrap: anywhere; }
-.row:hover { color: var(--ink); }
-.row.cur { color: var(--ink); }
-.row.cur .lv { color: var(--accent); }
-.row mark { padding: 0 .04em; margin: 0 -.04em; }
+.row:hover, .row.cur { color: var(--ink); }
+.row.cur .lv { color: var(--fig); }
+.row mark { padding: 0 .03em; margin: 0 -.03em; }
 
-/* Schedule */
+/* Schedule plot */
 .sched { display: grid; gap: 3px; }
-.srow { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) 3.6em; gap: 10px; align-items: center; font-variant-numeric: tabular-nums; }
-.srow .l { font-size: 12px; color: var(--sub); text-align: right; }
-.srow .track { height: 12px; position: relative; }
+.srow { display: grid; grid-template-columns: 2em minmax(0, 1fr) 3.4em; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.srow .l { font-size: 11.5px; color: var(--sub); text-align: right; }
+.srow .track { height: 11px; position: relative; }
 .srow .w { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
-.srow .add { position: absolute; top: 0; bottom: 0; background: var(--accent); }
-.srow .v { font-size: 12.5px; font-weight: 600; text-align: right; }
-.sched.dense .srow .track { height: 7px; }
+.srow .add { position: absolute; top: 0; bottom: 0; background: var(--fig); }
+.srow .v { font-size: 12px; font-weight: 600; text-align: right; }
 .sched.dense { gap: 2px; }
-.sched.dense .srow .l, .sched.dense .srow .v { font-size: 10.5px; line-height: 1; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--sub); }
-.legend i { display: inline-block; width: 14px; height: 10px; margin-right: 7px; vertical-align: -1px; }
+.sched.dense .srow .track { height: 6px; }
+.sched.dense .srow .l, .sched.dense .srow .v { font-size: 10px; line-height: 1; }
+.axis { display: grid; grid-template-columns: 2em minmax(0, 1fr) 3.4em; gap: 8px; font-size: 11.5px; color: var(--sub); }
+.axis span:nth-child(1) { text-align: right; }
+.axis span:nth-child(3) { text-align: right; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 12.5px; color: var(--sub); }
+.legend i { display: inline-block; width: 13px; height: 9px; margin-right: 6px; vertical-align: -1px; }
 
-.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--hair); }
-.fact { padding: 14px 16px 4px 0; display: grid; gap: 2px; min-width: 0; }
-.fact + .fact { padding-left: 16px; border-left: 1px solid var(--hair); }
-.fact b { font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 100; font-size: clamp(26px, 5vw, 38px); line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.fact span { font-size: 13px; color: var(--sub); line-height: 1.35; }
+/* Tables (booktabs) */
+.tbl { margin: 26px 0 30px; }
+.tcap { font-size: 15.5px; line-height: 1.5; margin-bottom: 8px; text-align: justify; hyphens: auto; }
+.tscroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; font-variant-numeric: tabular-nums; }
+thead tr { border-top: 1.5px solid var(--rule); border-bottom: .75px solid var(--rule); }
+tbody tr:last-child { border-bottom: 1.5px solid var(--rule); }
+th { font-weight: 600; text-align: left; padding: 6px 10px; white-space: nowrap; }
+td { padding: 5px 10px; white-space: nowrap; }
+th:first-child, td:first-child { padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+td.r, th.r { text-align: right; }
+td.ncm { font-weight: 700; color: var(--fig); }
+.minibar { display: inline-block; height: 9px; background: var(--fig); vertical-align: 0; min-width: 2px; }
+.minibar.base { background: var(--sub); }
 
 /* Race */
-.race { display: grid; gap: 0; border-top: 1px solid var(--hair); }
-.lane { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
-.lane-head { display: grid; gap: 2px; align-content: start; }
-.lane-head h3 { margin: 0; font-size: 15px; font-weight: 700; font-variation-settings: "wdth" 106; }
-.lane-head small { font-size: 12.5px; color: var(--sub); line-height: 1.35; }
-.count { font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 100; font-size: 34px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; margin-top: 6px; }
-.count em { font-style: normal; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--sub); font-family: var(--f-ui); margin-left: 6px; }
-.lane.ncm .count { color: var(--accent); }
-.lane-text { font-family: var(--f-text); font-size: 17px; line-height: 1.55; min-width: 0; overflow-wrap: anywhere; min-height: 3.1em; }
-.slot { display: inline-block; width: 2.2em; height: .62em; background: var(--hair); vertical-align: 0; }
-.lane-track { grid-column: 2; height: 4px; background: var(--hair); position: relative; }
+.race { display: grid; }
+.lane { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 6px 18px; padding: 12px 0; border-top: 1px solid var(--hair); }
+.lane:last-child { border-bottom: 1px solid var(--hair); }
+.lane-head { display: grid; gap: 1px; align-content: start; }
+.lane-head h4 { margin: 0; font: 700 14px/1.3 var(--f-fig); }
+.lane-head small { font-size: 12px; color: var(--sub); line-height: 1.35; }
+.count { font: 800 26px/1 var(--f-fig); letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 6px; }
+.count em { font-style: normal; font-size: 12px; font-weight: 500; letter-spacing: 0; color: var(--sub); margin-left: 5px; }
+.lane.ncm .count { color: var(--fig); }
+.lane-text { font-family: var(--f-text); font-size: 16.5px; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; min-height: 3em; }
+.slot { display: inline-block; width: 2em; height: .6em; background: var(--hair); }
+.lane-track { grid-column: 2; height: 3px; background: var(--hair); position: relative; }
 .lane-track span { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
-.lane.ncm .lane-track span { background: var(--accent); }
-@media (max-width: 640px) {
+.lane.ncm .lane-track span { background: var(--fig); }
+@media (max-width: 600px) {
+  body { font-size: 17px; }
   .lane { grid-template-columns: minmax(0, 1fr); }
   .lane-head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .count { margin: 0; grid-row: 1 / span 2; grid-column: 2; }
   .lane-track { grid-column: 1; }
+  p, .abstract p, figcaption, .tcap { text-align: left; }
 }
 
-/* Paper numbers */
-.paper { display: grid; gap: 18px; }
-.pset { display: grid; gap: 6px; }
-.pset-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; }
-.pset-top h4 { margin: 0; font-size: 15px; font-weight: 700; }
-.pset-top span { font-size: 13px; color: var(--sub); }
-.pset-top span b { color: var(--ink); font-weight: 700; }
-.pbar { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3.4em; gap: 10px; align-items: center; font-size: 12.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.pbar .t { height: 14px; position: relative; background: var(--wash); }
-.pbar .t span { position: absolute; inset: 0 auto 0 0; background: var(--sub); }
-.pbar.ncm .t span { background: var(--accent); }
-.pbar .v { text-align: right; font-weight: 650; color: var(--ink); }
-.fine { font-size: 13px; color: var(--sub); max-width: 70ch; margin: 0; line-height: 1.5; }
-
-footer { border-top: 3px solid var(--ink); padding-top: 16px; display: grid; gap: 8px; font-size: 13px; color: var(--sub); }
-footer p { margin: 0; max-width: 80ch; }
+/* References */
+ol.refs { list-style: none; padding: 0; margin: 0; font-size: 15.5px; line-height: 1.5; display: grid; gap: 8px; }
+ol.refs li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr); }
+ol.refs li > span:first-child { color: var(--sub); }
+ol.refs li:target { background: var(--wash); }
+.footnote { margin-top: 40px; padding-top: 10px; border-top: .75px solid var(--rule); font-size: 14px; color: var(--sub); max-width: 32em; }
+.footnote p { text-align: left; margin: 0 0 4px; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate mark { animation: none; }
@@ -258,33 +251,65 @@ footer p { margin: 0; max-width: 80ch; }
 </style>
 </head>
 <body>
-<div class="page">
-  <header class="top">
-    <span class="wordmark">NCM Refinement Viewer</span>
-    <nav aria-label="Links">
-      <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">Paper</a>
-      <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">NCM code</a>
-      <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">Source</a>
-    </nav>
-  </header>
+<article class="paper">
 
-  <section class="hero">
-    <h1>Coarse first.<br><span class="ghost">Then</span> fine.</h1>
-    <p>Next-Concept Modeling writes text the way you'd sketch a drawing: a rough outline, then a few passes of refinement, with <b>every position in a pass filled at once</b>. These figures show how that works, using the published samples and the model configs from the NCM repo.</p>
-  </section>
+<header class="titleblock">
+  <h1>Watching Text Resolve: An Interactive Companion to Next-Concept Modeling</h1>
+  <div class="authors">Kevin Broadie<sup>*</sup></div>
+  <div class="affil">Independent</div>
+  <div class="links">
+    <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">Code</a>
+    <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">NCM paper</a>
+    <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">NCM release</a>
+  </div>
+  <div class="date">November 2026</div>
+</header>
 
-  <!-- Fig 1: samples -->
-  <section class="fig" id="samples" aria-labelledby="f1">
-    <div class="fig-head">
-      <div class="fig-no">1</div>
-      <h2 id="f1">A sample, level by level</h2>
-      <p>Each level is one forward pass. Yellow marks words that changed since the previous level.</p>
-    </div>
-    <div class="fig-body">
+<section class="abstract" aria-labelledby="abs">
+  <h2 id="abs">Abstract</h2>
+  <p>Next-Concept Modeling (NCM) <a class="cite" href="#ref1">[1]</a> generates text from coarse to fine. A multiscale residual tokenizer represents a sequence as a hierarchy of discrete codes, and a transformer predicts that hierarchy one level at a time, filling every position within a level in parallel. The number of sequential forward passes therefore equals the number of levels rather than the number of tokens. This companion makes that process visible. We decode the published samples at every level, chart the level schedules of six released models from their evaluation configurations, and compare the pass counts of autoregressive, diffusion and next-concept generation on a single translation. All figures are interactive, and all sample text and schedules are taken from the public NCM release.</p>
+</section>
+
+<section id="intro" aria-labelledby="s1">
+  <h2 id="s1"><span class="n">1</span>Introduction</h2>
+  <p>Autoregressive language models produce one token per forward pass, so generation latency grows with output length. Diffusion language models sample positions in parallel, but they revisit the full sequence at every step and typically need many steps to reach good quality <a class="cite" href="#ref1">[1]</a>. NCM takes a third route: it commits to a short, coarse representation of the entire output and then adds detail over a fixed number of refinement levels. Kumbong et al. report that NCM matches or exceeds strong diffusion baselines while generating 10 to 31 times faster <a class="cite" href="#ref1">[1]</a>.</p>
+  <p>The intermediate levels of an NCM sample are simple to describe and hard to picture. This page is meant to close that gap. Our contributions are:</p>
+  <ul class="contrib">
+    <li>an interactive decoding of the three published samples, with per-level change highlighting (<a href="#samples">Section 3</a>);</li>
+    <li>a comparison of level schedules across six released checkpoints, read directly from their configurations (<a href="#schedules">Section 4</a>); and</li>
+    <li>a pass-count comparison that places NCM beside autoregressive and diffusion generation on the same output (<a href="#passes">Section 5</a>).</li>
+  </ul>
+</section>
+
+<section id="background" aria-labelledby="s2">
+  <h2 id="s2"><span class="n">2</span>Background</h2>
+  <h3><span class="n">2.1</span>Multiscale residual tokenization</h3>
+  <p>The NCM tokenizer is a VQ-VAE with a multiscale residual quantizer, similar in spirit to next-scale prediction for images <a class="cite" href="#ref2">[2]</a>. Let <i>z</i> be the encoder's representation of a sequence. The quantizer visits <i>L</i> levels in order, where level <i>ℓ</i> holds <i>n</i><sub><i>ℓ</i></sub> positions and <i>n</i><sub>1</sub> &lt; <i>n</i><sub>2</sub> &lt; … &lt; <i>n</i><sub><i>L</i></sub>. Schematically, each level quantizes whatever the earlier levels left unexplained:</p>
+  <div class="eq">
+    <div class="m"><i>r</i><sub>1</sub><span class="op">=</span><i>z</i>,&emsp;<i>q</i><sub><i>ℓ</i></sub><span class="op">=</span><i>Q</i><sub><i>ℓ</i></sub>(<i>D</i><sub><i>ℓ</i></sub>(<i>r</i><sub><i>ℓ</i></sub>)),&emsp;<i>r</i><sub><i>ℓ</i>+1</sub><span class="op">=</span><i>r</i><sub><i>ℓ</i></sub><span class="op">−</span><i>U</i><sub><i>ℓ</i></sub>(<i>q</i><sub><i>ℓ</i></sub>)</div>
+    <div class="no">(1)</div>
+  </div>
+  <p class="flush">where <i>D</i><sub><i>ℓ</i></sub> resamples the residual to <i>n</i><sub><i>ℓ</i></sub> positions, <i>Q</i><sub><i>ℓ</i></sub> maps each position to its nearest codebook entry, and <i>U</i><sub><i>ℓ</i></sub> maps the codes back to full length. The decoder reconstructs the sequence from the sum of all levels. Early levels therefore carry the broad content of the text and later levels carry corrections. The authors report token reconstruction accuracies between 99.79% and 99.99% on the text datasets they evaluate <a class="cite" href="#ref1">[1]</a>.</p>
+
+  <h3><span class="n">2.2</span>Level-wise parallel generation</h3>
+  <p>A transformer generator models the code hierarchy level by level. At step <i>ℓ</i> it reads every code from levels 1 through <i>ℓ</i>−1 and predicts all <i>n</i><sub><i>ℓ</i></sub> codes of level <i>ℓ</i> in a single forward pass:</p>
+  <div class="eq">
+    <div class="m"><i>p</i>(<i>q</i><sub>1</sub>, …, <i>q</i><sub><i>L</i></sub>)<span class="op">=</span><span class="big">∏</span><sub><i>ℓ</i>=1</sub><sup><i>L</i></sup>&thinsp;<i>p</i>(<i>q</i><sub><i>ℓ</i></sub> | <i>q</i><sub>&lt;<i>ℓ</i></sub>)</div>
+    <div class="no">(2)</div>
+  </div>
+  <p>Positions within a level are sampled in parallel, so a complete sample costs <i>L</i> forward passes for a given schedule (<i>n</i><sub>1</sub>, …, <i>n</i><sub><i>L</i></sub>). The released generators use a block-diagonal attention pattern, which the authors found gave the best perplexity and the fastest sampling among the variants they tested <a class="cite" href="#ref1">[1]</a>.</p>
+</section>
+
+<section id="samples" aria-labelledby="s3">
+  <h2 id="s3"><span class="n">3</span>Refinement in Published Samples</h2>
+  <p>The NCM repository includes an animation of three samples decoded at every level: an unconditional TinyStories <a class="cite" href="#ref3">[3]</a> story, an XSum <a class="cite" href="#ref4">[4]</a> summary, and a WMT14 <a class="cite" href="#ref5">[5]</a> German-to-English translation. We transcribed every level and present them in Figure 1.</p>
+
+  <figure id="fig1">
+    <div class="panel">
       <div class="tabs" role="tablist" aria-label="Sample" id="tabs"></div>
-      <div id="srcBlock" class="fig-body" style="gap:6px">
+      <div id="srcBlock">
         <div class="kicker" id="srcLabel">Source</div>
-        <div class="source" id="src"></div>
+        <div class="src" id="src"></div>
       </div>
       <div class="controls">
         <button class="btn" id="prev" aria-label="Previous level"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
@@ -296,87 +321,133 @@ footer p { margin: 0; max-width: 80ch; }
       <div class="stats">
         <span><b id="stWords">0</b> words</span>
         <span><b id="stChanged">0</b> changed</span>
-        <span class="key"><i></i>new since last level</span>
+        <span class="key"><i></i>changed since previous level</span>
       </div>
-      <div class="kicker" id="outLabel">NCM output</div>
-      <p class="output" id="out"></p>
-      <div class="note" id="note" hidden></div>
+      <div>
+        <div class="kicker" id="outLabel">NCM output</div>
+        <p class="out" id="out"></p>
+      </div>
+      <div class="inote" id="note" hidden></div>
       <details class="all" id="all">
         <summary>All levels at once <span id="allCount"></span></summary>
         <div class="rows" id="rows"></div>
       </details>
     </div>
-  </section>
+    <figcaption><b>Figure 1:</b> Published NCM samples decoded at every level. Each level corresponds to one forward pass of the generator. Highlighted words differ from the previous level under a word-level diff. Bar heights give the number of decoded words per level. Use the arrow keys, the bars, or the play control to move between levels.</figcaption>
+  </figure>
 
-  <!-- Fig 2: schedules -->
-  <section class="fig" id="schedule" aria-labelledby="f2">
-    <div class="fig-head">
-      <div class="fig-no">2</div>
-      <h2 id="f2">The level schedule</h2>
-      <p>Every model fixes how many code positions each level holds. Coarse levels are short; each level after adds positions until the full length is reached.</p>
+  <p>Three patterns recur across the samples. First, the earliest levels contain mostly high-frequency function words and punctuation, consistent with level 1 holding very few positions. Second, content words that anchor the meaning, such as names (<span class="q">Tim</span>, <span class="q">Pistorius</span>) and topic nouns (<span class="q">kite</span>, <span class="q">prison</span>, <span class="q">security</span>), appear several levels before the text is grammatical. Third, word order and spelling resolve last: the XSum sample reads <span class="q">Stekampkamp</span> at levels 7 and 8 and <span class="q">Steenkamp</span> only at level 9.</p>
+
+  <h3 id="s31"><span class="n">3.1</span>Refinement is not monotonic</h3>
+  <p>Decoded quality does not improve at every level. In the WMT14 sample, levels 9 and 10 repeat words (<span class="q">Mexican Mexican</span>, <span class="q">battle battle</span>) that level 8 did not contain, and level 11 resolves them. Kumbong et al. observe the same effect quantitatively, with decoded BLEU dropping at some intermediate levels before recovering <a class="cite" href="#ref1">[1]</a>.</p>
+</section>
+
+<section id="schedules" aria-labelledby="s4">
+  <h2 id="s4"><span class="n">4</span>Level Schedules</h2>
+  <p>Each released model fixes its schedule (<i>n</i><sub>1</sub>, …, <i>n</i><sub><i>L</i></sub>) in advance. Table 1 lists the schedules of six checkpoints, including models trained on LM1B <a class="cite" href="#ref6">[6]</a> and OpenWebText <a class="cite" href="#ref7">[7]</a>, and Figure 2 plots them.</p>
+
+  <div class="tbl" id="tab1">
+    <div class="tcap"><b>Table 1:</b> Level schedules of six released NCM checkpoints, read from <code>config/eval</code> in the NCM release <a class="cite" href="#ref1">[1]</a>. <i>L</i> is the number of levels and therefore the number of generator passes; <i>n</i><sub><i>L</i></sub> is the final length in code positions.</div>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Model</th><th class="r"><i>L</i></th><th class="r"><i>n</i><sub>1</sub></th><th class="r"><i>n</i><sub><i>L</i></sub></th><th class="r">Codebook</th><th>Growth</th></tr></thead>
+        <tbody id="t1body"></tbody>
+      </table>
     </div>
-    <div class="fig-body">
+  </div>
+
+  <figure id="fig2">
+    <div class="panel">
       <div class="tabs" role="tablist" aria-label="Model" id="stabs"></div>
-      <div class="facts">
-        <div class="fact"><b id="fLevels">0</b><span>levels, so this many passes</span></div>
-        <div class="fact"><b id="fLen">0</b><span>positions at the final level</span></div>
-        <div class="fact"><b id="fCode">0</b><span>codes in each level's codebook</span></div>
-      </div>
       <div class="sched" id="sched" role="img"></div>
-      <div class="legend"><span><i style="background:var(--ink)"></i>positions from earlier levels</span><span><i style="background:var(--accent)"></i>added at this level</span></div>
-      <p class="fine" id="schedNote"></p>
+      <div class="axis"><span>level</span><span></span><span><i>n</i><sub><i>ℓ</i></sub></span></div>
+      <div class="legend"><span><i style="background:var(--ink)"></i>positions present at earlier levels</span><span><i style="background:var(--fig)"></i>positions added at this level</span></div>
     </div>
-  </section>
+    <figcaption><b>Figure 2:</b> Positions per level for the selected model. Each row is one level; its length is <i>n</i><sub><i>ℓ</i></sub>, scaled to the final length <i>n</i><sub><i>L</i></sub>. A token-by-token model would need <i>n</i><sub><i>L</i></sub> passes for the same length, against <i>L</i> for NCM.</figcaption>
+  </figure>
 
-  <!-- Fig 3: pass count -->
-  <section class="fig" id="passes" aria-labelledby="f3">
-    <div class="fig-head">
-      <div class="fig-no">3</div>
-      <h2 id="f3">Counting passes</h2>
-      <p>The same translation produced three ways. Each tick is one forward pass through the model.</p>
-    </div>
-    <div class="fig-body">
+  <p>The schedules differ in shape. TinyStories and LM1B share a 12-level schedule that adds between 7 and 20 positions per level. The Sudoku schedule grows roughly geometrically, from 1 to 89 positions, over a codebook of only 16 entries. OpenWebText uses 32 levels whose lengths are the perfect squares 1, 4, 9, …, 1,024, so each level adds an odd number of positions that grows linearly. The authors find that schedules with the same number of levels and the same endpoints can still train to different quality, so how length is distributed across levels matters <a class="cite" href="#ref1">[1]</a>.</p>
+</section>
+
+<section id="passes" aria-labelledby="s5">
+  <h2 id="s5"><span class="n">5</span>Counting Passes</h2>
+  <p>Equation (2) implies that a sample costs <i>L</i> forward passes. Figure 3 makes this concrete by producing the WMT14 translation from Section 3 in three ways.</p>
+
+  <figure id="fig3">
+    <div class="panel">
       <div class="controls">
         <button class="btn solid" id="raceRun"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg><span id="raceText">Run again</span></button>
-        <span class="fine" style="margin-left:4px">One tick every 80 ms</span>
+        <span style="color:var(--sub);font-size:12.5px;margin-left:4px">one pass per 80 ms tick</span>
       </div>
       <div class="race">
         <div class="lane">
-          <div class="lane-head"><h3>Autoregressive</h3><small>one word per pass, left to right</small><div class="count" id="cAR">0</div></div>
+          <div class="lane-head"><h4>Autoregressive</h4><small>one word per pass</small><div class="count" id="cAR">0</div></div>
           <div class="lane-text" id="tAR"></div>
           <div class="lane-track"><span id="bAR"></span></div>
         </div>
         <div class="lane">
-          <div class="lane-head"><h3>Diffusion</h3><small>whole sequence every pass, 128 steps</small><div class="count" id="cDF">0</div></div>
+          <div class="lane-head"><h4>Diffusion</h4><small>full sequence, 128 steps</small><div class="count" id="cDF">0</div></div>
           <div class="lane-text" id="tDF"></div>
           <div class="lane-track"><span id="bDF"></span></div>
         </div>
         <div class="lane ncm">
-          <div class="lane-head"><h3>NCM</h3><small>one level per pass, real WMT14 levels</small><div class="count" id="cNC">0</div></div>
+          <div class="lane-head"><h4>NCM</h4><small>one level per pass</small><div class="count" id="cNC">0</div></div>
           <div class="lane-text" id="tNC"></div>
           <div class="lane-track"><span id="bNC"></span></div>
         </div>
       </div>
-      <p class="fine">The NCM lane plays the actual WMT14 sample from Fig. 1. The other two lanes are simulations of the same final sentence. Real autoregressive models take one pass per token, which is more than one per word, so that lane understates them. The diffusion lane uses 128 steps, the step count of the diffusion baselines in the paper's LM1B and XSum comparisons. Pass counts aren't wall-clock time: passes differ in cost, and the paper measures time separately.</p>
-
-      <div class="paper">
-        <div class="kicker">From the paper: passes per sample</div>
-        <div id="paperBars" class="paper"></div>
-        <p class="fine">Speedups are the paper's wall-clock comparisons against the strongest diffusion model at matched scale. NCM's quality was better on LM1B, competitive on OpenWebText, and matched on XSum ROUGE-L.</p>
-      </div>
     </div>
-  </section>
+    <figcaption><b>Figure 3:</b> Forward passes needed to produce the same translation. The NCM lane replays the WMT14 sample from Figure 1. The other two lanes are simulations: the autoregressive lane emits one word per pass, which understates a real model that emits one token per pass, and the diffusion lane unmasks positions over 128 steps, the step count of the diffusion baselines in the LM1B and XSum comparisons of <a class="cite" href="#ref1">[1]</a>. Track lengths are drawn on a common scale of 128 passes.</figcaption>
+  </figure>
 
-  <footer>
-    <p>Samples transcribed from <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">HazyResearch/ncm</a> (MIT license). Level schedules come from the repo's <code>config/eval</code> files. Highlights are computed here by a word diff against the previous level.</p>
-    <p>Paper: Kumbong et al., <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener"><i>Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation</i></a>, 2026. This viewer is independent and isn't affiliated with the authors.</p>
-  </footer>
+  <p>Pass counts are not wall-clock time. An autoregressive pass over a key-value cache is inexpensive, a diffusion pass processes the entire sequence, and an NCM pass reads the levels generated so far. Table 2 therefore reports the pass counts together with the wall-clock speedups measured in <a class="cite" href="#ref1">[1]</a>. NCM's quality was better than the diffusion baseline on LM1B, competitive on OpenWebText, and matched on XSum ROUGE-L.</p>
+
+  <div class="tbl" id="tab2">
+    <div class="tcap"><b>Table 2:</b> Forward passes per sample and wall-clock speedup over the strongest diffusion baseline at matched scale, as reported in <a class="cite" href="#ref1">[1]</a>. Bars are scaled within each row.</div>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Dataset</th><th>Baseline</th><th class="r">Baseline passes</th><th class="r">NCM passes</th><th style="width:28%"></th><th class="r">Speedup</th></tr></thead>
+        <tbody id="t2body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="limits" aria-labelledby="s6">
+  <h2 id="s6"><span class="n">6</span>Limitations</h2>
+  <p>This page is a visualization, not a replication. The per-level text is transcribed from an animation in the NCM release rather than generated by us, so transcription errors are possible. Change highlighting uses a word-level longest-common-subsequence diff, which approximates, but does not reproduce, the highlighting in the original animation. The autoregressive and diffusion lanes in Figure 3 are illustrative simulations. Producing new samples, including per-level outputs for the Sudoku models, requires running the released checkpoints on a GPU, which we leave to future work.</p>
+</section>
+
+<section id="conclusion" aria-labelledby="s7">
+  <h2 id="s7"><span class="n">7</span>Conclusion</h2>
+  <p>NCM replaces a token-by-token loop with a short, fixed sequence of parallel refinements. Watching a sample move through its levels shows both what that buys and what it costs: the outline arrives within the first few passes, and the details, including some temporary mistakes, are settled in the last ones.</p>
+</section>
+
+<section id="refs" aria-labelledby="sr">
+  <h2 id="sr">References</h2>
+  <ol class="refs">
+    <li id="ref1"><span>[1]</span><span>Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini, and Christopher Ré. Next-Concept Modeling: Fast, parallel coarse-to-fine text generation. <i>arXiv preprint arXiv:2610.14162</i>, 2026. <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">arxiv.org/abs/2610.14162</a></span></li>
+    <li id="ref2"><span>[2]</span><span>Keyu Tian, Yi Jiang, Zehuan Yuan, Bingyue Peng, and Liwei Wang. Visual autoregressive modeling: Scalable image generation via next-scale prediction. In <i>Advances in Neural Information Processing Systems</i>, 2024.</span></li>
+    <li id="ref3"><span>[3]</span><span>Ronen Eldan and Yuanzhi Li. TinyStories: How small can language models be and still speak coherent English? <i>arXiv preprint arXiv:2305.07759</i>, 2023.</span></li>
+    <li id="ref4"><span>[4]</span><span>Shashi Narayan, Shay B. Cohen, and Mirella Lapata. Don't give me the details, just the summary! Topic-aware convolutional neural networks for extreme summarization. In <i>Proceedings of EMNLP</i>, 2018.</span></li>
+    <li id="ref5"><span>[5]</span><span>Ondřej Bojar et al. Findings of the 2014 Workshop on Statistical Machine Translation. In <i>Proceedings of the Ninth Workshop on Statistical Machine Translation</i>, 2014.</span></li>
+    <li id="ref6"><span>[6]</span><span>Ciprian Chelba, Tomas Mikolov, Mike Schuster, Qi Ge, Thorsten Brants, Phillipp Koehn, and Tony Robinson. One billion word benchmark for measuring progress in statistical language modeling. <i>arXiv preprint arXiv:1312.3005</i>, 2013.</span></li>
+    <li id="ref7"><span>[7]</span><span>Aaron Gokaslan and Vanya Cohen. OpenWebText corpus, 2019.</span></li>
+  </ol>
+</section>
+
+<div class="footnote">
+  <p><sup>*</sup>Independent work. The author is not affiliated with the authors of <a href="#ref1">[1]</a>.</p>
+  <p>Sample text and level schedules are from the NCM release (<a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">HazyResearch/ncm</a>, MIT license).</p>
 </div>
+
+</article>
 
 <script>
 const $ = id => document.getElementById(id);
 const tok = s => s.replace(/\n/g, " \n ").split(/ +/).filter(Boolean);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => n.toLocaleString("en-US");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Words in b that are not part of the longest common subsequence with a.
@@ -415,7 +486,7 @@ function renderText(t, i, marks = true) {
   return html;
 }
 
-/* ---------- Fig 1: sample viewer ---------- */
+/* Figure 1 */
 const TASKS = {};
 let key = null, level = 0, timer = null, animate = false;
 
@@ -455,7 +526,7 @@ function render() {
   $("stChanged").textContent = t.nChanged[level];
   const note = t.notes && t.notes[String(level + 1)];
   $("note").hidden = !note;
-  if (note) $("note").textContent = note;
+  if (note) $("note").innerHTML = "<b>Level " + (level + 1) + ".</b> " + esc(note) + ' See <a href="#s31">Section 3.1</a>.';
   document.querySelectorAll("#strip .bar").forEach((b, i) => {
     b.classList.toggle("cur", i === level);
     b.classList.toggle("done", i < level);
@@ -499,43 +570,44 @@ $("tabs").addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.target.closest("input, textarea, select")) return;
-  const r = $("samples").getBoundingClientRect();
+  const r = $("fig1").getBoundingClientRect();
   if (r.bottom < 0 || r.top > innerHeight) return;
   if (e.key === "ArrowLeft") jump(level - 1);
   if (e.key === "ArrowRight") jump(level + 1);
 });
 window.addEventListener("hashchange", () => { if (TASKS[location.hash.slice(1)]) selectTask(location.hash.slice(1)); });
 
-/* ---------- Fig 2: level schedules ---------- */
+/* Figure 2 and Table 1 */
 let SCHED = [];
+function growth(L) {
+  const inc = L.slice(1).map((n, i) => n - L[i]);
+  const isSq = L.every((n, i) => n === (i + 1) * (i + 1));
+  if (isSq) return "squares, 1 to " + fmt(L[L.length - 1]);
+  return "+" + Math.min(...inc) + " to +" + Math.max(...inc) + " per level";
+}
 function selectSchedule(id) {
   const s = SCHED.find(x => x.id === id) || SCHED[0];
   document.querySelectorAll("#stabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === s.id ? "true" : "false"));
   const L = s.levels, max = L[L.length - 1];
-  $("fLevels").textContent = L.length;
-  $("fLen").textContent = max.toLocaleString("en-US");
-  $("fCode").textContent = s.codebook.toLocaleString("en-US");
   $("sched").classList.toggle("dense", L.length > 16);
   $("sched").setAttribute("aria-label", `${s.name} schedule: ${L.join(", ")} positions across ${L.length} levels`);
   $("sched").innerHTML = L.map((n, i) => {
     const prev = i ? L[i - 1] : 0;
-    return `<div class="srow"><span class="l">${i + 1}</span><span class="track"><span class="w" style="width:${prev / max * 100}%"></span><span class="add" style="left:${prev / max * 100}%;width:${(n - prev) / max * 100}%"></span></span><span class="v">${n.toLocaleString("en-US")}</span></div>`;
+    return `<div class="srow"><span class="l">${i + 1}</span><span class="track"><span class="w" style="width:${prev / max * 100}%"></span><span class="add" style="left:${prev / max * 100}%;width:${(n - prev) / max * 100}%"></span></span><span class="v">${fmt(n)}</span></div>`;
   }).join("");
-  $("schedNote").innerHTML = `${esc(s.name)}: ${L.length} levels cover ${max.toLocaleString("en-US")} positions. A token-by-token model would need ${max.toLocaleString("en-US")} passes for the same length; NCM needs ${L.length}. From <code>${esc(s.config)}</code>.`;
 }
 $("stabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectSchedule(b.dataset.k); });
 
-/* ---------- Fig 3: pass race ---------- */
+/* Figure 3 */
 const DIFF_STEPS = 128, TICK = 80;
 let race = null;
 function setupRace(wmt) {
-  const finalWords = wmt.tokens[wmt.tokens.length - 1].filter(w => w !== "\n");
-  // Deterministic pseudo-random unmasking order for the diffusion lane.
+  const words = wmt.tokens[wmt.tokens.length - 1].filter(w => w !== "\n");
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const reveal = finalWords.map(() => 1 + Math.floor(rnd() * (DIFF_STEPS - 1)));
+  const reveal = words.map(() => 1 + Math.floor(rnd() * (DIFF_STEPS - 1)));
   reveal[Math.floor(rnd() * reveal.length)] = DIFF_STEPS;
-  race = { wmt, words: finalWords, reveal, nAR: finalWords.length, nNC: wmt.levels.length, tick: 0, timer: null };
+  race = { wmt, words, reveal, nAR: words.length, nNC: wmt.levels.length, tick: 0, timer: null };
 }
 function drawRace(tick) {
   const r = race, w = r.words;
@@ -546,14 +618,13 @@ function drawRace(tick) {
   $("tAR").innerHTML = ar ? esc(w.slice(0, ar).join(" ")) : '<span class="slot"></span>';
   $("tDF").innerHTML = w.map((x, i) => r.reveal[i] <= df ? esc(x) : '<span class="slot"></span>').join(" ");
   $("tNC").innerHTML = nc ? renderText(r.wmt, nc - 1, nc < r.nNC) : '<span class="slot"></span>';
-  const scale = DIFF_STEPS;
-  $("bAR").style.width = ar / scale * 100 + "%";
-  $("bDF").style.width = df / scale * 100 + "%";
-  $("bNC").style.width = nc / scale * 100 + "%";
+  $("bAR").style.width = ar / DIFF_STEPS * 100 + "%";
+  $("bDF").style.width = df / DIFF_STEPS * 100 + "%";
+  $("bNC").style.width = nc / DIFF_STEPS * 100 + "%";
 }
 function runRace() {
   clearInterval(race.timer);
-  if (reduced) { race.tick = DIFF_STEPS; drawRace(race.tick); return; }
+  if (reduced) { drawRace(DIFF_STEPS); return; }
   race.tick = 0; drawRace(0);
   $("raceText").textContent = "Running";
   race.timer = setInterval(() => {
@@ -564,23 +635,19 @@ function runRace() {
 }
 $("raceRun").addEventListener("click", runRace);
 
+/* Table 2 */
 const PAPER = [
-  { name: "LM1B", speed: "21× faster", base: "DUO", b: 128, n: 12 },
-  { name: "OpenWebText", speed: "10× faster", base: "DUO", b: 1024, n: 32 },
-  { name: "XSum", speed: "31× faster", base: "AURORA-LM", b: 128, n: 8 }
+  { name: "LM1B", base: "DUO", b: 128, n: 12, speed: "21×" },
+  { name: "OpenWebText", base: "DUO", b: 1024, n: 32, speed: "10×" },
+  { name: "XSum", base: "AURORA-LM", b: 128, n: 8, speed: "31×" }
 ];
-function drawPaper() {
-  $("paperBars").innerHTML = PAPER.map(p => `
-    <div class="pset">
-      <div class="pset-top"><h4>${p.name}</h4><span>wall-clock: <b>${p.speed}</b></span></div>
-      <div class="pbar"><span>${p.base}</span><span class="t"><span style="width:100%"></span></span><span class="v">${p.b.toLocaleString("en-US")}</span></div>
-      <div class="pbar ncm"><span>NCM</span><span class="t"><span style="width:${p.n / p.b * 100}%;min-width:2px"></span></span><span class="v">${p.n}</span></div>
-    </div>`).join("");
-}
+$("t2body").innerHTML = PAPER.map(p => `<tr>
+  <td>${p.name}</td><td>${p.base}</td><td class="r">${fmt(p.b)}</td><td class="r ncm">${p.n}</td>
+  <td><span class="minibar base" style="width:100%;display:block;margin-bottom:2px"></span><span class="minibar" style="width:${p.n / p.b * 100}%;display:block"></span></td>
+  <td class="r">${p.speed}</td></tr>`).join("");
 
-/* ---------- Boot ---------- */
+/* Boot */
 async function boot() {
-  drawPaper();
   try {
     const res = await fetch("samples.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(res.status + " " + res.statusText);
@@ -592,15 +659,15 @@ async function boot() {
         levels: d.levels, notes: d.notes || null
       });
     }
-    $("tabs").innerHTML = data.samples.map(d =>
-      `<button class="tab" role="tab" data-k="${esc(d.id)}">${esc(d.name)}</button>`).join("");
+    $("tabs").innerHTML = data.samples.map(d => `<button class="tab" role="tab" data-k="${esc(d.id)}">${esc(d.name)}</button>`).join("");
     selectTask(location.hash.slice(1));
 
     SCHED = data.schedules || [];
     $("stabs").innerHTML = SCHED.map(s => `<button class="tab" role="tab" data-k="${esc(s.id)}">${esc(s.name)}</button>`).join("");
-    if (SCHED.length) selectSchedule(SCHED[0].id); else $("schedule").hidden = true;
+    $("t1body").innerHTML = SCHED.map(s => `<tr><td>${esc(s.name)}</td><td class="r">${s.levels.length}</td><td class="r">${s.levels[0]}</td><td class="r">${fmt(s.levels[s.levels.length - 1])}</td><td class="r">${fmt(s.codebook)}</td><td>${growth(s.levels)}</td></tr>`).join("");
+    if (SCHED.length) selectSchedule(SCHED[0].id);
 
-    if (TASKS.wmt14) { setupRace(TASKS.wmt14); drawRace(DIFF_STEPS); } else $("passes").hidden = true;
+    if (TASKS.wmt14) { setupRace(TASKS.wmt14); drawRace(DIFF_STEPS); }
   } catch (err) {
     $("srcBlock").hidden = true;
     $("out").innerHTML = '<span class="empty">Couldn’t load samples.json (' + esc(err.message || err) + '). If you opened this file directly, serve the folder instead, for example with <code>python3 -m http.server</code>.</span>';

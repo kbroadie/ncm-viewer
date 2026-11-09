@@ -1,14 +1,16 @@
-# NCM Refinement Viewer
+# Watching Text Resolve
 
-An interactive viewer for [Next-Concept Modeling (NCM)](https://github.com/HazyResearch/ncm) samples. Step through each generation level and watch text resolve from a rough sketch into finished output.
+**An Interactive Companion to Next-Concept Modeling**
 
-**Live page:** https://kbroadie.github.io/ncm-viewer/
+A paper-format web page with interactive figures for [Next-Concept Modeling (NCM)](https://github.com/HazyResearch/ncm). It decodes the published samples level by level, charts the level schedules of six released models, and compares pass counts with autoregressive and diffusion generation.
+
+**Read it:** https://kbroadie.github.io/ncm-viewer/
 
 ## What NCM does
 
 Most language models write left to right, one token per forward pass. NCM, from Stanford's HazyResearch lab, works coarse to fine instead. A tokenizer compresses text into a stack of codes, coarse on top and fine at the bottom, and a transformer predicts that stack from the top down. Every position within a level is predicted at once, so the whole output takes one forward pass per level.
 
-The page has three figures:
+The page follows the structure of an ML paper (abstract, background with equations, results, limitations and references) and has three interactive figures:
 
 1. **A sample, level by level.** Step or play through each level of a published sample. Highlights mark the words that changed since the previous level, and the level strip charts word count per level. Tap a bar to jump to it, or open "All levels at once" to see every pass stacked.
 2. **The level schedule.** How many code positions each level holds, for six of the released models (TinyStories, XSum, WMT14, Sudoku, LM1B and OpenWebText), read straight from the NCM repo's `config/eval` files.
