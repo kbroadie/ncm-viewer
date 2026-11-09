@@ -8,9 +8,8 @@
     {
       "id": "tinystories",
       "name": "TinyStories",
-      "tag": "story",
-      "task": "unconditional story",
-      "outputLabel": "NCM output · unconditional",
+      "task": "Story writing",
+      "outputLabel": "Output: a new story",
       "levels": [
         ".",
         "was..... the.",
@@ -24,15 +23,15 @@
         "upon a, there was a boy Tim. He a long kite he loved play with. One day, he to play his kite in park.While he was, a wind came and the kite Tim Tim. wind blew and, but kite too too for him he could not it. be sad he missed home.\nThen something unexpected happened A kind saw Tim and to. The bird took kite with feet! was so. He the bird that. It",
         "upon upon a, there was a boy named Tim. had a long long that loved to play play. sunny sunny,, he play play with his kite the..\nWhile was, a a big wind and blew the kite from Tim. The wind blew and but but the went too away him him. could not it it. Tim be because missed his home.\nThen, something unexpected happened A kind bird saw Tim flew him.. bird took the kite with its! Tim was so. He thanked bird bird and. its",
         "Once upon a time, there was a little boy named Tim. He had a long kite that he loved to play with. One sunny day, he went to play with his kite in the park.\nWhile he was playing, a big wind came and blew the kite far from Tim. The wind blew and blew, but the kite went too far for him. He could not find it. Tim felt sad because he missed his kite.\nThen, something unexpected happened. A kind bird saw Tim and flew to him. The bird took the kite with its beak! Tim was so happy."
-      ]
+      ],
+      "inputLabel": "Input",
+      "inputNote": "None. This model writes a short children's story from scratch. It was trained on TinyStories, a dataset of simple stories, and starts from a blank page each time."
     },
     {
       "id": "xsum",
       "name": "XSum",
-      "tag": "summary",
-      "task": "summarization",
-      "outputLabel": "NCM output · summary",
-      "sourceLabel": "Article (excerpt)",
+      "task": "Summarization",
+      "outputLabel": "Output: a one-sentence summary",
       "sourceLang": "en",
       "source": [
         "He was driven to Pretoria's Kgosi Mampuru prison where he is expected to be housed in the hospital wing.",
@@ -48,15 +47,15 @@
         "South athlete Pist Pist been sentenced six prison prison prison killing girlfriend Ste Stekampkamp",
         "South African athlete Pist Pist been sentenced to to six prison prison for killing girlfriend Re Ste Stekampkamp",
         "South African athlete Oscar Pistorius has been sentenced to six years in prison for killing his girlfriend Reeva Steenkamp."
-      ]
+      ],
+      "inputLabel": "Input: a news article",
+      "inputNote": "The model condenses the article into one sentence. Only the opening of the article is shown here, as in the NCM repository's animation."
     },
     {
       "id": "wmt14",
       "name": "WMT14",
-      "tag": "DE → EN",
-      "task": "German to English translation",
-      "outputLabel": "NCM output · English",
-      "sourceLabel": "German source",
+      "task": "Translation",
+      "outputLabel": "Output: the English translation",
       "sourceLang": "de",
       "source": [
         "Sowohl die US-Behörden als auch die mexikanischen Sicherheitskräfte befinden sich in einem Dauer-Kampf gegen die Drogenkartelle."
@@ -77,7 +76,9 @@
       "notes": {
         "9": "Words repeat here (“Mexican Mexican”, “battle battle”). The paper notes that intermediate levels don’t improve steadily, and translation quality can dip before recovering.",
         "10": "Still repeating. The final pass resolves it into a clean sentence."
-      }
+      },
+      "inputLabel": "Input: a German sentence",
+      "inputNote": "The model translates the sentence into English."
     }
   ],
   "schedules": [

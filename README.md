@@ -20,9 +20,11 @@ The page explains NCM in four sections, each written at three depths:
 
 A reading-depth control opens every technical or expert layer at once, and each layer can also be expanded on its own.
 
+The page works like an app: one section per screen, with breadcrumbs at the top and a pager at the bottom. Swipe sideways or use the arrow keys to move between sections. Each section has its own link (`#drafts`, `#levels`, `#speed`, `#limits`, `#about`).
+
 Three interactive figures support the text:
 
-1. **A sample, pass by pass.** The published TinyStories, XSum and WMT14 samples, decoded after every pass, with changed words highlighted.
+1. **A sample, pass by pass.** The published TinyStories, XSum and WMT14 samples, decoded after every pass, with changed words highlighted. Each sample shows its input above the output: none for the story model, a news article for summarization, and a German sentence for translation. These are single-task research models, so there is no written prompt. Swipe across the output to step through passes.
 2. **Level schedules.** Positions per level for six released models, read from the NCM repository's `config/eval` files.
 3. **Counting passes.** The WMT14 translation produced word by word, by diffusion and by NCM. The NCM lane replays the real sample; the other two are simulations.
 
@@ -38,17 +40,17 @@ All data lives in [`samples.json`](samples.json). Each sample looks like this:
 {
   "id": "xsum",
   "name": "XSum",
-  "tag": "summary",
-  "task": "summarization",
-  "outputLabel": "NCM output · summary",
-  "sourceLabel": "Article (excerpt)",
+  "task": "Summarization",
+  "inputLabel": "Input: a news article",
+  "inputNote": "The model condenses the article into one sentence.",
   "sourceLang": "en",
   "source": ["First paragraph of the input.", "Second paragraph."],
+  "outputLabel": "Output: a one-sentence summary",
   "levels": ["text after pass 1", "text after pass 2", "..."]
 }
 ```
 
-`source`, `sourceLabel` and `sourceLang` are optional; leave them out for unconditional samples. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by pass number, shows a callout under that pass. New samples show up as tabs automatically.
+`source` and `sourceLang` are optional; leave them out for unconditional samples and use `inputNote` to say there is no input. Use `\n` inside a level for a paragraph break. An optional `notes` object, keyed by pass number, shows a callout under that pass. New samples show up as tabs automatically.
 
 Level schedules live in the same file under `schedules`, one entry per model with its `levels` (positions per level), `codebook` size and source `config` path.
 

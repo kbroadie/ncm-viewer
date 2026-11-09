@@ -6,12 +6,14 @@
 <title>NCM Refinement Viewer</title>
 <meta name="description" content="An interactive explainer for Next-Concept Modeling, a coarse-to-fine text generation method from researchers at Stanford. Visualizer by Kevin Broadie.">
 <meta name="author" content="Kevin Broadie">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0E13" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230F1218'/%3E%3Crect x='3' y='3' width='2' height='2' fill='%23fff'/%3E%3Crect x='3' y='7' width='6' height='2' fill='%23fff'/%3E%3Crect x='3' y='11' width='10' height='2' fill='%23FFE14D'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
 <style>
-/* Layout: Swiss two-column grid. Each section gets a heavy rule and a section number on the left; the overview reads on the right, with technical and expert layers expanding beneath it. */
+/* Layout: app shell. Sticky bar with breadcrumbs on top, one section per screen in the middle, sticky pager at the bottom. Inside a screen, the Swiss two-column grid: section number left, overview and expandable layers right. */
 :root {
   --bg: #FFFFFF;
   --ink: #0F1218;
@@ -38,30 +40,66 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
 html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-ui); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
 a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 a:hover { color: var(--accent); }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .85em; }
 
-.page {
-  max-width: 1120px; margin: 0 auto; padding-block: 0 64px;
+.app { min-height: 100%; display: flex; flex-direction: column; }
+.wrap {
+  max-width: 1120px; margin: 0 auto; width: 100%;
   padding-left: max(20px, env(safe-area-inset-left, 0px));
   padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
 
-/* Top bar */
-.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; padding-block: 18px 14px; }
-.wordmark { font-weight: 700; font-variation-settings: "wdth" 112; font-size: 15px; letter-spacing: .01em; }
-.top nav { display: flex; gap: 18px; font-size: 14px; color: var(--sub); }
-.top nav a { text-decoration: none; }
-.top nav a:hover { color: var(--ink); text-decoration: underline; }
+/* App bar + breadcrumbs */
+.appbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hair); }
+.appbar .wrap { display: flex; align-items: center; gap: 6px 18px; flex-wrap: wrap; padding-block: 10px 9px; }
+.wordmark { font-weight: 700; font-variation-settings: "wdth" 112; font-size: 14.5px; text-decoration: none; white-space: nowrap; }
+.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; font-size: 13.5px; color: var(--sub); min-width: 0; }
+.crumbs li { display: inline-flex; align-items: center; min-width: 0; }
+.crumbs li + li::before { content: "/"; margin: 0 8px; color: var(--hair); font-weight: 600; }
+.crumbs a { text-decoration: none; }
+.crumbs a:hover { color: var(--ink); text-decoration: underline; }
+.crumbs [aria-current="page"] { color: var(--ink); font-weight: 600; }
+.progress { height: 3px; background: transparent; }
+.progress span { display: block; height: 100%; background: var(--ink); width: 0; transition: width .25s ease; }
+@media (max-width: 620px) { .wordmark { display: none; } }
 
-/* Hero */
-.hero { padding-block: clamp(28px, 7vw, 72px) clamp(24px, 5vw, 44px); display: grid; gap: 22px; }
+/* Screens */
+main { flex: 1; touch-action: pan-y; }
+.screen { padding-block: 0 40px; }
+.screen.in-right { animation: inR .28s ease-out; }
+.screen.in-left { animation: inL .28s ease-out; }
+@keyframes inR { from { opacity: 0; transform: translateX(32px); } }
+@keyframes inL { from { opacity: 0; transform: translateX(-32px); } }
+
+/* Pager */
+.pager { position: sticky; bottom: 0; z-index: 20; background: var(--bg); border-top: 1.5px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pager .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; padding-block: 8px; }
+.pbtn {
+  appearance: none; background: none; border: 0; cursor: pointer; padding: 8px 0; min-height: 44px;
+  display: grid; gap: 0; text-align: left; min-width: 0;
+}
+.pbtn.next { text-align: right; justify-self: end; }
+.pbtn small { font-size: 11.5px; color: var(--sub); font-weight: 500; }
+.pbtn span { font-size: 14px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pbtn:disabled { visibility: hidden; }
+.pbtn:hover span { color: var(--accent); }
+.dots { display: flex; gap: 6px; align-items: center; }
+.dot { appearance: none; border: 0; padding: 0; cursor: pointer; width: 8px; height: 8px; background: var(--hair); }
+.dot[aria-current="step"] { background: var(--ink); width: 22px; }
+.dot:hover { background: var(--sub); }
+.swipehint { font-size: 12px; color: var(--sub); text-align: center; grid-column: 1 / -1; margin-top: -4px; }
+
+/* Intro */
+.hero { padding-block: clamp(28px, 6vw, 64px) 24px; display: grid; gap: 20px; }
 .hero .eyebrow { font-size: 14px; font-weight: 600; color: var(--sub); margin-bottom: -10px; }
 .hero h1 {
   margin: 0; max-width: 18ch; font-family: var(--f-display); font-weight: 800; font-variation-settings: "wdth" 108;
@@ -69,47 +107,45 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 }
 .hero .lede { margin: 0; max-width: 60ch; font-family: var(--f-text); font-size: clamp(17px, 2.3vw, 20px); line-height: 1.5; color: var(--sub); }
 .hero .lede b { color: var(--ink); font-weight: 600; }
-.credit {
-  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; max-width: 640px;
-  font-size: 13.5px; line-height: 1.45; border-top: 1px solid var(--hair); padding-top: 12px;
-}
+.credit { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; max-width: 640px; font-size: 13.5px; line-height: 1.45; border-top: 1px solid var(--hair); padding-top: 12px; margin: 0; }
 .credit dt { color: var(--sub); font-weight: 500; }
 .credit dd { margin: 0; }
 
-/* Depth control */
-.depth { display: grid; gap: 10px; padding-block: 20px 28px; border-top: 3px solid var(--ink); }
-.depth-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
-.depth-row > span { font-weight: 700; font-size: 15px; font-variation-settings: "wdth" 108; }
-.seg { display: grid; grid-template-columns: repeat(3, minmax(0, auto)); border: 1.5px solid var(--ink); }
-.seg button {
-  appearance: none; background: var(--bg); border: 0; cursor: pointer; padding: 8px 14px 7px;
-  display: grid; gap: 1px; text-align: left; font-size: 14px; font-weight: 650;
+.introgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 48px; border-top: 3px solid var(--ink); padding-top: 18px; }
+@media (max-width: 760px) { .introgrid { grid-template-columns: minmax(0, 1fr); } }
+.block-title { font-weight: 700; font-size: 15px; font-variation-settings: "wdth" 108; margin: 0 0 10px; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; }
+.toc button {
+  appearance: none; background: none; border: 0; border-top: 1px solid var(--hair); cursor: pointer; width: 100%;
+  display: grid; grid-template-columns: 2em minmax(0, 1fr) auto; gap: 2px 10px; padding: 11px 0; text-align: left; align-items: baseline;
 }
+.toc li:last-child button { border-bottom: 1px solid var(--hair); }
+.toc .n { font-family: var(--f-display); font-weight: 800; font-size: 20px; line-height: 1; }
+.toc .t { font-weight: 650; font-size: 15px; }
+.toc .d { grid-column: 2; font-size: 13px; color: var(--sub); }
+.toc .go { grid-row: 1; grid-column: 3; color: var(--sub); }
+.toc button:hover .t { color: var(--accent); }
+
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1.5px solid var(--ink); }
+.seg button { appearance: none; background: var(--bg); border: 0; cursor: pointer; padding: 9px 12px 8px; display: grid; gap: 1px; text-align: left; font-size: 14px; font-weight: 650; }
 .seg button + button { border-left: 1.5px solid var(--ink); }
 .seg button small { font-size: 11.5px; font-weight: 400; color: var(--sub); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
 .seg button[aria-pressed="true"] small { color: var(--on-ink); opacity: .75; }
-.depth p { margin: 0; font-size: 13.5px; color: var(--sub); max-width: 70ch; }
-@media (max-width: 520px) {
-  .seg { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
-  .seg button { padding: 8px 10px 7px; }
-}
+.helptext { margin: 10px 0 0; font-size: 13.5px; color: var(--sub); max-width: 60ch; }
+.startrow { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
 
 /* Sections */
-.sec {
-  border-top: 3px solid var(--ink);
-  display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
-  gap: 20px 48px; padding-block: 18px 64px;
-}
+.sec { border-top: 3px solid var(--ink); display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px 48px; padding-top: 18px; margin-top: 24px; }
 .sec-head { display: grid; align-content: start; gap: 8px; }
 .sec-no { font-family: var(--f-display); font-weight: 800; font-size: 64px; line-height: .85; letter-spacing: -.04em; }
 .sec-head h2 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 700; font-variation-settings: "wdth" 108; text-wrap: balance; }
 .sec-body { display: grid; gap: 22px; min-width: 0; align-content: start; }
 .prose { display: grid; gap: 14px; max-width: 64ch; }
 .prose p { margin: 0; font-family: var(--f-text); font-size: 18px; line-height: 1.58; }
-.prose p i, .prose .q { font-style: italic; }
+.prose p i { font-style: italic; }
 @media (max-width: 760px) {
-  .sec { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .sec { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-top: 14px; margin-top: 16px; }
   .sec-head { grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; align-items: end; }
   .sec-no { font-size: 48px; }
   .prose p { font-size: 17px; }
@@ -117,33 +153,26 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 
 /* Layers */
 details.layer { min-width: 0; }
-details.layer > summary {
-  list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  padding: 11px 14px; font-size: 14.5px; font-weight: 650;
-}
+details.layer > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 11px 14px; font-size: 14.5px; font-weight: 650; }
 details.layer > summary::-webkit-details-marker { display: none; }
 details.layer > summary::before { content: "+"; width: 1em; font-weight: 500; font-size: 17px; line-height: 1; }
 details.layer[open] > summary::before { content: "\2212"; }
-details.layer > summary small { font-size: 12.5px; font-weight: 400; color: var(--sub); }
 details.layer > .inner { padding: 4px 18px 18px; display: grid; gap: 14px; }
-details.layer > .inner > p, details.layer > .inner > .prose p { margin: 0; font-family: var(--f-text); font-size: 16.5px; line-height: 1.55; max-width: 64ch; }
+details.layer > .inner > p { margin: 0; font-family: var(--f-text); font-size: 16.5px; line-height: 1.55; max-width: 64ch; }
 details.tech { background: var(--wash); border-top: 1px solid var(--hair); }
 details.tech > summary:hover { background: var(--wash2); }
 details.expert { background: var(--wash2); margin: 4px -4px 0; }
-details.expert > summary { padding-left: 14px; }
 details.expert > summary:hover { background: var(--hair); }
 .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px 1px; border: 1px solid currentColor; }
 details.tech > summary .tag { color: var(--sub); }
 details.expert > summary .tag { color: var(--accent); }
-@media (max-width: 520px) {
-  details.layer > .inner { padding: 4px 14px 16px; }
-}
+@media (max-width: 520px) { details.layer > .inner { padding: 4px 14px 16px; } }
 
 /* Equations */
 .eq { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; margin: 2px 0; }
 .eq .m { text-align: center; font-family: var(--f-text); font-size: 18px; overflow-x: auto; white-space: nowrap; padding: 4px 0; }
 .eq .no { font-size: 14px; color: var(--sub); }
-.m.wrap { white-space: normal; line-height: 1.9; }
+.m.wrap { white-space: normal; line-height: 1.9; max-width: none; padding-left: 0; padding-right: 0; }
 .m.wrap > span { white-space: nowrap; margin: 0 .6em; display: inline-block; }
 .m i, .mi { font-family: var(--f-text); font-style: italic; }
 .m .op { margin: 0 .28em; }
@@ -154,26 +183,24 @@ details.expert > summary .tag { color: var(--accent); }
 .figure { display: grid; gap: 16px; min-width: 0; border-top: 1px solid var(--hair); padding-top: 16px; }
 .figcap { font-size: 13px; color: var(--sub); line-height: 1.45; max-width: 70ch; }
 .figcap b { color: var(--ink); font-weight: 650; }
-
 .tabs { display: flex; flex-wrap: wrap; gap: 4px 22px; border-bottom: 1px solid var(--hair); }
-.tab {
-  appearance: none; background: none; border: 0; cursor: pointer; padding: 6px 0 9px; margin-bottom: -1px;
-  font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent;
-}
+.tab { appearance: none; background: none; border: 0; cursor: pointer; padding: 6px 0 9px; margin-bottom: -1px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent; display: grid; text-align: left; }
+.tab small { font-size: 11.5px; font-weight: 500; }
 .tab:hover { color: var(--ink); }
 .tab[aria-selected="true"] { color: var(--ink); font-weight: 650; border-bottom-color: var(--ink); }
 
-.kicker { font-size: 12.5px; font-weight: 600; color: var(--sub); letter-spacing: .02em; }
-.source { margin: 4px 0 0; max-width: 64ch; font-family: var(--f-text); font-size: 15.5px; line-height: 1.5; color: var(--sub); }
-.source p { margin: 0 0 4px; }
-.source[lang="de"] { font-style: italic; }
+.io-in { background: var(--wash); padding: 14px 16px; display: grid; gap: 6px; }
+.io-label { font-size: 12.5px; font-weight: 700; letter-spacing: .02em; }
+.io-label span { font-weight: 500; color: var(--sub); }
+.io-src { font-family: var(--f-text); font-size: 16px; line-height: 1.5; max-width: 64ch; }
+.io-src p { margin: 0 0 4px; }
+.io-src[lang="de"] { font-style: italic; }
+.io-note { font-size: 13px; color: var(--sub); line-height: 1.45; max-width: 64ch; }
+.io-arrow { display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 600; color: var(--sub); }
+.io-arrow::before { content: "\2193"; font-size: 18px; line-height: 1; color: var(--ink); font-weight: 500; }
 
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.btn {
-  appearance: none; cursor: pointer; height: 40px; min-width: 40px; padding: 0 14px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--bg); border: 1.5px solid var(--ink); border-radius: 0; font-size: 14px; font-weight: 600;
-}
+.btn { appearance: none; cursor: pointer; height: 40px; min-width: 40px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--ink); border-radius: 0; font-size: 14px; font-weight: 600; }
 .btn:hover { background: var(--wash); }
 .btn:disabled { opacity: .3; cursor: default; background: var(--bg); }
 .btn.solid { background: var(--ink); color: var(--on-ink); padding: 0 18px; }
@@ -182,7 +209,7 @@ details.expert > summary .tag { color: var(--accent); }
 .readout { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 14px; color: var(--sub); }
 .readout b { font-family: var(--f-display); font-weight: 800; font-size: 28px; color: var(--ink); letter-spacing: -.02em; }
 
-.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; align-items: end; height: 84px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; align-items: end; height: 76px; }
 .bar { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 5px; min-width: 0; }
 .bar .fill { align-self: end; width: 100%; min-height: 3px; background: var(--hair); transition: background .15s; }
 .bar .n { font-size: 11px; color: var(--sub); font-variant-numeric: tabular-nums; }
@@ -190,13 +217,12 @@ details.expert > summary .tag { color: var(--accent); }
 .bar.done .fill { background: var(--ink); opacity: .55; }
 .bar.cur .fill { background: var(--accent); opacity: 1; }
 .bar.cur .n { color: var(--ink); font-weight: 700; }
-
 .stats { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 650; }
 .key { display: inline-flex; align-items: center; gap: 7px; }
 .key i { width: 16px; height: 10px; background: var(--mark); display: inline-block; }
 
-.output { margin: 4px 0 0; max-width: 60ch; min-height: 3.4em; font-family: var(--f-text); font-size: clamp(20px, 3.2vw, 25px); line-height: 1.55; overflow-wrap: anywhere; }
+.output { margin: 6px 0 0; max-width: 60ch; min-height: 3.4em; font-family: var(--f-text); font-size: clamp(20px, 3.2vw, 25px); line-height: 1.55; overflow-wrap: anywhere; }
 .output .empty { color: var(--sub); font-style: italic; font-size: .8em; }
 mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08em; border-radius: 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .animate mark { animation: arrive .4s ease-out; }
@@ -210,11 +236,7 @@ details.all > summary::before { content: "+"; width: 1em; font-weight: 500; }
 details.all[open] > summary::before { content: "\2212"; }
 details.all > summary span { color: var(--sub); font-weight: 400; }
 .rows { display: grid; margin-top: 8px; }
-.row {
-  appearance: none; background: none; border: 0; text-align: left; cursor: pointer; color: var(--sub);
-  display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--hair);
-  font-family: var(--f-text); font-size: 15.5px; line-height: 1.5;
-}
+.row { appearance: none; background: none; border: 0; text-align: left; cursor: pointer; color: var(--sub); display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--hair); font-family: var(--f-text); font-size: 15.5px; line-height: 1.5; }
 .row .lv { font-family: var(--f-ui); font-size: 12.5px; font-weight: 700; line-height: 1.9; font-variant-numeric: tabular-nums; }
 .row .tx { min-width: 0; overflow-wrap: anywhere; }
 .row:hover, .row.cur { color: var(--ink); }
@@ -234,7 +256,6 @@ details.all > summary span { color: var(--sub); font-weight: 400; }
 .sched.dense .srow .l, .sched.dense .srow .v { font-size: 10.5px; line-height: 1; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--sub); }
 .legend i { display: inline-block; width: 14px; height: 10px; margin-right: 7px; vertical-align: -1px; }
-
 .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--hair); }
 .fact { padding: 14px 16px 4px 0; display: grid; gap: 4px; min-width: 0; align-content: start; }
 .fact + .fact { padding-left: 16px; border-left: 1px solid var(--hair); }
@@ -277,262 +298,289 @@ td.ncm { font-weight: 700; color: var(--accent); }
 .minibar { display: block; height: 8px; background: var(--sub); min-width: 2px; }
 .minibar.n { background: var(--accent); margin-top: 2px; }
 
-/* About + footer */
 .sources { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; max-width: 70ch; }
 .sources li { padding-left: 1.2em; text-indent: -1.2em; }
-footer { border-top: 3px solid var(--ink); padding-top: 16px; display: grid; gap: 6px; font-size: 13px; color: var(--sub); }
-footer p { margin: 0; max-width: 90ch; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate mark { animation: none; }
-  .bar .fill { transition: none; }
+  .screen.in-right, .screen.in-left, .animate mark { animation: none; }
+  .bar .fill, .progress span { transition: none; }
 }
 </style>
 </head>
 <body>
-<div class="page">
-  <header class="top">
-    <span class="wordmark">NCM Refinement Viewer</span>
-    <nav aria-label="Links">
-      <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">Paper</a>
-      <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">NCM code</a>
-      <a href="#about">About this page</a>
-    </nav>
+<div class="app">
+  <header class="appbar">
+    <div class="wrap">
+      <a class="wordmark" href="#intro">NCM Refinement Viewer</a>
+      <nav class="crumbs" aria-label="Breadcrumb"><ol id="crumbs"></ol></nav>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="prog"></span></div>
   </header>
 
-  <section class="hero">
-    <div class="eyebrow">Interactive explainer</div>
-    <h1>How Next&#8209;Concept Modeling generates text</h1>
-    <p class="lede">Next-Concept Modeling (NCM) is a method for generating text developed by researchers at Stanford. Rather than writing one word after another, it produces a rough draft of the entire passage and then refines that draft in a small, fixed number of passes. <b>This page explains how the method works and lets you watch it happen.</b></p>
-    <dl class="credit">
-      <dt>Research</dt><dd>Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré, <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">“Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation”</a> (2026)</dd>
-      <dt>Visualizer</dt><dd>Kevin Broadie, an independent project not affiliated with the authors</dd>
-    </dl>
-  </section>
-
-  <section class="depth" aria-label="Reading depth">
-    <div class="depth-row">
-      <span>Reading depth</span>
-      <div class="seg" id="depth">
-        <button type="button" data-d="0" aria-pressed="true">Overview<small>plain language</small></button>
-        <button type="button" data-d="1" aria-pressed="false">Technical<small>how it works</small></button>
-        <button type="button" data-d="2" aria-pressed="false">Expert<small>for ML researchers</small></button>
-      </div>
-    </div>
-    <p>Each section opens with a plain-language overview. Technical and expert detail can be expanded one section at a time, or all at once with this control.</p>
-  </section>
-
-  <!-- 1 -->
-  <section class="sec" id="drafts" aria-labelledby="h1s">
-    <div class="sec-head"><div class="sec-no">1</div><h2 id="h1s">Writing in drafts</h2></div>
-    <div class="sec-body">
-      <div class="prose">
-        <p>Most language models, including the chatbots in common use, generate text one piece at a time. Each new word requires a full pass through the model, so a longer answer takes proportionally longer to produce.</p>
-        <p>NCM works differently. It first settles on a coarse outline of the whole passage, containing only a handful of words. It then makes a series of refinement passes. Each pass adds detail everywhere in the text at once, and the number of passes is fixed in advance, regardless of how long the text is.</p>
-        <p>The figure below replays three examples published with the method. Each step is one pass, and highlighted words are the ones that changed.</p>
-      </div>
-
-      <div class="figure" id="fig1">
-        <div class="tabs" role="tablist" aria-label="Sample" id="tabs"></div>
-        <div id="srcBlock">
-          <div class="kicker" id="srcLabel">Source</div>
-          <div class="source" id="src"></div>
+  <main id="screens">
+    <!-- Intro -->
+    <section class="screen" data-route="intro" data-title="Introduction">
+      <div class="wrap">
+        <div class="hero">
+          <div class="eyebrow">Interactive explainer</div>
+          <h1>How Next&#8209;Concept Modeling generates text</h1>
+          <p class="lede">Next-Concept Modeling (NCM) is a method for generating text developed by researchers at Stanford. Rather than writing one word after another, it produces a rough draft of the entire passage and then refines that draft in a small, fixed number of passes. <b>This explainer describes how the method works and lets you watch it happen.</b></p>
+          <dl class="credit">
+            <dt>Research</dt><dd>Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré, <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">“Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation”</a> (2026)</dd>
+            <dt>Visualizer</dt><dd>Kevin Broadie, an independent project not affiliated with the authors</dd>
+          </dl>
         </div>
-        <div class="controls">
-          <button class="btn" id="prev" aria-label="Previous pass"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
-          <button class="btn solid" id="play"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
-          <button class="btn" id="next" aria-label="Next pass"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
-          <div class="readout" aria-live="polite">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></div>
+        <div class="introgrid">
+          <div>
+            <h2 class="block-title">Contents</h2>
+            <ol class="toc" id="toc"></ol>
+          </div>
+          <div>
+            <h2 class="block-title">Reading depth</h2>
+            <div class="seg" id="depth" role="group" aria-label="Reading depth">
+              <button type="button" data-d="0" aria-pressed="true">Overview<small>plain language</small></button>
+              <button type="button" data-d="1" aria-pressed="false">Technical<small>how it works</small></button>
+              <button type="button" data-d="2" aria-pressed="false">Expert<small>for ML researchers</small></button>
+            </div>
+            <p class="helptext">Each section opens with a plain-language overview. Technical and expert detail can be expanded one section at a time, or all at once with this control.</p>
+            <div class="startrow">
+              <button class="btn solid" type="button" data-goto="drafts">Start<svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
+              <span class="helptext" style="margin:0">Swipe sideways or use the arrow keys to move between sections.</span>
+            </div>
+          </div>
         </div>
-        <div class="strip" id="strip" aria-label="Passes"></div>
-        <div class="stats">
-          <span><b id="stWords">0</b> words</span>
-          <span><b id="stChanged">0</b> changed</span>
-          <span class="key"><i></i>changed since the previous pass</span>
-        </div>
-        <div>
-          <div class="kicker" id="outLabel">NCM output</div>
-          <p class="output" id="out"></p>
-        </div>
-        <div class="note" id="note" hidden></div>
-        <details class="all" id="all">
-          <summary>All passes at once <span id="allCount"></span></summary>
-          <div class="rows" id="rows"></div>
-        </details>
-        <div class="figcap"><b>Figure 1.</b> Published NCM samples, decoded after every pass. Bar heights show how many words the draft contains at each pass. Use the arrow keys, the bars or the play button to step through.</div>
       </div>
+    </section>
 
-      <div class="prose">
-        <p>The same pattern appears in all three examples. Early drafts consist mostly of common words and punctuation. Names and key nouns, such as <i>Tim</i>, <i>kite</i> and <i>Pistorius</i>, appear several passes before the sentences are grammatical. Word order and spelling are settled last.</p>
-      </div>
+    <!-- 1 -->
+    <section class="screen" data-route="drafts" data-title="Writing in drafts" data-desc="The core idea, with the published samples" hidden>
+      <div class="wrap"><div class="sec">
+        <div class="sec-head"><div class="sec-no">1</div><h2>Writing in drafts</h2></div>
+        <div class="sec-body">
+          <div class="prose">
+            <p>Most language models, including the chatbots in common use, generate text one piece at a time. Each new word requires a full pass through the model, so a longer answer takes proportionally longer to produce.</p>
+            <p>NCM works differently. It first settles on a coarse outline of the whole passage, containing only a handful of words. It then makes a series of refinement passes. Each pass adds detail everywhere in the text at once, and the number of passes is fixed in advance, regardless of how long the text is.</p>
+            <p>The examples below come from three separate models, each trained for a single job: writing a short story from scratch, summarizing a news article, and translating a German sentence into English. None of them takes a written instruction the way a chatbot does. Each model's input is simply the text it works on, and the story model has no input at all.</p>
+          </div>
 
-      <details class="layer tech">
-        <summary><span class="tag">Technical</span>How the passes work</summary>
-        <div class="inner">
-          <p>Language models operate on tokens, which are words or fragments of words. The standard design, the autoregressive model, predicts each token from all the tokens before it, so producing <span class="mi">n</span> tokens takes <span class="mi">n</span> sequential forward passes. Diffusion language models instead begin from a fully masked sequence and unmask it over many steps. Each step predicts every position in parallel, but each step also reprocesses the full sequence.</p>
-          <p>NCM divides the problem between two models. A tokenizer compresses text into a stack of levels, short and coarse at the top, long and detailed at the bottom. A generator then predicts that stack one level at a time, producing every position within a level simultaneously. A sample therefore costs one forward pass per level: 11 passes for the translation in Figure 1, against one pass per token for an autoregressive model.</p>
-          <details class="layer expert">
-            <summary><span class="tag">Expert</span>Factorization and attention</summary>
+          <div class="figure" id="fig1">
+            <div class="tabs" role="tablist" aria-label="Sample" id="tabs"></div>
+            <div class="io-in">
+              <div class="io-label" id="inLabel">Input</div>
+              <div class="io-src" id="src"></div>
+              <div class="io-note" id="inNote"></div>
+            </div>
+            <div class="io-arrow" id="arrowText">NCM drafts the output in passes</div>
+            <div class="controls">
+              <button class="btn" id="prev" aria-label="Previous pass"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
+              <button class="btn solid" id="play"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
+              <button class="btn" id="next" aria-label="Next pass"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
+              <div class="readout" aria-live="polite">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></div>
+            </div>
+            <div class="strip" id="strip" aria-label="Passes" data-swipe="pass"></div>
+            <div class="stats">
+              <span><b id="stWords">0</b> words</span>
+              <span><b id="stChanged">0</b> changed</span>
+              <span class="key"><i></i>changed since the previous pass</span>
+            </div>
+            <div data-swipe="pass">
+              <div class="io-label" id="outLabel">Output</div>
+              <p class="output" id="out"></p>
+            </div>
+            <div class="note" id="note" hidden></div>
+            <details class="all">
+              <summary>All passes at once <span id="allCount"></span></summary>
+              <div class="rows" id="rows"></div>
+            </details>
+            <div class="figcap"><b>Figure 1.</b> Published NCM samples, decoded after every pass. Bar heights show how many words the draft contains at each pass. Swipe across the output or the bars, tap a bar, or use the play button to step through passes.</div>
+          </div>
+
+          <div class="prose">
+            <p>The same pattern appears in all three examples. Early drafts consist mostly of common words and punctuation. Names and key nouns, such as <i>Tim</i>, <i>kite</i> and <i>Pistorius</i>, appear several passes before the sentences are grammatical. Word order and spelling are settled last.</p>
+          </div>
+
+          <details class="layer tech">
+            <summary><span class="tag">Technical</span>How the passes work</summary>
             <div class="inner">
-              <p>The generator factorizes the joint distribution over code levels <span class="mi">q</span><sub>1</sub>, …, <span class="mi">q</span><sub><span class="mi">L</span></sub> as</p>
-              <div class="eq"><div class="m"><i>p</i>(<i>q</i><sub>1</sub>, …, <i>q</i><sub><i>L</i></sub>)<span class="op">=</span><span class="big">∏</span><sub><i>ℓ</i>=1</sub><sup><i>L</i></sup>&thinsp;<i>p</i>(<i>q</i><sub><i>ℓ</i></sub> | <i>q</i><sub>&lt;<i>ℓ</i></sub>)</div><div class="no">(1)</div></div>
-              <p>and samples all <span class="mi">n</span><sub><span class="mi">ℓ</span></sub> codes of level <span class="mi">ℓ</span> in one forward pass, so codes within a level are conditionally independent given the earlier levels. The released generators are transformers of roughly 100M parameters with a block-diagonal attention pattern, which the authors found gave the best perplexity and the fastest sampling among the patterns they compared.</p>
-              <p>Decoded quality is not monotonic in depth. In the WMT14 sample, passes 9 and 10 introduce repetitions (<i>Mexican Mexican</i>, <i>battle battle</i>) that pass 11 removes, and the paper reports a corresponding dip in decoded BLEU at intermediate levels.</p>
+              <p>Language models operate on tokens, which are words or fragments of words. The standard design, the autoregressive model, predicts each token from all the tokens before it, so producing <span class="mi">n</span> tokens takes <span class="mi">n</span> sequential forward passes. Diffusion language models instead begin from a fully masked sequence and unmask it over many steps. Each step predicts every position in parallel, but each step also reprocesses the full sequence.</p>
+              <p>NCM divides the problem between two models. A tokenizer compresses text into a stack of levels, short and coarse at the top, long and detailed at the bottom. A generator then predicts that stack one level at a time, producing every position within a level simultaneously. A sample therefore costs one forward pass per level: 11 passes for the translation in Figure 1, against one pass per token for an autoregressive model.</p>
+              <p>The summarization and translation models are conditional: the source text is encoded and supplied to the generator at every pass. The story model is unconditional and samples from what it learned about the training stories alone.</p>
+              <details class="layer expert">
+                <summary><span class="tag">Expert</span>Factorization and attention</summary>
+                <div class="inner">
+                  <p>The generator factorizes the joint distribution over code levels <span class="mi">q</span><sub>1</sub>, …, <span class="mi">q</span><sub><span class="mi">L</span></sub> as</p>
+                  <div class="eq"><div class="m"><i>p</i>(<i>q</i><sub>1</sub>, …, <i>q</i><sub><i>L</i></sub>)<span class="op">=</span><span class="big">∏</span><sub><i>ℓ</i>=1</sub><sup><i>L</i></sup>&thinsp;<i>p</i>(<i>q</i><sub><i>ℓ</i></sub> | <i>q</i><sub>&lt;<i>ℓ</i></sub>)</div><div class="no">(1)</div></div>
+                  <p>and samples all <span class="mi">n</span><sub><span class="mi">ℓ</span></sub> codes of level <span class="mi">ℓ</span> in one forward pass, so codes within a level are conditionally independent given the earlier levels. For the conditional tasks, each factor is additionally conditioned on the source. The released generators are transformers of roughly 100M parameters with a block-diagonal attention pattern, which the authors found gave the best perplexity and the fastest sampling among the patterns they compared.</p>
+                  <p>Decoded quality is not monotonic in depth. In the WMT14 sample, passes 9 and 10 introduce repetitions (<i>Mexican Mexican</i>, <i>battle battle</i>) that pass 11 removes, and the paper reports a corresponding dip in decoded BLEU at intermediate levels.</p>
+                </div>
+              </details>
             </div>
           </details>
         </div>
-      </details>
-    </div>
-  </section>
+      </div></div>
+    </section>
 
-  <!-- 2 -->
-  <section class="sec" id="levels" aria-labelledby="h2s">
-    <div class="sec-head"><div class="sec-no">2</div><h2 id="h2s">Turning text into levels</h2></div>
-    <div class="sec-body">
-      <div class="prose">
-        <p>For the generator to work from coarse to fine, the text must first be represented that way. NCM's tokenizer converts a passage into a series of levels. The first level is a very short code. Each following level is longer and records what the levels above it got wrong, so every added level makes the reconstruction more exact.</p>
-        <p>A progressive image download is a useful comparison: it shows a blurred version of a photograph first and sharpens it as more data arrives. NCM applies the same principle to text.</p>
-        <p>Each model fixes the length of every level in advance. Figure 2 shows these schedules for six of the released models.</p>
-      </div>
-
-      <div class="figure" id="fig2">
-        <div class="tabs" role="tablist" aria-label="Model" id="stabs"></div>
-        <div class="facts">
-          <div class="fact"><b id="fLevels">0</b><span>levels, and so this many passes</span></div>
-          <div class="fact"><b id="fLen">0</b><span>positions in the final level</span></div>
-          <div class="fact"><b id="fCode">0</b><span>possible codes per position</span></div>
-        </div>
-        <div class="sched" id="sched" role="img"></div>
-        <div class="legend"><span><i style="background:var(--ink)"></i>positions from earlier levels</span><span><i style="background:var(--accent)"></i>positions added at this level</span></div>
-        <div class="figcap"><b>Figure 2.</b> Positions per level for the selected model, read from the configuration files in the NCM repository. Each row is one level. A word-by-word model would need one pass per position in the final level; NCM needs one per row.</div>
-      </div>
-
-      <details class="layer tech">
-        <summary><span class="tag">Technical</span>Codebooks and residuals</summary>
-        <div class="inner">
-          <p>The tokenizer is a vector-quantized autoencoder (VQ-VAE). Each position in a level is stored as an index into a codebook, a learned list of vectors; the text models use codebooks of 4,096 or 8,192 entries. Quantization is residual: each level encodes the difference between the input representation and the reconstruction from all previous levels.</p>
-          <p>The schedules differ by model. TinyStories and LM1B use 12 levels that grow to 128 positions. OpenWebText uses 32 levels whose lengths are the perfect squares 1, 4, 9, …, 1,024. The Sudoku model uses 12 levels and a codebook of only 16 entries.</p>
-          <details class="layer expert">
-            <summary><span class="tag">Expert</span>Quantizer, training and schedule design</summary>
+    <!-- 2 -->
+    <section class="screen" data-route="levels" data-title="Turning text into levels" data-desc="How the tokenizer represents text" hidden>
+      <div class="wrap"><div class="sec">
+        <div class="sec-head"><div class="sec-no">2</div><h2>Turning text into levels</h2></div>
+        <div class="sec-body">
+          <div class="prose">
+            <p>For the generator to work from coarse to fine, the text must first be represented that way. NCM's tokenizer converts a passage into a series of levels. The first level is a very short code. Each following level is longer and records what the levels above it got wrong, so every added level makes the reconstruction more exact.</p>
+            <p>A progressive image download is a useful comparison: it shows a blurred version of a photograph first and sharpens it as more data arrives. NCM applies the same principle to text.</p>
+            <p>Each model fixes the length of every level in advance. Figure 2 shows these schedules for six of the released models.</p>
+          </div>
+          <div class="figure" id="fig2">
+            <div class="tabs" role="tablist" aria-label="Model" id="stabs"></div>
+            <div class="facts">
+              <div class="fact"><b id="fLevels">0</b><span>levels, and so this many passes</span></div>
+              <div class="fact"><b id="fLen">0</b><span>positions in the final level</span></div>
+              <div class="fact"><b id="fCode">0</b><span>possible codes per position</span></div>
+            </div>
+            <div class="sched" id="sched" role="img"></div>
+            <div class="legend"><span><i style="background:var(--ink)"></i>positions from earlier levels</span><span><i style="background:var(--accent)"></i>positions added at this level</span></div>
+            <div class="figcap"><b>Figure 2.</b> Positions per level for the selected model, read from the configuration files in the NCM repository. Each row is one level. A word-by-word model would need one pass per position in the final level; NCM needs one per row.</div>
+          </div>
+          <details class="layer tech">
+            <summary><span class="tag">Technical</span>Codebooks and residuals</summary>
             <div class="inner">
-              <p>Schematically, with encoder output <span class="mi">z</span>:</p>
-              <div class="eq"><div class="m wrap"><span><i>r</i><sub>1</sub><span class="op">=</span><i>z</i>,</span> <span><i>q</i><sub><i>ℓ</i></sub><span class="op">=</span><i>Q</i><sub><i>ℓ</i></sub>(<i>D</i><sub><i>ℓ</i></sub>(<i>r</i><sub><i>ℓ</i></sub>)),</span> <span><i>r</i><sub><i>ℓ</i>+1</sub><span class="op">=</span><i>r</i><sub><i>ℓ</i></sub><span class="op">−</span><i>U</i><sub><i>ℓ</i></sub>(<i>q</i><sub><i>ℓ</i></sub>)</span></div><div class="no">(2)</div></div>
-              <p>where <span class="mi">D</span><sub><span class="mi">ℓ</span></sub> resamples to <span class="mi">n</span><sub><span class="mi">ℓ</span></sub> positions, <span class="mi">Q</span><sub><span class="mi">ℓ</span></sub> is nearest-neighbor quantization against level <span class="mi">ℓ</span>'s codebook, and <span class="mi">U</span><sub><span class="mi">ℓ</span></sub> maps back to full length. The construction resembles the multiscale residual quantizer of VAR (Tian et al., 2024). This equation is a summary for orientation, not the paper's exact formulation.</p>
-              <p>Training applies nested dropout to the fine levels, which pushes global information into the coarse ones. Reported token reconstruction accuracy ranges from 99.79% on XSum to 99.99% on OpenWebText. The tokenizer is trained separately and then frozen, so it cannot adapt to the generator's objective.</p>
-              <p>On schedule design, the authors find that additional levels improve generative perplexity with diminishing returns while adding sequential depth, and that schedules with equal depth and equal endpoints can still train to different quality. The distribution of length across levels therefore matters, not only the number of levels.</p>
+              <p>The tokenizer is a vector-quantized autoencoder (VQ-VAE). Each position in a level is stored as an index into a codebook, a learned list of vectors; the text models use codebooks of 4,096 or 8,192 entries. Quantization is residual: each level encodes the difference between the input representation and the reconstruction from all previous levels.</p>
+              <p>The schedules differ by model. TinyStories and LM1B use 12 levels that grow to 128 positions. OpenWebText uses 32 levels whose lengths are the perfect squares 1, 4, 9, …, 1,024. The Sudoku model uses 12 levels and a codebook of only 16 entries.</p>
+              <details class="layer expert">
+                <summary><span class="tag">Expert</span>Quantizer, training and schedule design</summary>
+                <div class="inner">
+                  <p>Schematically, with encoder output <span class="mi">z</span>:</p>
+                  <div class="eq"><div class="m wrap"><span><i>r</i><sub>1</sub><span class="op">=</span><i>z</i>,</span> <span><i>q</i><sub><i>ℓ</i></sub><span class="op">=</span><i>Q</i><sub><i>ℓ</i></sub>(<i>D</i><sub><i>ℓ</i></sub>(<i>r</i><sub><i>ℓ</i></sub>)),</span> <span><i>r</i><sub><i>ℓ</i>+1</sub><span class="op">=</span><i>r</i><sub><i>ℓ</i></sub><span class="op">−</span><i>U</i><sub><i>ℓ</i></sub>(<i>q</i><sub><i>ℓ</i></sub>)</span></div><div class="no">(2)</div></div>
+                  <p>where <span class="mi">D</span><sub><span class="mi">ℓ</span></sub> resamples to <span class="mi">n</span><sub><span class="mi">ℓ</span></sub> positions, <span class="mi">Q</span><sub><span class="mi">ℓ</span></sub> is nearest-neighbor quantization against level <span class="mi">ℓ</span>'s codebook, and <span class="mi">U</span><sub><span class="mi">ℓ</span></sub> maps back to full length. The construction resembles the multiscale residual quantizer of VAR (Tian et al., 2024). This equation is a summary for orientation, not the paper's exact formulation.</p>
+                  <p>Training applies nested dropout to the fine levels, which pushes global information into the coarse ones. Reported token reconstruction accuracy ranges from 99.79% on XSum to 99.99% on OpenWebText. The tokenizer is trained separately and then frozen, so it cannot adapt to the generator's objective.</p>
+                  <p>On schedule design, the authors find that additional levels improve generative perplexity with diminishing returns while adding sequential depth, and that schedules with equal depth and equal endpoints can still train to different quality. The distribution of length across levels therefore matters, not only the number of levels.</p>
+                </div>
+              </details>
             </div>
           </details>
         </div>
-      </details>
-    </div>
-  </section>
+      </div></div>
+    </section>
 
-  <!-- 3 -->
-  <section class="sec" id="speed" aria-labelledby="h3s">
-    <div class="sec-head"><div class="sec-no">3</div><h2 id="h3s">Why fewer passes means faster</h2></div>
-    <div class="sec-body">
-      <div class="prose">
-        <p>Each pass through a model takes time, so the number of passes largely determines how quickly text appears. Figure 3 produces the same translation three ways. A word-by-word model needs one pass per word. A diffusion model, a newer design that also works in parallel, typically needs many refinement steps. NCM needs one pass per level.</p>
-      </div>
-
-      <div class="figure" id="fig3">
-        <div class="controls">
-          <button class="btn solid" id="raceRun"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg><span id="raceText">Run again</span></button>
-          <span class="figcap" style="margin-left:4px">one pass every 80 ms</span>
-        </div>
-        <div class="race">
-          <div class="lane">
-            <div class="lane-head"><h3>Word by word</h3><small>one word per pass</small><div class="count" id="cAR">0</div></div>
-            <div class="lane-text" id="tAR"></div>
-            <div class="lane-track"><span id="bAR"></span></div>
+    <!-- 3 -->
+    <section class="screen" data-route="speed" data-title="Why fewer passes means faster" data-desc="Pass counts and measured speedups" hidden>
+      <div class="wrap"><div class="sec">
+        <div class="sec-head"><div class="sec-no">3</div><h2>Why fewer passes means faster</h2></div>
+        <div class="sec-body">
+          <div class="prose">
+            <p>Each pass through a model takes time, so the number of passes largely determines how quickly text appears. Figure 3 produces the same translation three ways. A word-by-word model needs one pass per word. A diffusion model, a newer design that also works in parallel, typically needs many refinement steps. NCM needs one pass per level.</p>
           </div>
-          <div class="lane">
-            <div class="lane-head"><h3>Diffusion</h3><small>whole passage, 128 steps</small><div class="count" id="cDF">0</div></div>
-            <div class="lane-text" id="tDF"></div>
-            <div class="lane-track"><span id="bDF"></span></div>
+          <div class="figure" id="fig3">
+            <div class="io-in">
+              <div class="io-label">Input: a German sentence <span>(same as Figure 1)</span></div>
+              <div class="io-src" lang="de" id="raceSrc"></div>
+            </div>
+            <div class="controls">
+              <button class="btn solid" id="raceRun"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg><span id="raceText">Run again</span></button>
+              <span class="figcap" style="margin-left:4px">one pass every 80 ms</span>
+            </div>
+            <div class="race">
+              <div class="lane">
+                <div class="lane-head"><h3>Word by word</h3><small>one word per pass</small><div class="count" id="cAR">0</div></div>
+                <div class="lane-text" id="tAR"></div>
+                <div class="lane-track"><span id="bAR"></span></div>
+              </div>
+              <div class="lane">
+                <div class="lane-head"><h3>Diffusion</h3><small>whole passage, 128 steps</small><div class="count" id="cDF">0</div></div>
+                <div class="lane-text" id="tDF"></div>
+                <div class="lane-track"><span id="bDF"></span></div>
+              </div>
+              <div class="lane ncm">
+                <div class="lane-head"><h3>NCM</h3><small>one level per pass</small><div class="count" id="cNC">0</div></div>
+                <div class="lane-text" id="tNC"></div>
+                <div class="lane-track"><span id="bNC"></span></div>
+              </div>
+            </div>
+            <div class="figcap"><b>Figure 3.</b> Passes needed to translate the same German sentence into English. The NCM lane replays the real WMT14 sample from Figure 1. The other two lanes are simulations of the same output.</div>
           </div>
-          <div class="lane ncm">
-            <div class="lane-head"><h3>NCM</h3><small>one level per pass</small><div class="count" id="cNC">0</div></div>
-            <div class="lane-text" id="tNC"></div>
-            <div class="lane-track"><span id="bNC"></span></div>
+          <div class="prose">
+            <p>In the researchers' measurements, NCM generated text 10 to 31 times faster than the strongest diffusion models of the same size, with comparable or better quality.</p>
           </div>
-        </div>
-        <div class="figcap"><b>Figure 3.</b> Passes needed to produce the same translation. The NCM lane replays the real WMT14 sample from Figure 1. The other two lanes are simulations of the same sentence.</div>
-      </div>
-
-      <div class="prose">
-        <p>In the researchers' measurements, NCM generated text 10 to 31 times faster than the strongest diffusion models of the same size, with comparable or better quality.</p>
-      </div>
-      <div class="facts accent">
-        <div class="fact"><b>21×</b><span>faster on LM1B, a benchmark of news sentences</span></div>
-        <div class="fact"><b>10×</b><span>faster on OpenWebText, a corpus of web pages</span></div>
-        <div class="fact"><b>31×</b><span>faster on XSum, one-sentence news summaries</span></div>
-      </div>
-
-      <details class="layer tech">
-        <summary><span class="tag">Technical</span>Passes versus time</summary>
-        <div class="inner">
-          <p>Pass counts and wall-clock time are related but not identical. An autoregressive pass over a key-value cache processes only the newest token. A diffusion pass processes the entire sequence. An NCM pass processes the current level while attending to the levels already generated. The paper therefore reports both measures. The table gives pass counts per sample alongside the measured speedups.</p>
-          <div class="tscroll">
-            <table>
-              <thead><tr><th>Dataset</th><th>Diffusion baseline</th><th class="r">Its passes</th><th class="r">NCM passes</th><th style="width:26%"></th><th class="r">Speedup</th></tr></thead>
-              <tbody id="t2body"></tbody>
-            </table>
+          <div class="facts accent">
+            <div class="fact"><b>21×</b><span>faster on LM1B, a benchmark of news sentences</span></div>
+            <div class="fact"><b>10×</b><span>faster on OpenWebText, a corpus of web pages</span></div>
+            <div class="fact"><b>31×</b><span>faster on XSum, one-sentence news summaries</span></div>
           </div>
-          <p>In Figure 3, the word-by-word lane understates a real autoregressive model, which takes one pass per token rather than one per word. The diffusion lane uses 128 steps, the step count of the diffusion baselines in the paper's LM1B and XSum comparisons.</p>
-          <details class="layer expert">
-            <summary><span class="tag">Expert</span>Baselines and caveats</summary>
+          <details class="layer tech">
+            <summary><span class="tag">Technical</span>Passes versus time</summary>
             <div class="inner">
-              <p>Comparisons are at matched parameter scale against the strongest diffusion baseline for each task, DUO on LM1B and OpenWebText. NCM achieves better generative perplexity on LM1B and is competitive on OpenWebText. On XSum it matches the strongest diffusion model's ROUGE-L, and with 8 function evaluations it exceeds the unguided AURORA-LM baseline at 128. On WMT14 it uses 11 evaluations without guidance but trails the strongest diffusion baseline, E2D2.</p>
-              <p>The authors note two limits on these comparisons. Some baseline results are inherited from prior work, and some timing baselines were randomly initialized because released checkpoints were unavailable, which weakens absolute wall-clock claims.</p>
+              <p>Pass counts and wall-clock time are related but not identical. An autoregressive pass over a key-value cache processes only the newest token. A diffusion pass processes the entire sequence. An NCM pass processes the current level while attending to the levels already generated. The paper therefore reports both measures. The table gives pass counts per sample alongside the measured speedups.</p>
+              <div class="tscroll">
+                <table>
+                  <thead><tr><th>Dataset</th><th>Diffusion baseline</th><th class="r">Its passes</th><th class="r">NCM passes</th><th style="width:26%"></th><th class="r">Speedup</th></tr></thead>
+                  <tbody id="t2body"></tbody>
+                </table>
+              </div>
+              <p>In Figure 3, the word-by-word lane understates a real autoregressive model, which takes one pass per token rather than one per word. The diffusion lane uses 128 steps, the step count of the diffusion baselines in the paper's LM1B and XSum comparisons.</p>
+              <details class="layer expert">
+                <summary><span class="tag">Expert</span>Baselines and caveats</summary>
+                <div class="inner">
+                  <p>Comparisons are at matched parameter scale against the strongest diffusion baseline for each task, DUO on LM1B and OpenWebText. NCM achieves better generative perplexity on LM1B and is competitive on OpenWebText. On XSum it matches the strongest diffusion model's ROUGE-L, and with 8 function evaluations it exceeds the unguided AURORA-LM baseline at 128. On WMT14 it uses 11 evaluations without guidance but trails the strongest diffusion baseline, E2D2.</p>
+                  <p>The authors note two limits on these comparisons. Some baseline results are inherited from prior work, and some timing baselines were randomly initialized because released checkpoints were unavailable, which weakens absolute wall-clock claims.</p>
+                </div>
+              </details>
             </div>
           </details>
         </div>
-      </details>
-    </div>
-  </section>
+      </div></div>
+    </section>
 
-  <!-- 4 -->
-  <section class="sec" id="limits" aria-labelledby="h4s">
-    <div class="sec-head"><div class="sec-no">4</div><h2 id="h4s">Current limits</h2></div>
-    <div class="sec-body">
-      <div class="prose">
-        <p>NCM is a research method, not a product. The published models are small, around 100 million parameters, and are trained on standard research datasets. Every input receives the same number of passes, whether the text is easy or difficult to produce. Some intermediate drafts also become temporarily worse before the final pass, as the translation in Figure 1 shows at passes 9 and 10.</p>
-      </div>
-      <details class="layer tech">
-        <summary><span class="tag">Technical</span>Where errors come from</summary>
-        <div class="inner">
-          <p>Because the tokenizer is fixed before the generator is trained, its mistakes become the generator's mistakes. The paper identifies named entities, numerals, diacritics, markup and word boundaries as weak points, which matter most in tasks that require exact output. Errors at coarse levels can also propagate to finer ones.</p>
-          <details class="layer expert">
-            <summary><span class="tag">Expert</span>Scale and adaptivity</summary>
+    <!-- 4 -->
+    <section class="screen" data-route="limits" data-title="Current limits" data-desc="What the method cannot do yet" hidden>
+      <div class="wrap"><div class="sec">
+        <div class="sec-head"><div class="sec-no">4</div><h2>Current limits</h2></div>
+        <div class="sec-body">
+          <div class="prose">
+            <p>NCM is a research method, not a product. The published models are small, around 100 million parameters, and are trained on standard research datasets. Every input receives the same number of passes, whether the text is easy or difficult to produce. Some intermediate drafts also become temporarily worse before the final pass, as the translation in Figure 1 shows at passes 9 and 10.</p>
+          </div>
+          <details class="layer tech">
+            <summary><span class="tag">Technical</span>Where errors come from</summary>
             <div class="inner">
-              <p>Scaling has been tested up to 725M parameters on LM1B, where generative perplexity improves with size while sample entropy remains high. Hierarchy depth and level lengths are fixed per model rather than adapted per input, so compute does not scale with difficulty. The deterministic quantizer also limits how far the method's ELBO interpretation applies.</p>
+              <p>Because the tokenizer is fixed before the generator is trained, its mistakes become the generator's mistakes. The paper identifies named entities, numerals, diacritics, markup and word boundaries as weak points, which matter most in tasks that require exact output. Errors at coarse levels can also propagate to finer ones.</p>
+              <details class="layer expert">
+                <summary><span class="tag">Expert</span>Scale and adaptivity</summary>
+                <div class="inner">
+                  <p>Scaling has been tested up to 725M parameters on LM1B, where generative perplexity improves with size while sample entropy remains high. Hierarchy depth and level lengths are fixed per model rather than adapted per input, so compute does not scale with difficulty. The deterministic quantizer also limits how far the method's ELBO interpretation applies.</p>
+                </div>
+              </details>
             </div>
           </details>
         </div>
-      </details>
-    </div>
-  </section>
+      </div></div>
+    </section>
 
-  <!-- About -->
-  <section class="sec" id="about" aria-labelledby="h5s">
-    <div class="sec-head"><div class="sec-no">5</div><h2 id="h5s">About this page</h2></div>
-    <div class="sec-body">
-      <div class="prose">
-        <p>This visualizer was built by Kevin Broadie as an independent companion to the NCM paper. It is not affiliated with the authors. The research, the models and the samples are theirs; this page only presents them.</p>
-        <p>The per-pass text in Figure 1 is transcribed from an animation in the NCM repository. Highlights are computed with a word-level comparison against the previous pass and approximate the original animation. The schedules in Figure 2 are read from the repository's configuration files, and the speed figures are quoted from the paper.</p>
-      </div>
-      <ul class="sources">
-        <li>Kumbong, H., Khare, I. S., Mlauzi, I., Woen, A., Ding, C., Buchanan, E. K., Arora, S., Mirhoseini, A. and Ré, C. (2026). <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation</a>. arXiv:2610.14162.</li>
-        <li>NCM code, checkpoints and samples: <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">github.com/HazyResearch/ncm</a> (MIT license).</li>
-        <li>Visualizer source: <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">github.com/kbroadie/ncm-viewer</a>.</li>
-      </ul>
-    </div>
-  </section>
+    <!-- 5 -->
+    <section class="screen" data-route="about" data-title="About this page" data-desc="Credits, data sources and license" hidden>
+      <div class="wrap"><div class="sec">
+        <div class="sec-head"><div class="sec-no">5</div><h2>About this page</h2></div>
+        <div class="sec-body">
+          <div class="prose">
+            <p>This visualizer was built by Kevin Broadie as an independent companion to the NCM paper. It is not affiliated with the authors. The research, the models and the samples are theirs; this page only presents them.</p>
+            <p>The per-pass text in Figure 1 is transcribed from an animation in the NCM repository. Highlights are computed with a word-level comparison against the previous pass and approximate the original animation. The schedules in Figure 2 are read from the repository's configuration files, and the speed figures are quoted from the paper.</p>
+            <p>The visualizer's source code is published on GitHub under the MIT license, so anyone may reuse or adapt it with attribution. The NCM code, checkpoints and samples are separately MIT licensed by their authors.</p>
+          </div>
+          <ul class="sources">
+            <li>Kumbong, H., Khare, I. S., Mlauzi, I., Woen, A., Ding, C., Buchanan, E. K., Arora, S., Mirhoseini, A. and Ré, C. (2026). <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation</a>. arXiv:2610.14162.</li>
+            <li>NCM code, checkpoints and samples: <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">github.com/HazyResearch/ncm</a> (MIT license).</li>
+            <li>Visualizer source: <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">github.com/kbroadie/ncm-viewer</a> (MIT license).</li>
+          </ul>
+        </div>
+      </div></div>
+    </section>
+  </main>
 
-  <footer>
-    <p>NCM Refinement Viewer by Kevin Broadie. Next-Concept Modeling is the work of its authors at Stanford; see the paper for full credit.</p>
-  </footer>
+  <nav class="pager" aria-label="Sections">
+    <div class="wrap">
+      <button class="pbtn prev" id="pPrev" type="button"><small>Previous</small><span id="pPrevT"></span></button>
+      <div class="dots" id="dots"></div>
+      <button class="pbtn next" id="pNext" type="button"><small>Next</small><span id="pNextT"></span></button>
+    </div>
+  </nav>
 </div>
 
 <script>
@@ -542,7 +590,87 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const fmt = n => n.toLocaleString("en-US");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* Reading depth */
+/* ---------- Screens, breadcrumbs, pager ---------- */
+const SCREENS = [...document.querySelectorAll(".screen")];
+const ROUTES = SCREENS.map(s => s.dataset.route);
+let cur = -1;
+let crumbExtra = { drafts: "", levels: "" };
+
+$("toc").innerHTML = SCREENS.slice(1).map((s, i) =>
+  `<li><button type="button" data-goto="${s.dataset.route}"><span class="n">${i + 1}</span><span class="t">${esc(s.dataset.title)}</span><span class="go">›</span><span class="d">${esc(s.dataset.desc || "")}</span></button></li>`).join("");
+$("dots").innerHTML = SCREENS.map((s, i) => `<button class="dot" type="button" data-goto="${s.dataset.route}" aria-label="${esc(s.dataset.title)}"></button>`).join("");
+
+function renderCrumbs() {
+  const s = SCREENS[cur];
+  const items = [];
+  if (cur === 0) items.push(`<li><span aria-current="page">Home</span></li>`);
+  else {
+    items.push(`<li><a href="#intro">Home</a></li>`);
+    const extra = crumbExtra[s.dataset.route];
+    const label = `${cur}. ${esc(s.dataset.title)}`;
+    if (extra) items.push(`<li><a href="#${s.dataset.route}">${label}</a></li><li><span aria-current="page">${esc(extra)}</span></li>`);
+    else items.push(`<li><span aria-current="page">${label}</span></li>`);
+  }
+  $("crumbs").innerHTML = items.join("");
+}
+function show(i) {
+  if (i === cur || i < 0 || i >= SCREENS.length) return;
+  const dir = i > cur ? "in-right" : "in-left";
+  SCREENS.forEach((s, k) => { s.hidden = k !== i; s.classList.remove("in-right", "in-left"); });
+  if (cur !== -1 && !reduced) { void SCREENS[i].offsetWidth; SCREENS[i].classList.add(dir); }
+  cur = i;
+  window.scrollTo(0, 0);
+  renderCrumbs();
+  $("prog").style.width = (i / (SCREENS.length - 1) * 100) + "%";
+  document.querySelectorAll(".dot").forEach((d, k) => d.setAttribute("aria-current", k === i ? "step" : "false"));
+  $("pPrev").disabled = i === 0;
+  $("pNext").disabled = i === SCREENS.length - 1;
+  $("pPrevT").textContent = i > 0 ? SCREENS[i - 1].dataset.title : "";
+  $("pNextT").textContent = i < SCREENS.length - 1 ? SCREENS[i + 1].dataset.title : "";
+  if (ROUTES[i] !== "drafts") stop();
+}
+const goRoute = r => { if (location.hash.slice(1) === r) route(); else location.hash = r; };
+const step = d => { const n = cur + d; if (n >= 0 && n < SCREENS.length) goRoute(ROUTES[n]); };
+function route() {
+  const h = location.hash.slice(1);
+  if (TASKS[h]) { selectTask(h); location.replace("#drafts"); return; }   // older sample links
+  const i = ROUTES.indexOf(h);
+  show(i === -1 ? 0 : i);
+}
+document.addEventListener("click", e => { const g = e.target.closest("[data-goto]"); if (g) goRoute(g.dataset.goto); });
+$("pPrev").addEventListener("click", () => step(-1));
+$("pNext").addEventListener("click", () => step(1));
+window.addEventListener("hashchange", route);
+
+// Swipe: sideways moves between sections; on Figure 1's output and bars it steps passes.
+let touch = null;
+$("screens").addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) { touch = null; return; }
+  const t = e.touches[0];
+  touch = { x: t.clientX, y: t.clientY, time: Date.now(), target: e.target };
+}, { passive: true });
+$("screens").addEventListener("touchend", e => {
+  if (!touch) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touch.x, dy = t.clientY - touch.y, dt = Date.now() - touch.time;
+  const target = touch.target; touch = null;
+  if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.4 || dt > 800) return;
+  if (target.closest(".tscroll, .m, input, textarea, [data-noswipe]")) return;
+  if (getSelection && String(getSelection()).length) return;
+  if (target.closest('[data-swipe="pass"]')) { jump(level + (dx < 0 ? 1 : -1)); return; }
+  step(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+document.addEventListener("keydown", e => {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (e.target.closest("input, textarea, select")) return;
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  const d = e.key === "ArrowRight" ? 1 : -1;
+  if (ROUTES[cur] === "drafts" && document.activeElement && document.activeElement.closest("#fig1")) { jump(level + d); return; }
+  step(d);
+});
+
+/* ---------- Reading depth ---------- */
 function setDepth(d, save = true) {
   document.querySelectorAll("#depth button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.d === d ? "true" : "false"));
   document.querySelectorAll("details.tech").forEach(el => { el.open = d >= 1; });
@@ -552,7 +680,7 @@ function setDepth(d, save = true) {
 $("depth").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setDepth(+b.dataset.d); });
 try { const d = +localStorage.getItem("ncm-depth"); if (d === 1 || d === 2) setDepth(d, false); } catch (e) {}
 
-// Words in b that are not part of the longest common subsequence with a.
+/* ---------- Text helpers ---------- */
 function changed(a, b) {
   const n = a.length, m = b.length;
   const dp = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
@@ -570,7 +698,7 @@ function changed(a, b) {
 }
 function prepare(t) {
   t.tokens = t.levels.map(tok);
-  t.diffs = t.tokens.map((cur, i) => i === 0 ? cur.map(() => true) : changed(t.tokens[i - 1], cur));
+  t.diffs = t.tokens.map((c, i) => i === 0 ? c.map(() => true) : changed(t.tokens[i - 1], c));
   t.words = t.tokens.map(ts => ts.filter(w => w !== "\n").length);
   t.nChanged = t.tokens.map((ts, i) => ts.filter((w, k) => w !== "\n" && t.diffs[i][k]).length);
   return t;
@@ -588,7 +716,7 @@ function renderText(t, i, marks = true) {
   return html;
 }
 
-/* Figure 1 */
+/* ---------- Figure 1 ---------- */
 const TASKS = {};
 let key = null, level = 0, timer = null, animate = false;
 
@@ -599,22 +727,20 @@ function selectTask(k) {
   const t = TASKS[k];
   level = t.levels.length - 1;
   document.querySelectorAll("#tabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
-  $("srcBlock").hidden = !t.src;
-  if (t.src) {
-    $("srcLabel").textContent = t.srcLabel;
-    $("src").setAttribute("lang", t.srcLang);
-    $("src").innerHTML = t.src.map(p => "<p>" + esc(p) + "</p>").join("");
-  }
-  $("outLabel").textContent = t.outLabel;
+  $("inLabel").textContent = t.inputLabel;
+  $("src").hidden = !t.src;
+  if (t.src) { $("src").setAttribute("lang", t.srcLang); $("src").innerHTML = t.src.map(p => "<p>" + esc(p) + "</p>").join(""); }
+  $("inNote").textContent = t.inputNote;
+  $("arrowText").textContent = t.src ? "NCM writes the output in passes" : "NCM writes the story in passes";
   $("lvMax").textContent = t.levels.length;
   $("allCount").textContent = t.levels.length + " passes";
   const max = Math.max(...t.words);
   $("strip").innerHTML = t.words.map((w, i) =>
-    `<button class="bar" data-i="${i}" aria-label="Pass ${i + 1}, ${w} words"><span class="fill" style="height:${Math.max(4, Math.round(w / max * 100))}%"></span><span class="n">${i + 1}</span></button>`
-  ).join("");
+    `<button class="bar" data-i="${i}" aria-label="Pass ${i + 1}, ${w} words"><span class="fill" style="height:${Math.max(4, Math.round(w / max * 100))}%"></span><span class="n">${i + 1}</span></button>`).join("");
   $("rows").innerHTML = t.levels.map((_, i) =>
-    `<button class="row" data-i="${i}"><span class="lv">${i + 1}</span><span class="tx">${renderText(t, i)}</span></button>`
-  ).join("");
+    `<button class="row" data-i="${i}"><span class="lv">${i + 1}</span><span class="tx">${renderText(t, i)}</span></button>`).join("");
+  crumbExtra.drafts = t.name;
+  if (ROUTES[cur] === "drafts") renderCrumbs();
   animate = false;
   render();
   setPlayUI(false);
@@ -623,6 +749,7 @@ function render() {
   const t = TASKS[key];
   $("out").classList.toggle("animate", animate);
   $("out").innerHTML = renderText(t, level);
+  $("outLabel").innerHTML = esc(t.outputLabel) + ` <span>after pass ${level + 1} of ${t.levels.length}</span>`;
   $("lvNow").textContent = level + 1;
   $("stWords").textContent = t.words[level];
   $("stChanged").textContent = t.nChanged[level];
@@ -650,36 +777,21 @@ function setPlayUI(on) {
   $("playText").textContent = on ? "Pause" : (atEnd ? "Replay" : "Play");
   $("playIcon").innerHTML = on ? '<path d="M3 2h4v12H3zM9 2h4v12H9z"/>' : '<path d="M4 2l10 6-10 6z"/>';
 }
-function stop() { clearInterval(timer); timer = null; setPlayUI(false); }
+function stop() { clearInterval(timer); timer = null; if (key) setPlayUI(false); }
 function play() {
   if (level === TASKS[key].levels.length - 1) go(0);
   setPlayUI(true);
-  timer = setInterval(() => {
-    go(level + 1);
-    if (level >= TASKS[key].levels.length - 1) stop();
-  }, 800);
+  timer = setInterval(() => { go(level + 1); if (level >= TASKS[key].levels.length - 1) stop(); }, 800);
 }
-const jump = i => { stop(); go(i); setPlayUI(false); };
+const jump = i => { if (!key) return; stop(); go(i); setPlayUI(false); };
 $("play").addEventListener("click", () => timer ? stop() : play());
 $("prev").addEventListener("click", () => jump(level - 1));
 $("next").addEventListener("click", () => jump(level + 1));
 $("strip").addEventListener("click", e => { const b = e.target.closest(".bar"); if (b) jump(+b.dataset.i); });
 $("rows").addEventListener("click", e => { const r = e.target.closest(".row"); if (r) jump(+r.dataset.i); });
-$("tabs").addEventListener("click", e => {
-  const b = e.target.closest(".tab"); if (!b) return;
-  if (location.hash.slice(1) === b.dataset.k) selectTask(b.dataset.k);
-  else location.hash = b.dataset.k;
-});
-document.addEventListener("keydown", e => {
-  if (e.target.closest("input, textarea, select, summary")) return;
-  const r = $("fig1").getBoundingClientRect();
-  if (r.bottom < 0 || r.top > innerHeight) return;
-  if (e.key === "ArrowLeft") jump(level - 1);
-  if (e.key === "ArrowRight") jump(level + 1);
-});
-window.addEventListener("hashchange", () => { if (TASKS[location.hash.slice(1)]) selectTask(location.hash.slice(1)); });
+$("tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectTask(b.dataset.k); });
 
-/* Figure 2 */
+/* ---------- Figure 2 ---------- */
 let SCHED = [];
 function selectSchedule(id) {
   const s = SCHED.find(x => x.id === id) || SCHED[0];
@@ -694,10 +806,12 @@ function selectSchedule(id) {
     const prev = i ? L[i - 1] : 0;
     return `<div class="srow"><span class="l">${i + 1}</span><span class="track"><span class="w" style="width:${prev / max * 100}%"></span><span class="add" style="left:${prev / max * 100}%;width:${(n - prev) / max * 100}%"></span></span><span class="v">${fmt(n)}</span></div>`;
   }).join("");
+  crumbExtra.levels = s.name;
+  if (ROUTES[cur] === "levels") renderCrumbs();
 }
 $("stabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectSchedule(b.dataset.k); });
 
-/* Figure 3 */
+/* ---------- Figure 3 ---------- */
 const DIFF_STEPS = 128, TICK = 80;
 let race = null;
 function setupRace(wmt) {
@@ -707,6 +821,7 @@ function setupRace(wmt) {
   const reveal = words.map(() => 1 + Math.floor(rnd() * (DIFF_STEPS - 1)));
   reveal[Math.floor(rnd() * reveal.length)] = DIFF_STEPS;
   race = { wmt, words, reveal, nAR: words.length, nNC: wmt.levels.length, tick: 0, timer: null };
+  $("raceSrc").innerHTML = (wmt.src || []).map(esc).join(" ");
 }
 function drawRace(tick) {
   const r = race, w = r.words;
@@ -734,18 +849,15 @@ function runRace() {
 }
 $("raceRun").addEventListener("click", runRace);
 
-/* Pass-count table */
 const PAPER = [
   { name: "LM1B", base: "DUO", b: 128, n: 12, speed: "21×" },
   { name: "OpenWebText", base: "DUO", b: 1024, n: 32, speed: "10×" },
   { name: "XSum", base: "AURORA-LM", b: 128, n: 8, speed: "31×" }
 ];
-$("t2body").innerHTML = PAPER.map(p => `<tr>
-  <td>${p.name}</td><td>${p.base}</td><td class="r">${fmt(p.b)}</td><td class="r ncm">${p.n}</td>
-  <td><span class="minibar" style="width:100%"></span><span class="minibar n" style="width:${p.n / p.b * 100}%"></span></td>
-  <td class="r">${p.speed}</td></tr>`).join("");
+$("t2body").innerHTML = PAPER.map(p => `<tr><td>${p.name}</td><td>${p.base}</td><td class="r">${fmt(p.b)}</td><td class="r ncm">${p.n}</td>
+  <td><span class="minibar" style="width:100%"></span><span class="minibar n" style="width:${p.n / p.b * 100}%"></span></td><td class="r">${p.speed}</td></tr>`).join("");
 
-/* Boot */
+/* ---------- Boot ---------- */
 async function boot() {
   try {
     const res = await fetch("samples.json", { cache: "no-cache" });
@@ -753,23 +865,22 @@ async function boot() {
     const data = await res.json();
     for (const d of data.samples) {
       TASKS[d.id] = prepare({
-        outLabel: d.outputLabel || "NCM output",
-        srcLabel: d.sourceLabel || null, src: d.source || null, srcLang: d.sourceLang || "en",
-        levels: d.levels, notes: d.notes || null
+        name: d.name, task: d.task || "", levels: d.levels, notes: d.notes || null,
+        inputLabel: d.inputLabel || "Input", inputNote: d.inputNote || "",
+        src: d.source || null, srcLang: d.sourceLang || "en",
+        outputLabel: d.outputLabel || "Output"
       });
     }
-    $("tabs").innerHTML = data.samples.map(d => `<button class="tab" role="tab" data-k="${esc(d.id)}">${esc(d.name)}</button>`).join("");
-    selectTask(location.hash.slice(1));
-
+    $("tabs").innerHTML = data.samples.map(d => `<button class="tab" role="tab" data-k="${esc(d.id)}">${esc(d.name)}<small>${esc(d.task || "")}</small></button>`).join("");
     SCHED = data.schedules || [];
     $("stabs").innerHTML = SCHED.map(s => `<button class="tab" role="tab" data-k="${esc(s.id)}">${esc(s.name)}</button>`).join("");
+    selectTask(TASKS[location.hash.slice(1)] ? location.hash.slice(1) : "tinystories");
     if (SCHED.length) selectSchedule(SCHED[0].id);
-
     if (TASKS.wmt14) { setupRace(TASKS.wmt14); drawRace(DIFF_STEPS); }
   } catch (err) {
-    $("srcBlock").hidden = true;
     $("out").innerHTML = '<span class="empty">Couldn’t load samples.json (' + esc(err.message || err) + '). If you opened this file directly, serve the folder instead, for example with <code>python3 -m http.server</code>.</span>';
   }
+  route();
 }
 boot();
 </script>
