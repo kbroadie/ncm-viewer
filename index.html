@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#FBFBF9">
 <title>What If AI Wrote the Way It Paints?</title>
 <meta name="description" content="AI image tools build a picture from rough to sharp. Researchers at Stanford built a model that writes text the same way. An illustrated, interactive story by Kevin Broadie.">
 <meta name="author" content="Kevin Broadie">
@@ -13,304 +13,294 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap">
 <style>
-/* Layout: long-form story built from pinned scenes. Each scene holds still for several screens while scrolling scrubs its animation, then releases. Every scene has its own color. Light theme only, soft fills, humanist type. */
+/* Layout: long-form story built from pinned scenes. A scene holds still while scrolling steps through its beats; each beat pairs one caption with one state of the graphic. Prose sits in a 640px column on grained paper. Each scene has its own color and pattern. */
 :root {
   color-scheme: light;
-  --bg: #FFFFFF;
+  --paper: #FBFBF9;
   --ink: #1F2430;
   --sub: #5F6675;
-  --line: #DFE4EC;
+  --faint: #8A90A0;
+  --line: #E1E4EA;
   --accent: #3557E0;
   --accent-soft: #E3E9FF;
   --coral: #EE6B4D;
-  --coral-soft: #FDE7E1;
   --mint: #2E9E78;
   --mark: #FFE27A;
-  --shadow: 0 10px 30px rgba(31, 36, 48, .08), 0 2px 6px rgba(31, 36, 48, .05);
-  --c-pics: #FFF4CC;
-  --c-story: #E8F0FF;
-  --c-race: #FFEAE2;
-  --c-slots: #E0F4EA;
-  --c-try: #EEEAFF;
-  --c-steps: #EDF0F5;
-  --c-sudoku: #DFF2F4;
-  --c-mem: #FBE8EF;
+  --shadow: 0 1px 2px rgba(31, 36, 48, .06), 0 12px 32px -8px rgba(31, 36, 48, .14);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .12 0 0 0 0 .14 0 0 0 0 .19 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --f-sans: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
   --f-serif: "Alegreya", Georgia, "Times New Roman", serif;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--f-sans); }
+body { margin: 0; background: var(--paper) var(--grain); color: var(--ink); font: 400 16px/1.5 var(--f-sans); text-rendering: optimizeLegibility; }
 a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-.gutter { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
-.col { max-width: 660px; margin: 0 auto; }
-.wide { max-width: 1080px; margin: 0 auto; }
+.gutter { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.col { max-width: 640px; margin: 0 auto; }
 mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08em; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.sc { font-variant-caps: all-small-caps; letter-spacing: .06em; font-weight: 700; }
+.num { font-variant-numeric: tabular-nums lining-nums; }
 
 /* Header */
-.masthead { display: flex; justify-content: space-between; gap: 12px; padding-block: 18px 0; font-size: 15px; color: var(--sub); }
-.masthead b { color: var(--ink); font-weight: 800; }
-.hed { padding-block: clamp(36px, 8vw, 80px) 32px; display: grid; gap: 20px; }
-.hed h1 { margin: 0; font-weight: 800; font-size: clamp(42px, 8vw, 82px); line-height: 1; letter-spacing: -.02em; text-wrap: balance; }
-.dek { margin: 0; font-family: var(--f-serif); font-size: clamp(20px, 2.7vw, 24px); line-height: 1.45; color: var(--sub); max-width: 34em; }
-.byline { font-size: 15.5px; line-height: 1.5; color: var(--sub); }
-.byline b { color: var(--ink); }
+.hed { padding-block: clamp(56px, 11vw, 120px) clamp(48px, 7vw, 80px); display: grid; gap: 24px; }
+.hed h1 { margin: 0; max-width: 13ch; font-weight: 800; font-size: clamp(44px, 8.4vw, 86px); line-height: .98; letter-spacing: -.025em; text-wrap: balance; }
+.dek { margin: 0; max-width: 30em; font-family: var(--f-serif); font-size: clamp(20px, 2.6vw, 24px); line-height: 1.45; color: var(--sub); text-wrap: pretty; }
+.byline { display: flex; flex-wrap: wrap; gap: 4px 18px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 15px; color: var(--sub); }
+.byline b { color: var(--ink); font-weight: 700; }
 
 /* Prose */
-.prose { padding-block: 48px; }
-.prose p { margin: 0 0 1.05em; font-family: var(--f-serif); font-size: 21px; line-height: 1.6; }
+.prose { padding-block: 72px; }
+.prose p { margin: 0 0 1em; font-family: var(--f-serif); font-size: 21px; line-height: 1.62; text-wrap: pretty; hanging-punctuation: first; font-variant-numeric: oldstyle-nums proportional-nums; }
 .prose p:last-child { margin-bottom: 0; }
 .prose strong { font-weight: 700; }
-.prose h2 { margin: 8px 0 18px; font-weight: 800; font-size: clamp(30px, 4.6vw, 40px); line-height: 1.08; letter-spacing: -.015em; text-wrap: balance; }
-.prose h2 span { background: linear-gradient(transparent 60%, var(--mark) 60%, var(--mark) 92%, transparent 92%); padding: 0 .1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.prose h2 + p { margin-top: 0; }
-.prose .kicker { font-size: 15px; font-weight: 800; color: var(--accent); margin: 0 0 6px; letter-spacing: .02em; }
-@media (max-width: 600px) { .prose p { font-size: 19px; } .prose { padding-block: 40px; } }
-
-/* Controls */
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { appearance: none; border: 0; cursor: pointer; padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.75); font-size: 15px; font-weight: 700; line-height: 1.15; display: grid; text-align: left; }
-.chip small { font-size: 12.5px; font-weight: 500; color: var(--sub); }
-.chip:hover { background: #fff; }
-.chip[aria-selected="true"] { background: var(--accent); color: #fff; }
-.chip[aria-selected="true"] small { color: #fff; opacity: .8; }
-.btn { appearance: none; border: 0; cursor: pointer; height: 40px; min-width: 40px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #F1F3F8; font-size: 15px; font-weight: 700; }
-.btn:hover { background: var(--accent-soft); }
-.btn:disabled { opacity: .35; cursor: default; }
-.btn.solid { background: var(--accent); color: #fff; }
-.btn.solid:hover { background: #2443BD; }
-.btn svg { width: 13px; height: 13px; fill: currentColor; flex: none; }
-.caption { font-size: 14.5px; color: var(--sub); line-height: 1.45; max-width: 72ch; }
+.prose h2 { margin: 0 0 20px; font-weight: 800; font-size: clamp(30px, 4.4vw, 38px); line-height: 1.1; letter-spacing: -.015em; text-wrap: balance; }
+.prose h2 span { background: linear-gradient(transparent 62%, var(--mark) 62%, var(--mark) 90%, transparent 90%); padding: 0 .1em; margin: 0 -.1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.prose * + h2 { margin-top: 72px; }
+.prose .small { font-family: var(--f-sans); font-size: 15px; line-height: 1.5; color: var(--sub); }
+@media (max-width: 600px) { .prose { padding-block: 56px; } .prose p { font-size: 19px; line-height: 1.6; } .prose * + h2 { margin-top: 56px; } }
 
 /* Pinned scenes */
-.scene { position: relative; height: calc(var(--len, 4) * 100vh); background: var(--scene, #F1F3F8); }
+.scene { position: relative; height: calc(var(--beats) * 90vh + 100vh); background-color: var(--bg); background-image: var(--grain), var(--pattern); background-size: 180px 180px, var(--pattern-size, 22px 22px); }
 .stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; overflow: hidden; }
-.stage-in { width: 100%; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); gap: 48px; align-items: center; padding-block: 20px; }
-.cap { display: grid; gap: 10px; align-content: center; }
-.cap-k { font-size: 15px; font-weight: 800; color: var(--accent); letter-spacing: .02em; }
-.cap-t { margin: 0; font-family: var(--f-serif); font-size: 21px; line-height: 1.5; transition: opacity .18s; }
-.cap-t.fade { opacity: 0; }
-.prog { display: flex; gap: 6px; }
-.prog i { width: 8px; height: 8px; border-radius: 99px; background: rgba(31,36,48,.15); transition: background .2s, width .2s; }
-.prog i.on { background: var(--ink); width: 22px; }
-.hint { font-size: 13.5px; color: var(--sub); }
+.stage-in { width: 100%; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px; align-items: center; padding-block: 24px; }
+.cap { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 0 18px; align-content: center; }
+.rail { grid-row: 1 / span 3; display: flex; flex-direction: column; gap: 6px; align-items: center; padding-top: 4px; }
+.rail i { width: 6px; height: 6px; border-radius: 99px; background: rgba(31, 36, 48, .2); transition: height .25s, background .25s; }
+.rail i.done { background: rgba(31, 36, 48, .45); }
+.rail i.on { height: 24px; background: var(--ink); }
+.cap-k { font-size: 15px; color: var(--accent); margin-bottom: 6px; }
+.cap-t { margin: 0; font-family: var(--f-serif); font-size: 21px; line-height: 1.5; text-wrap: pretty; }
+.cap-t.in { animation: capin .25s ease-out; }
+@keyframes capin { from { opacity: .15; } }
+.cue { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--sub); }
+.cue svg { width: 14px; height: 20px; flex: none; }
+.cue .wheel { animation: wheel 1.6s ease-in-out infinite; }
+@keyframes wheel { 0%, 100% { transform: translateY(0); opacity: 1; } 60% { transform: translateY(4px); opacity: .3; } }
 .viz { min-width: 0; display: grid; justify-items: center; }
-.panel { width: 100%; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 22px 24px; display: grid; gap: 14px; min-width: 0; }
+.panel { width: 100%; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 24px; display: grid; gap: 16px; min-width: 0; }
 .stack { display: grid; }
 .stack > * { grid-area: 1 / 1; min-width: 0; }
 .stack > .sizer { visibility: hidden; }
 @media (max-width: 860px) {
-  .stage-in { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-block: 12px; }
-  .cap { order: 2; gap: 6px; }
+  .scene { height: calc(var(--beats) * 85vh + 100vh); }
+  .stage-in { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 12px; }
+  .cap { order: 2; gap: 0 14px; grid-template-columns: 10px minmax(0, 1fr); }
+  .rail i { width: 5px; height: 5px; } .rail i.on { height: 18px; }
   .viz { order: 1; }
-  .cap-t { font-size: 17px; line-height: 1.45; }
-  .cap-k { font-size: 14px; }
-  .panel { padding: 14px 16px; gap: 10px; border-radius: 18px; }
+  .cap-t { font-size: 17.5px; line-height: 1.45; }
+  .cap-k { font-size: 14px; margin-bottom: 2px; }
+  .cue { margin-top: 8px; font-size: 13px; }
+  .panel { padding: 16px; gap: 12px; border-radius: 18px; }
+}
+@media (max-width: 860px) and (max-height: 720px) {
+  .stage-in { padding-block: 6px; gap: 12px; }
+  .cap-t { font-size: 16px; }
+  .cue { display: none; }
 }
 
-/* Scene: pictures */
-.pics { display: grid; gap: 12px; justify-items: center; }
-.pics canvas { width: min(360px, 74vw, 44vh); height: auto; aspect-ratio: 1; border-radius: 18px; box-shadow: var(--shadow); image-rendering: pixelated; background: #fff; }
-.pics .lbl { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+/* Scene colors and patterns */
+#sc-pics { --bg: #FFF4CC; --pattern: radial-gradient(rgba(150, 110, 0, .12) 1.2px, transparent 1.6px); }
+#sc-story { --bg: #E8F0FF; --pattern: repeating-linear-gradient(0deg, rgba(53, 87, 224, .07) 0 1px, transparent 1px 30px); --pattern-size: auto; }
+#sc-race { --bg: #FFEAE2; --pattern: repeating-linear-gradient(45deg, rgba(238, 107, 77, .07) 0 1px, transparent 1px 14px); --pattern-size: auto; }
+#sc-slots { --bg: #E0F4EA; --pattern: linear-gradient(rgba(46, 158, 120, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 158, 120, .08) 1px, transparent 1px); --pattern-size: 26px 26px; }
+#sc-steps { --bg: #EDF0F5; --pattern: radial-gradient(rgba(31, 36, 48, .09) 1px, transparent 1.4px); --pattern-size: 12px 12px; }
+#sc-sudoku { --bg: #DFF2F4; --pattern: linear-gradient(rgba(20, 120, 130, .08) 2px, transparent 2px), linear-gradient(90deg, rgba(20, 120, 130, .08) 2px, transparent 2px); --pattern-size: 66px 66px; }
+#sc-mem { --bg: #FBE8EF; --pattern: repeating-linear-gradient(90deg, rgba(192, 87, 122, .08) 0 2px, transparent 2px 18px); --pattern-size: auto; }
+
+/* Pictures */
+.pics { display: grid; gap: 14px; justify-items: center; }
+.pics canvas { width: min(360px, 72vw, 44vh); height: auto; aspect-ratio: 1; border-radius: 16px; box-shadow: var(--shadow); image-rendering: pixelated; background: #fff; }
+.pics .lbl { font-size: 16px; font-weight: 700; }
 .pics .lbl span { font-weight: 500; color: var(--sub); }
 
-/* Scene: story */
-.story-card { width: 100%; max-width: 620px; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 22px 26px 24px; display: grid; gap: 12px; }
-.story-card .h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.story-card .h span { font-size: 15px; font-weight: 700; color: var(--sub); }
-.story-card .h b { font-size: 30px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-.story-card .h b small { font-size: 16px; color: var(--sub); }
-.story-text { font-family: var(--f-serif); font-size: 19px; line-height: 1.55; overflow-wrap: anywhere; }
-@media (max-width: 860px) { .story-card { padding: 14px 16px 16px; gap: 8px; } .story-card .h b { font-size: 24px; } .story-text { font-size: 15px; line-height: 1.48; } }
+/* Story */
+.story-card { width: 100%; max-width: 600px; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 24px 28px 28px; display: grid; gap: 14px; }
+.story-card .h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.story-card .h span { font-size: 14px; color: var(--sub); }
+.story-card .h b { font-size: 15px; font-weight: 700; color: var(--sub); }
+.story-card .h b strong { font-size: 28px; font-weight: 800; color: var(--ink); margin-right: 2px; }
+.story-text { font-family: var(--f-serif); font-size: 19px; line-height: 1.6; overflow-wrap: anywhere; }
+@media (max-width: 860px) { .story-card { padding: 16px 18px 18px; gap: 10px; } .story-card .h { padding-bottom: 8px; } .story-card .h b strong { font-size: 22px; } .story-text { font-size: 15px; line-height: 1.5; } }
 
-/* Scene: race */
-.de { font-family: var(--f-serif); font-style: italic; font-size: 16px; line-height: 1.45; color: var(--sub); background: var(--c-race); border-radius: 12px; padding: 10px 12px; }
-.de b { font-family: var(--f-sans); font-style: normal; font-size: 13.5px; color: var(--ink); display: block; }
-.lane { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start; padding: 10px 0; transition: opacity .25s; }
-.lane + .lane { border-top: 1px solid var(--line); }
+/* Race */
+.de { font-family: var(--f-serif); font-style: italic; font-size: 16px; line-height: 1.45; color: var(--sub); }
+.de b { font-family: var(--f-sans); font-style: normal; font-size: 14px; color: var(--ink); display: block; margin-bottom: 2px; }
+.lane { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 2px 14px; align-items: start; padding-top: 14px; border-top: 1px solid var(--line); transition: opacity .25s; }
 .lane.dim { opacity: .3; }
-.lane .ic { width: 40px; height: 40px; grid-row: span 3; }
-.lane h3 { margin: 0; font-size: 16.5px; font-weight: 800; line-height: 1.2; }
+.lane .ic { width: 36px; height: 36px; grid-row: span 3; }
+.lane h3 { margin: 0; font-size: 16px; font-weight: 800; line-height: 1.2; }
 .lane h3 small { display: block; font-size: 13.5px; font-weight: 500; color: var(--sub); }
-.lane .count { font-size: 28px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; }
-.lane .count em { display: block; font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--mint); text-align: right; min-height: 1.2em; }
-.lane .txt { grid-column: 2 / -1; font-family: var(--f-serif); font-size: 16.5px; line-height: 1.45; overflow-wrap: anywhere; }
-.lane .bar { grid-column: 2 / -1; height: 6px; background: #F1F3F8; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+.lane .count { font-size: 26px; font-weight: 800; line-height: 1; text-align: right; }
+.lane .count em { display: block; font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--mint); min-height: 1.2em; }
+.lane .txt { grid-column: 2 / -1; margin-top: 6px; font-family: var(--f-serif); font-size: 16.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.lane .bar { grid-column: 2 / -1; height: 5px; background: #F1F3F8; border-radius: 99px; overflow: hidden; margin-top: 8px; }
 .lane .bar span { display: block; height: 100%; width: 0; border-radius: 99px; }
 .lane.ar .bar span { background: #7C869B; }
 .lane.df .bar span { background: var(--coral); }
 .lane.nc .bar span { background: var(--accent); }
 .lane.nc .count { color: var(--accent); }
 .slot { display: inline-block; width: 1.8em; height: .55em; background: var(--line); border-radius: 99px; }
-@media (max-width: 860px) { .lane { padding: 6px 0; grid-template-columns: 32px minmax(0, 1fr) auto; } .lane .ic { width: 32px; height: 32px; } .lane .txt { font-size: 14px; } .lane .count { font-size: 22px; } .de { font-size: 13.5px; padding: 8px 10px; } .lane h3 { font-size: 15px; } .lane h3 small { font-size: 12.5px; } }
+@media (max-width: 860px) { .lane { padding-top: 8px; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 1px 10px; } .lane .ic { width: 28px; height: 28px; } .lane .txt { font-size: 14px; margin-top: 3px; } .lane .count { font-size: 20px; } .de { font-size: 13.5px; } .lane h3 { font-size: 15px; } .lane h3 small { font-size: 12.5px; } .lane .bar { margin-top: 5px; } }
+@media (max-width: 860px) and (max-height: 720px) { .lane h3 small { display: none; } .de span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } }
 
-@media (max-width: 860px) and (max-height: 720px) {
-  .lane h3 small { display: none; }
-  .de span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .cap-t { font-size: 16px; }
-  .stage-in { padding-block: 6px; gap: 10px; }
-  .lane { padding: 4px 0; }
-}
-
-/* Scene: slots */
-.slots .row2 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.slots .row2 b { font-size: 16px; font-weight: 800; }
-.slots .row2 span { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--mint); }
-.slots .row2 span small { font-size: 15px; color: var(--sub); }
-.sgrid { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 4px; }
-.sgrid i { display: block; aspect-ratio: 1; border-radius: 4px; background: #EEF2F6; transition: background .2s; }
-.sgrid i.old { background: #93CDB4; }
+/* Slots */
+.slots .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.slots .top b { font-size: 15px; font-weight: 700; color: var(--sub); }
+.slots .top span { font-size: 15px; color: var(--sub); }
+.slots .top span strong { font-size: 28px; font-weight: 800; color: var(--mint); }
+.sgrid { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 5px; }
+.sgrid i { display: block; aspect-ratio: 1; border-radius: 4px; background: #EEF2F6; }
+.sgrid i.old { background: #9AD2BA; }
 .sgrid i.new { background: var(--mint); }
-.unpack { display: grid; gap: 4px; background: var(--c-slots); border-radius: 14px; padding: 12px 14px; }
-.unpack .l { font-size: 13.5px; font-weight: 800; }
-.unpack .t { font-family: var(--f-serif); font-size: 19px; line-height: 1.45; overflow-wrap: anywhere; }
-.unpack .t .empty { color: var(--sub); font-style: italic; font-size: .85em; }
-@media (max-width: 860px) { .sgrid { gap: 3px; } .unpack .t { font-size: 16px; } .slots .row2 span { font-size: 22px; } }
-.schedules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
-.sch { background: var(--c-slots); border-radius: 16px; padding: 12px 14px; display: grid; gap: 2px; }
-.sch b { font-size: 16px; font-weight: 800; }
-.sch span { font-size: 14.5px; color: var(--sub); }
+.unpack { display: grid; gap: 4px; padding-top: 14px; border-top: 1px solid var(--line); }
+.unpack .l { font-size: 14px; color: var(--sub); }
+.unpack .t { font-family: var(--f-serif); font-size: 20px; line-height: 1.45; overflow-wrap: anywhere; }
+.unpack .t .empty { color: var(--faint); font-style: italic; font-size: .85em; }
+@media (max-width: 860px) { .sgrid { gap: 3px; } .unpack .t { font-size: 16px; } .slots .top span strong { font-size: 22px; } }
+.schedules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin-top: 28px; background: var(--line); border-radius: 14px; overflow: hidden; }
+.sch { background: #fff; padding: 12px 14px; display: grid; gap: 1px; }
+.sch b { font-size: 15.5px; font-weight: 700; }
+.sch span { font-size: 14px; color: var(--sub); }
 @media (max-width: 560px) { .schedules { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* Try it */
-.try { background: var(--c-try); padding-block: 44px; }
-.try .panel { max-width: 860px; margin: 0 auto; }
-.vin { background: var(--c-try); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; }
-.vin .l { font-size: 14px; font-weight: 800; }
-.vin .s { font-family: var(--f-serif); font-size: 16px; line-height: 1.45; }
+.try { background-color: #EEEAFF; background-image: var(--grain); padding-block: 56px; }
+.try .panel { max-width: 820px; margin: 0 auto; gap: 18px; }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: #F3F1FB; border-radius: 14px; }
+.tab { appearance: none; border: 0; cursor: pointer; padding: 8px 6px; border-radius: 10px; text-align: center; line-height: 1.2; background: transparent; font-size: 15px; font-weight: 700; color: var(--sub); }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(31, 36, 48, .12); }
+.vin { display: grid; gap: 4px; }
+.vin .l { font-size: 14px; color: var(--sub); }
+.vin .s { font-family: var(--f-serif); font-size: 16.5px; line-height: 1.5; }
 .vin .s[lang="de"] { font-style: italic; }
-.vin .nt { font-size: 14px; color: var(--sub); line-height: 1.4; }
-.vctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.vctrl input[type="range"] { flex: 1 1 160px; min-width: 0; accent-color: var(--accent); height: 28px; }
-.vread { font-size: 15px; color: var(--sub); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.vread b { font-size: 24px; font-weight: 800; color: var(--ink); }
-.vlab { font-size: 14px; font-weight: 800; }
-.vlab span { font-weight: 500; color: var(--sub); }
+.vin .nt { font-size: 14.5px; color: var(--sub); line-height: 1.4; }
+.scrub { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; padding-block: 4px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.scrub input[type="range"] { width: 100%; accent-color: var(--accent); height: 34px; }
+.scrub span { font-size: 15px; color: var(--sub); white-space: nowrap; }
+.scrub span b { font-size: 22px; font-weight: 800; color: var(--ink); }
+.vlab { font-size: 14px; color: var(--sub); }
 .vout { margin: 4px 0 0; font-family: var(--f-serif); font-size: 21px; line-height: 1.5; overflow-wrap: anywhere; min-height: 3em; }
-.vout .empty { color: var(--sub); font-style: italic; font-size: .8em; }
-.vnote { font-size: 15px; line-height: 1.45; background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; }
-.bloop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.bloop span { font-size: 14.5px; font-weight: 700; color: var(--sub); margin-right: 2px; }
-.bloop button { appearance: none; border: 0; cursor: pointer; border-radius: 999px; padding: 6px 12px; background: var(--mark); font-family: var(--f-serif); font-size: 16px; font-weight: 500; }
-.bloop button:hover { background: #FFD24A; }
-.animate mark { animation: arrive .45s ease-out; }
-@keyframes arrive { from { background: transparent; } }
+.vout .empty { color: var(--faint); font-style: italic; font-size: .8em; }
+.vnote { font-size: 15px; line-height: 1.45; background: var(--accent-soft); border-radius: 12px; padding: 10px 14px; }
+@media (max-width: 600px) { .vout { font-size: 18px; } .try { padding-block: 40px; } }
 
-/* Scene: steps */
-.units { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: 100%; max-width: 520px; }
-.ug .h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
-.ug .h b { font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.ug .h span { white-space: nowrap; }
-.ug .h span { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+/* Steps */
+.units { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; width: 100%; max-width: 500px; }
+.ug .h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.ug .h b { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ug .h span { font-size: 24px; font-weight: 800; white-space: nowrap; }
 .ug.df .h span { color: var(--coral); }
 .ug.nc .h span { color: var(--accent); }
 .gridbox { aspect-ratio: 1; width: 100%; min-height: 0; overflow: hidden; }
 .grid { display: grid; grid-template-columns: repeat(32, minmax(0, 1fr)); gap: 2px; }
-.grid i { display: block; aspect-ratio: 1; background: #E6EAF1; border-radius: 2px; }
+.grid i { display: block; aspect-ratio: 1; background: rgba(31, 36, 48, .08); border-radius: 2px; }
 .ug.df .grid i.on { background: var(--coral); }
 .ug.nc .grid i.on { background: var(--accent); }
-@media (max-width: 860px) { .units { width: min(100%, 46vh); max-width: none; } .ug .h span { font-size: 20px; } .ug .h b { font-size: 14px; } .grid { gap: 1.5px; } }
+@media (max-width: 860px) { .units { width: min(100%, 44vh); max-width: none; gap: 10px; } .ug .h span { font-size: 19px; } .ug .h b { font-size: 13.5px; } .grid { gap: 1.5px; } }
 
-.bignums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 8px auto 24px; }
-.bignum { background: var(--accent-soft); border-radius: 18px; padding: 16px 16px 14px; display: grid; gap: 4px; }
-.bignum b { font-size: clamp(40px, 8.5vw, 66px); font-weight: 800; line-height: .95; letter-spacing: -.02em; color: var(--accent); }
-.bignum span { font-size: 15.5px; line-height: 1.3; font-weight: 500; }
-@media (max-width: 520px) { .bignums { grid-template-columns: minmax(0, 1fr); } .bignum { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 14px; } }
-.drafts { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 3fr); gap: 20px; align-items: center; background: #F4F6FA; border-radius: 20px; padding: 18px 20px; margin: 4px auto 8px; }
-.drafts .one, .drafts .many { display: grid; gap: 8px; justify-items: center; text-align: center; font-size: 14.5px; font-weight: 700; }
-.drafts .vs { font-weight: 800; color: var(--sub); }
-.drafts .docs { display: grid; grid-template-columns: repeat(8, 26px); gap: 6px; }
-.drafts svg { width: 26px; height: 32px; display: block; }
-.drafts .one svg { width: 46px; height: 57px; }
+.bignums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 32px 0; background: var(--line); border-radius: 18px; overflow: hidden; }
+.bignum { background: #fff; padding: 18px 18px 16px; display: grid; gap: 4px; }
+.bignum b { font-size: clamp(40px, 8vw, 62px); font-weight: 800; line-height: .95; letter-spacing: -.02em; color: var(--accent); }
+.bignum span { font-size: 15px; line-height: 1.3; color: var(--sub); }
+@media (max-width: 520px) { .bignums { grid-template-columns: minmax(0, 1fr); } .bignum { grid-template-columns: 3.2em minmax(0, 1fr); align-items: center; gap: 14px; } }
+.drafts { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 2.6fr); gap: 20px; align-items: center; margin: 32px 0; padding: 20px; background: #fff; border-radius: 18px; box-shadow: var(--shadow); }
+.drafts .one, .drafts .many { display: grid; gap: 10px; justify-items: center; text-align: center; font-size: 14.5px; color: var(--sub); }
+.drafts .one b, .drafts .many b { color: var(--ink); }
+.drafts .vs { font-size: 14px; color: var(--faint); }
+.drafts .docs { display: grid; grid-template-columns: repeat(8, 24px); gap: 6px; }
+.drafts svg { width: 24px; height: 30px; display: block; }
+.drafts .one svg { width: 42px; height: 52px; }
 @media (max-width: 560px) { .drafts { grid-template-columns: minmax(0, 1fr); } }
 
-/* Scene: sudoku */
-.sud { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; }
-.sud .s { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 14px; display: grid; gap: 8px; justify-items: center; text-align: center; align-content: start; }
-.sud .s b { font-size: 16px; font-weight: 800; }
-.sud .s .c { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
-.sud .s .c small { font-size: 14px; color: var(--sub); font-weight: 700; }
-.sud .s.nc .c { color: var(--accent); }
+/* Sudoku */
+.sud { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 560px; }
+.sud .s { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 16px; display: grid; gap: 10px; justify-items: center; text-align: center; align-content: start; transition: opacity .25s; }
+.sud .s.dim { opacity: .45; }
+.sud .s .t { display: grid; gap: 2px; }
+.sud .s .t b { font-size: 15.5px; font-weight: 800; }
+.sud .s .t span { font-size: 14px; color: var(--sub); }
+.sud .s .t span strong { font-size: 22px; font-weight: 800; color: var(--ink); }
+.sud .s.nc .t span strong { color: var(--accent); }
 .sud svg { width: 100%; max-width: 230px; height: auto; display: block; }
 .passbar { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; width: 100%; max-width: 230px; }
-.passbar i { height: 10px; border-radius: 3px; background: #E6EAF1; }
+.passbar i { height: 8px; border-radius: 3px; background: #E6EAF1; }
 .passbar i.on { background: var(--accent); }
 .sud .note { font-size: 13px; color: var(--sub); line-height: 1.35; min-height: 2.7em; }
-@media (max-width: 860px) { .sud .note { min-height: 4.1em; font-size: 12.5px; } .sud { gap: 10px; } .sud .s { padding: 10px; } .sud svg { max-width: 40vh; } .sud .s .c { font-size: 20px; } .sud .s b { font-size: 14px; } }
-.pull { margin: 8px auto 20px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: center; }
-.pull b { font-size: clamp(60px, 13vw, 104px); font-weight: 800; line-height: .9; letter-spacing: -.03em; color: var(--mint); }
-.pull span { font-family: var(--f-serif); font-size: 19px; line-height: 1.45; }
+@media (max-width: 860px) { .sud { gap: 10px; } .sud .s { padding: 10px; gap: 6px; } .sud svg { max-width: 38vh; } .sud .s .t span strong { font-size: 18px; } .sud .s .t b { font-size: 14px; } .sud .note { min-height: 4.1em; font-size: 12.5px; } }
+.pull { margin: 0 0 40px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 24px; align-items: center; }
+.pull b { font-size: clamp(64px, 13vw, 108px); font-weight: 800; line-height: .9; letter-spacing: -.03em; color: var(--mint); }
+.pull span { font-family: var(--f-serif); font-size: 19px; line-height: 1.45; color: var(--sub); text-wrap: pretty; }
 @media (max-width: 520px) { .pull { grid-template-columns: minmax(0, 1fr); } }
 
-/* Scene: memory */
-.mem { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; width: 100%; max-width: 620px; }
-.mrow { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 14px 16px; display: grid; grid-template-columns: auto minmax(0, 1fr) 8.5em; gap: 8px 14px; align-items: center; }
-.mrow svg.chip-ic { width: 64px; height: 44px; }
+/* Memory */
+.mem { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; width: 100%; max-width: 600px; }
+.mrow { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 16px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr) 8.5em; gap: 10px 14px; align-items: center; transition: opacity .25s; }
+.mrow.dim { opacity: .45; }
+.mrow svg.chip-ic { width: 56px; height: 40px; }
 .mrow .t b { display: block; font-size: 16px; font-weight: 800; }
 .mrow .t span { font-size: 13.5px; color: var(--sub); }
-.mrow .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mrow .n b { display: block; font-size: 28px; font-weight: 800; line-height: 1; }
-.mrow .n span { font-size: 13px; color: var(--sub); font-weight: 700; }
+.mrow .n { text-align: right; white-space: nowrap; }
+.mrow .n b { display: block; font-size: 26px; font-weight: 800; line-height: 1; }
+.mrow .n span { font-size: 13px; color: var(--sub); }
 .mrow.nc .n b { color: var(--accent); }
+.mrow.ar .n b { color: #B2486C; }
 .mrow .ticks { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(64, minmax(0, 1fr)); gap: 2px; }
-.mrow .ticks i { height: 12px; border-radius: 2px; background: #EEE6EA; }
+.mrow .ticks i { height: 10px; border-radius: 2px; background: #F1E8EC; }
 .mrow.ar .ticks i.on { background: #C0577A; }
 .mrow.nc .ticks i.on { background: var(--accent); }
-@media (max-width: 860px) { .mrow { padding: 10px 12px; grid-template-columns: auto minmax(0, 1fr) 7.6em; gap: 6px 10px; } .mrow svg.chip-ic { width: 48px; height: 33px; } .mrow .n b { font-size: 22px; } .mrow .t b { font-size: 14.5px; } }
+@media (max-width: 860px) { .mrow { padding: 12px 14px; grid-template-columns: auto minmax(0, 1fr) 7.6em; gap: 6px 10px; } .mrow svg.chip-ic { width: 42px; height: 30px; } .mrow .n b { font-size: 20px; } .mrow .t b { font-size: 14.5px; } .mrow .t span { font-size: 12.5px; } }
 
 /* Notes */
-.notes { margin-top: 24px; padding-block: 24px 80px; border-top: 1px solid var(--line); }
-.notes h2 { font-size: 24px; font-weight: 800; margin: 0 0 12px; }
-.notes h3 { font-size: 16.5px; font-weight: 800; margin: 22px 0 6px; }
-.notes p, .notes li { font-size: 16px; line-height: 1.55; margin: 0 0 8px; max-width: 70ch; }
+.notes { padding-block: 40px 96px; border-top: 1px solid var(--line); }
+.notes h2 { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
+.notes h3 { font-size: 15px; margin: 24px 0 4px; }
+.notes p, .notes li { font-size: 15.5px; line-height: 1.55; margin: 0 0 6px; color: var(--sub); }
 .notes ul { margin: 0; padding-left: 1.1em; }
-.notes .muted { color: var(--sub); }
 
 @media (prefers-reduced-motion: reduce) {
-  .cap-t, .lane, .sgrid i, .prog i { transition: none; }
-  .animate mark { animation: none; }
+  .cap-t.in, .cue .wheel { animation: none; }
+  .rail i, .lane, .sud .s, .mrow { transition: none; }
 }
 </style>
 </head>
 <body>
-<header class="gutter"><div class="wide masthead"><b>NCM Refinement Viewer</b><span>November 2026</span></div></header>
-
 <main>
-  <section class="gutter">
+  <header class="gutter">
     <div class="col hed">
       <h1>What if AI wrote the way it paints?</h1>
       <p class="dek">AI image tools don’t draw a picture pixel by pixel. They rough in the whole thing and sharpen it. Chatbots still write one word at a time. Researchers at Stanford built a model that writes like a painter, and it’s fast.</p>
-      <div class="byline">Story and illustrations by <b>Kevin Broadie</b>. Based on research by Hermann Kumbong and colleagues at Stanford. <a href="#notes">Credits and notes</a></div>
+      <div class="byline"><span>Story and illustrations by <b>Kevin Broadie</b></span><span>Research by Hermann Kumbong and colleagues at Stanford</span><span>November 2026</span></div>
     </div>
-  </section>
+  </header>
 
-  <!-- Scene 1: pictures -->
-  <section class="scene gutter" id="sc-pics" style="--len:4;--scene:var(--c-pics)" aria-label="A picture sharpening from one block to full detail">
+  <!-- Scene: pictures -->
+  <section class="scene gutter" id="sc-pics" aria-label="A picture sharpening from one block to full detail">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div><div class="hint">Keep scrolling</div></div>
-      <div class="viz"><div class="pics"><canvas id="picCanvas" width="256" height="256" aria-hidden="true"></canvas><div class="lbl" id="picLbl">1 × 1 <span>block</span></div></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
+      <div class="viz"><div class="pics"><canvas id="picCanvas" width="256" height="256" aria-hidden="true"></canvas><div class="lbl num" id="picLbl"></div></div></div>
     </div></div>
   </section>
 
   <section class="gutter">
     <div class="col prose">
-      <p>Text has always worked differently. ChatGPT, Gemini, Llama and nearly every other chatbot is a <strong>large language model</strong>, or LLM, and LLMs write by predicting the next token, a word or a piece of a word, adding it to the page, and doing it again. Each token takes a full trip through the model. A 300-word answer means roughly 400 trips, one after another, and none of them can start until the last one finishes.</p>
+      <p>Text has always worked differently. ChatGPT, Gemini, Llama and nearly every other chatbot is a <strong>large language model</strong>, or LLM. LLMs write by predicting the next token, a word or piece of a word, adding it to the page and doing it again. Each token takes a full trip through the model. A 300-word answer means roughly 400 trips, one after another, and none can start until the last one finishes.</p>
       <p>A team at Stanford asked a simple question: what if text could be painted instead of typed? Their answer is a method called <strong>Next-Concept Modeling</strong>, or NCM. The name riffs on “next-token prediction.” Instead of guessing the next word, NCM guesses the next, sharper version of the whole passage.</p>
       <p>Here’s one of their models writing a children’s story from scratch.</p>
     </div>
   </section>
 
-  <!-- Scene 2: story -->
-  <section class="scene gutter" id="sc-story" style="--len:6;--scene:var(--c-story)" aria-label="A story being written pass by pass">
+  <!-- Scene: story -->
+  <section class="scene gutter" id="sc-story" aria-label="A story being written pass by pass">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="story-card">
-          <div class="h"><span>NCM writing a story</span><b>pass <span id="sPass">1</span><small> of 12</small></b></div>
-          <div class="stack"><div class="story-text sizer" id="sSizer"></div><div class="story-text" id="sText">.</div></div>
+          <div class="h"><span>NCM writing a story</span><b class="num">pass <strong id="sPass">1</strong> of 12</b></div>
+          <div class="stack"><div class="story-text sizer" id="sSizer"></div><div class="story-text" id="sText"></div></div>
         </div>
       </div>
     </div></div>
@@ -319,37 +309,37 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
   <section class="gutter">
     <div class="col prose">
       <h2><span>Three ways to write a sentence</span></h2>
-      <p>AI text generators fall into roughly three families, and each one maps onto something familiar.</p>
+      <p>AI text generators fall into roughly three families, and each maps onto something familiar.</p>
       <p><strong>The typewriter</strong> is the LLM approach behind today’s chatbots, known in the field as autoregressive generation. <strong>The scratch-off card</strong> is a newer family called diffusion language models, including Google’s Gemini Diffusion, Inception Labs’ Mercury and the research model LLaDA. They start with every word hidden and reveal a few at a time. <strong>The sketch artist</strong> is NCM.</p>
       <p>Watch all three translate the same German sentence into English.</p>
     </div>
   </section>
 
-  <!-- Scene 3: race -->
-  <section class="scene gutter" id="sc-race" style="--len:6;--scene:var(--c-race)" aria-label="Three ways to write the same sentence">
+  <!-- Scene: race -->
+  <section class="scene gutter" id="sc-race" aria-label="Three ways to write the same sentence">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="panel">
           <div class="de"><b>Input: a German sentence</b><span id="raceSrc"></span></div>
           <div class="lane ar" id="lAR">
             <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="16" rx="3" fill="#fff" stroke="#1F2430" stroke-width="2.5"/><path d="M15 12h18M15 17h12" stroke="#B9C3DC" stroke-width="2.5" stroke-linecap="round"/><rect x="4" y="20" width="40" height="22" rx="7" fill="#7C869B"/><g fill="#fff"><circle cx="13" cy="28" r="2.4"/><circle cx="20" cy="28" r="2.4"/><circle cx="27" cy="28" r="2.4"/><circle cx="34" cy="28" r="2.4"/><rect x="14" y="34" width="20" height="4" rx="2"/></g></svg>
             <h3>Typewriter<small>LLM: one word per step, in order</small></h3>
-            <div class="count"><span id="cAR">0</span><em id="dAR"></em></div>
+            <div class="count num"><span id="cAR">0</span><em id="dAR"></em></div>
             <div class="stack txt"><div class="sizer" id="zAR"></div><div id="tAR"></div></div>
             <div class="bar"><span id="bAR"></span></div>
           </div>
           <div class="lane df" id="lDF">
             <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="9" width="38" height="30" rx="6" fill="#FDE7E1"/><rect x="11" y="15" width="26" height="18" rx="3" fill="#EE6B4D"/><path d="M12 30c3-3 5 1 8-2s5 1 8-2 5 1 8-2" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="38" cy="37" r="7" fill="#F2C94C" stroke="#1F2430" stroke-width="2"/></svg>
             <h3>Scratch-off card<small>diffusion: reveal a few at a time</small></h3>
-            <div class="count"><span id="cDF">0</span><em id="dDF"></em></div>
+            <div class="count num"><span id="cDF">0</span><em id="dDF"></em></div>
             <div class="stack txt"><div class="sizer" id="zDF"></div><div id="tDF"></div></div>
             <div class="bar"><span id="bDF"></span></div>
           </div>
           <div class="lane nc" id="lNC">
             <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="8" width="30" height="34" rx="5" fill="#E3E9FF"/><path d="M9 18c4-3 8 2 12-1M9 26c5-2 9 2 14 0M9 34c3-2 6 1 9 0" stroke="#3557E0" stroke-width="2.5" fill="none" stroke-linecap="round"/><g transform="rotate(40 34 22)"><rect x="30" y="4" width="8" height="30" rx="2" fill="#F2C94C" stroke="#1F2430" stroke-width="2"/><path d="M30 34l4 8 4-8z" fill="#fff" stroke="#1F2430" stroke-width="2" stroke-linejoin="round"/></g></svg>
             <h3>Sketch artist<small>NCM: rough in everything, refine</small></h3>
-            <div class="count"><span id="cNC">0</span><em id="dNC"></em></div>
+            <div class="count num"><span id="cNC">0</span><em id="dNC"></em></div>
             <div class="stack txt"><div class="sizer" id="zNC"></div><div id="tNC"></div></div>
             <div class="bar"><span id="bNC"></span></div>
           </div>
@@ -360,21 +350,21 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
 
   <section class="gutter">
     <div class="col prose">
-      <p class="caption">Only the sketch artist shows real model output, the drafts from the researchers’ translation model. The other two are simulations of the same sentence. A real LLM types word pieces, so it would need more steps than shown. The 128-step scratch-off matches the diffusion models the researchers compared against.</p>
+      <p class="small">Only the sketch artist shows real model output: the drafts from the researchers’ translation model. The other two are simulations of the same sentence. A real LLM types word pieces, so it would need more steps than shown. The 128-step scratch-off matches the diffusion models the researchers compared against.</p>
       <h2><span>What does a rough sentence look like?</span></h2>
       <p>A blurry picture is easy to imagine. A blurry sentence is not. So how does NCM rough in text?</p>
-      <p>It borrows the picture trick. Before writing anything, NCM learns a compact shorthand for text. Think of it as a palette: instead of colors, it holds 4,096 symbols, each standing for a chunk of meaning. A passage is stored as rows of slots, and each slot holds one symbol. The first row has just one slot, the single-block picture of the passage. Each row after it has more slots and fixes what the rows above got wrong, the way the picture above went from one block to four to sixteen.</p>
+      <p>It borrows the picture trick. Before writing anything, NCM learns a compact shorthand for text. Think of it as a palette: instead of colors, it holds 4,096 symbols, each standing for a chunk of meaning. A passage is stored as rows of slots, and each slot holds one symbol. The first row has a single slot, the one-block picture of the passage. Each row after it has more slots and corrects what the rows above got wrong, the way the picture went from one block to four to sixteen.</p>
       <p>Writing means filling the rows from the top down, one row per pass, with every slot in a row filled at the same moment. Here’s the translation from the race, with its slots.</p>
     </div>
   </section>
 
-  <!-- Scene 4: slots -->
-  <section class="scene gutter" id="sc-slots" style="--len:5;--scene:var(--c-slots)" aria-label="Slots filling pass by pass">
+  <!-- Scene: slots -->
+  <section class="scene gutter" id="sc-slots" aria-label="Slots filling pass by pass">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="panel slots">
-          <div class="row2"><b>Slots filled after pass <span id="slPass" style="font-size:inherit;color:inherit">1</span></b><span id="slN">1<small> of 64</small></span></div>
+          <div class="top"><b class="num">After pass <span id="slPass">1</span></b><span class="num"><strong id="slN">1</strong> of 64 slots filled</span></div>
           <div class="sgrid" id="slGrid" aria-hidden="true"></div>
           <div class="unpack"><div class="l">Unpacked into words, the draft reads:</div><div class="stack t"><div class="sizer" id="slSizer"></div><div id="slText"></div></div></div>
         </div>
@@ -386,51 +376,39 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
     <div class="col prose">
       <p>The shorthand is remarkably faithful. When the researchers unpacked the slots for their web-page model, they got back 99.99% of the original words exactly. Each model has its own number of rows and slots, set in the files the researchers published:</p>
       <div class="schedules" id="schedules"></div>
-      <h2 style="margin-top:56px"><span>Try it yourself</span></h2>
-      <p>The researchers published three examples, each from a model with one job. One writes stories from nothing. One reads a news article and sums it up in a sentence. One translates German into English. None of them is a chatbot, so there’s no prompt to type: the story model gets no input at all, and the other two get only the text they’re working on.</p>
-      <p>Drag the slider to scrub through the drafts, or jump straight to one of the bloopers, the strange mistakes that only a model writing everything at once would make.</p>
+      <h2><span>Try it yourself</span></h2>
+      <p>The researchers published three examples, each from a model with one job. One writes stories from nothing. One reads a news article and sums it up in a sentence. One translates German into English. None is a chatbot, so there’s no prompt to type: the story model gets no input at all, and the other two get only the text they’re working on.</p>
+      <p>Drag the slider to scrub through the drafts. Pass 7 of the summary and passes 8 and 9 of the translation hold some of the strangest mistakes.</p>
     </div>
   </section>
 
   <!-- Try it -->
-  <section class="try gutter" id="viewerBand" aria-label="Step through the published examples">
+  <section class="try gutter" aria-label="Scrub through the published examples">
     <div class="panel">
-      <div class="chips" role="tablist" aria-label="Example" id="tabs"></div>
+      <div class="tabs" role="tablist" aria-label="Example" id="tabs"></div>
       <div class="vin"><div class="l" id="inLabel">Input</div><div class="s" id="src"></div><div class="nt" id="inNote"></div></div>
-      <div class="vctrl">
-        <button class="btn" id="prev" type="button" aria-label="Previous pass"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
-        <button class="btn solid" id="play" type="button"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
-        <button class="btn" id="next" type="button" aria-label="Next pass"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
-        <input type="range" id="slider" min="1" max="12" value="12" aria-label="Pass">
-        <span class="vread">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></span>
-      </div>
+      <div class="scrub"><input type="range" id="slider" min="1" max="12" value="12" aria-label="Pass"><span class="num">pass <b id="lvNow">1</b> of <span id="lvMax">1</span></span></div>
       <div><div class="vlab" id="outLabel">Output</div><p class="vout" id="out"></p></div>
       <div class="vnote" id="note" hidden></div>
-      <div class="bloop" id="bloop"><span>Bloopers:</span>
-        <button type="button" data-jump="xsum:7">Stekampkamp</button>
-        <button type="button" data-jump="xsum:8">Pist Pist</button>
-        <button type="button" data-jump="wmt14:8">drugels</button>
-        <button type="button" data-jump="wmt14:9">Mexican Mexican</button>
-      </div>
     </div>
   </section>
 
   <section class="gutter">
     <div class="col prose">
-      <p>“Mexican Mexican” is worth a second look. The translation’s ninth draft really is messier than its eighth. The researchers measured this: quality can dip in the middle drafts before the last pass cleans everything up. Anyone who has tidied a room knows the feeling. It always looks worst right before it’s done.</p>
+      <p>The translation’s ninth draft, with its “Mexican Mexican,” really is messier than its eighth. The researchers measured this: quality can dip in the middle drafts before the last pass cleans everything up. Anyone who has tidied a room knows the feeling. It always looks worst right before it’s done.</p>
       <h2><span>So how much faster is it?</span></h2>
       <p>Every pass costs time, so fewer passes should mean faster text. The researchers counted the steps NCM needed against the strongest diffusion model of the same size.</p>
     </div>
   </section>
 
-  <!-- Scene 5: steps -->
-  <section class="scene gutter" id="sc-steps" style="--len:5;--scene:var(--c-steps)" aria-label="Steps per sample">
+  <!-- Scene: steps -->
+  <section class="scene gutter" id="sc-steps" aria-label="Steps per sample">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="units">
-          <div class="ug df"><div class="h"><b id="uBaseName">Diffusion model</b><span id="uBaseN">0</span></div><div class="gridbox"><div class="grid" id="uBase"></div></div></div>
-          <div class="ug nc"><div class="h"><b>NCM</b><span id="uNcmN">0</span></div><div class="grid" id="uNcm"></div></div>
+          <div class="ug df"><div class="h"><b id="uBaseName">Diffusion model</b><span class="num" id="uBaseN">0</span></div><div class="gridbox"><div class="grid" id="uBase"></div></div></div>
+          <div class="ug nc"><div class="h"><b>NCM</b><span class="num" id="uNcmN">0</span></div><div class="grid" id="uNcm"></div></div>
         </div>
       </div>
     </div></div>
@@ -439,63 +417,58 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
   <section class="gutter">
     <div class="col prose">
       <p>Fewer steps don’t turn into time one-for-one, because each step does a different amount of work. So the researchers also timed both approaches on real hardware.</p>
-    </div>
-    <div class="col bignums">
-      <div class="bignum"><b>10×</b><span>faster on web pages</span></div>
-      <div class="bignum"><b>21×</b><span>faster on news sentences</span></div>
-      <div class="bignum"><b>31×</b><span>faster on news summaries</span></div>
-    </div>
-    <div class="col prose" style="padding-top:0">
-      <p>It didn’t give up quality to get there. NCM’s writing scored better than the diffusion model on news sentences, about as well on web pages, and just as well on summaries. It even found a clever use for the time it saved: in the steps a diffusion model spends on one summary, NCM can write 16 and keep the best.</p>
-    </div>
-    <div class="col drafts" id="drafts"></div>
-    <div class="col prose" style="padding-top:12px">
+      <div class="bignums">
+        <div class="bignum"><b class="num">10×</b><span>faster on web pages</span></div>
+        <div class="bignum"><b class="num">21×</b><span>faster on news sentences</span></div>
+        <div class="bignum"><b class="num">31×</b><span>faster on news summaries</span></div>
+      </div>
+      <p>It didn’t give up quality to get there. NCM’s writing scored better than the diffusion model on news sentences, about as well on web pages and just as well on summaries. It even found a use for the time it saved: in the steps a diffusion model spends on one summary, NCM can write 16 and keep the best.</p>
+      <div class="drafts" id="drafts"></div>
       <p>When the researchers tried exactly that, their summaries scored about 7% better.</p>
-      <h2 style="margin-top:56px"><span>It’s also weirdly good at Sudoku</span></h2>
+      <h2><span>It’s also weirdly good at Sudoku</span></h2>
       <p>One surprising result has nothing to do with words. The team trained NCM on Sudoku: give it a puzzle, and it writes out the solved grid of 81 digits, treating it like a short, very strict sentence.</p>
     </div>
   </section>
 
-  <!-- Scene 6: sudoku -->
-  <section class="scene gutter" id="sc-sudoku" style="--len:4;--scene:var(--c-sudoku)" aria-label="Solving a Sudoku two ways">
+  <!-- Scene: sudoku -->
+  <section class="scene gutter" id="sc-sudoku" aria-label="Solving a Sudoku two ways">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="sud">
-          <div class="s"><b>LLM-style</b><div class="c"><span id="sudA">0</span><small> of 81 steps</small></div><svg viewBox="0 0 182 182" id="sgA" aria-label="Grid solved one cell per step"></svg><div class="note">writes one cell per step, left to right</div></div>
-          <div class="s nc"><b>NCM</b><div class="c"><span id="sudB">0</span><small> of 12 passes</small></div><svg viewBox="0 0 182 182" id="sgB" aria-label="Grid solved in 12 passes"></svg><div class="passbar" id="passbar"></div><div class="note" id="sudNote">each pass refines its shorthand for the whole grid</div></div>
+          <div class="s ar" id="sA"><div class="t"><b>LLM-style</b><span class="num"><strong id="sudA">0</strong> of 81 steps</span></div><svg viewBox="0 0 182 182" id="sgA" aria-label="Grid solved one cell per step"></svg><div class="note">one cell per step, left to right</div></div>
+          <div class="s nc" id="sB"><div class="t"><b>NCM</b><span class="num"><strong id="sudB">0</strong> of 12 passes</span></div><svg viewBox="0 0 182 182" id="sgB" aria-label="Grid solved in 12 passes"></svg><div class="passbar" id="passbar"></div><div class="note num" id="sudNote"></div></div>
         </div>
       </div>
     </div></div>
   </section>
 
   <section class="gutter">
-    <div class="col pull"><b>99.5%</b><span>of easy puzzles solved, in 12 passes. NCM beat the LLM-style and diffusion models it was tested against at every difficulty level.</span></div>
-    <div class="col prose" style="padding-top:0">
+    <div class="col prose">
+      <div class="pull"><b class="num">99.5%</b><span>of easy puzzles solved in 12 passes. NCM beat the LLM-style and diffusion models it was tested against at every difficulty level.</span></div>
       <p>Why might drafting help? Sudoku punishes you for committing to a digit before you’ve considered the whole board. An LLM has to commit to each cell in order and can’t take it back. NCM settles the big picture of the whole grid first and the details last. The paper doesn’t claim that’s the reason, but it fits.</p>
-
-      <h2 style="margin-top:56px"><span>Why your graphics card cares</span></h2>
-      <p>Here’s something most people don’t know about running an LLM: the slow part usually isn’t the math. It’s memory. To write each token, the computer has to read the entire model out of memory, every one of its billions of numbers, and push them through the chip. A mid-sized model like Mistral 7B is about 14 gigabytes at standard precision, so a top-end gaming card spends roughly 14 milliseconds per token just moving data, while its math units mostly sit idle.</p>
+      <h2><span>Why your graphics card cares</span></h2>
+      <p>Here’s something most people don’t know about running an LLM: the slow part usually isn’t the math. It’s memory. To write each token, the computer reads the entire model out of memory, every one of its billions of numbers, and pushes them through the chip. A mid-sized model like Mistral 7B is about 14 gigabytes at standard precision, so a top-end gaming card spends roughly 14 milliseconds per token just moving data while its math units mostly sit idle.</p>
       <p>Count the trips for a short story.</p>
     </div>
   </section>
 
-  <!-- Scene 7: memory -->
-  <section class="scene gutter" id="sc-mem" style="--len:4;--scene:var(--c-mem)" aria-label="Trips through memory">
+  <!-- Scene: memory -->
+  <section class="scene gutter" id="sc-mem" aria-label="Trips through memory">
     <div class="stage"><div class="stage-in">
-      <div class="cap"><div class="cap-k"></div><p class="cap-t"></p><div class="prog"></div></div>
+      <div class="cap"><div class="rail"></div><div class="cap-k sc"></div><p class="cap-t"></p><div class="cue"></div></div>
       <div class="viz">
         <div class="mem">
-          <div class="mrow ar">
+          <div class="mrow ar" id="mrA">
             <svg class="chip-ic" viewBox="0 0 64 44" aria-hidden="true"><rect x="8" y="6" width="48" height="32" rx="6" fill="#F6D3DF"/><g stroke="#1F2430" stroke-width="2" stroke-linecap="round"><path d="M14 2v4M22 2v4M30 2v4M38 2v4M46 2v4M14 38v4M22 38v4M30 38v4M38 38v4M46 38v4"/></g><rect x="16" y="13" width="32" height="18" rx="3" fill="#C0577A"/><text x="32" y="26" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="10" font-weight="800" fill="#fff">VRAM</text></svg>
-            <div class="t"><b>LLM</b><span>one full read of the model per token</span></div>
-            <div class="n"><b id="mA">0</b><span id="mAgb">0 GB moved</span></div>
+            <div class="t"><b>LLM</b><span>reads the whole model once per token</span></div>
+            <div class="n num"><b id="mA">0 trips</b><span id="mAgb">0 GB moved</span></div>
             <div class="ticks" id="tkA"></div>
           </div>
-          <div class="mrow nc">
+          <div class="mrow nc" id="mrB">
             <svg class="chip-ic" viewBox="0 0 64 44" aria-hidden="true"><rect x="8" y="6" width="48" height="32" rx="6" fill="#E3E9FF"/><g stroke="#1F2430" stroke-width="2" stroke-linecap="round"><path d="M14 2v4M22 2v4M30 2v4M38 2v4M46 2v4M14 38v4M22 38v4M30 38v4M38 38v4M46 38v4"/></g><rect x="16" y="13" width="32" height="18" rx="3" fill="#3557E0"/><text x="32" y="26" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="10" font-weight="800" fill="#fff">VRAM</text></svg>
-            <div class="t"><b>NCM</b><span>one full read of the model per pass</span></div>
-            <div class="n"><b id="mB">0</b><span id="mBgb">0 GB moved</span></div>
+            <div class="t"><b>NCM</b><span>reads the whole model once per pass</span></div>
+            <div class="n num"><b id="mB">0 trips</b><span id="mBgb">0 GB moved</span></div>
             <div class="ticks" id="tkB"></div>
           </div>
         </div>
@@ -505,36 +478,36 @@ mark { background: var(--mark); color: inherit; padding: 0 .08em; margin: 0 -.08
 
   <section class="gutter">
     <div class="col prose">
-      <p>That memory problem is now a supply problem. AI data centers are buying up the world’s fast memory, especially the high-bandwidth memory stacked next to their GPUs. Late in 2025, the head of storage-chip maker Silicon Motion said hard drives, DRAM, high-bandwidth memory and flash storage would all be in severe shortage in 2026, and <a href="https://www.pcgamer.com/hardware/memory/were-facing-what-has-never-happened-before-hdd-dram-hbm-nand-all-in-severe-shortage-in-2026-says-silicon-motions-ceo-as-memory-prices-continue-to-soar" target="_blank" rel="noopener">PC Gamer reported</a> that RAM and SSD prices were already climbing for ordinary buyers. If you’ve priced a graphics card or a RAM upgrade lately, you’ve felt it.</p>
+      <p>That memory problem is now a supply problem. AI data centers are buying up the world’s fast memory, especially the high-bandwidth memory stacked beside their GPUs. Late in 2025, the head of storage-chip maker Silicon Motion said hard drives, DRAM, high-bandwidth memory and flash storage would all be in severe shortage in 2026, and <a href="https://www.pcgamer.com/hardware/memory/were-facing-what-has-never-happened-before-hdd-dram-hbm-nand-all-in-severe-shortage-in-2026-says-silicon-motions-ceo-as-memory-prices-continue-to-soar" target="_blank" rel="noopener">PC Gamer reported</a> that RAM and SSD prices were already climbing for ordinary buyers. If you’ve priced a graphics card or a RAM upgrade lately, you’ve felt it.</p>
       <p>A method that needs fewer trips through memory could help on both ends. <strong>In data centers</strong>, where companies pack as many users as possible onto each scarce GPU, fewer trips per answer means more answers per chip. <strong>At home</strong>, where people run models like Llama on a laptop or gaming PC for privacy and offline use, memory speed is exactly what makes local AI feel slow. Drafting in a dozen passes keeps the chip’s idle math units busy instead of waiting on memory.</p>
       <p>There are caveats. NCM doesn’t shrink a model, so it still has to fit in your card’s memory. Each pass does more work than a single LLM step. And the paper measures speed, not memory use or energy, so the hardware payoff is a promising implication rather than a proven result.</p>
-
-      <h2 style="margin-top:56px"><span>What it can’t do yet</span></h2>
-      <p>NCM is a research project, not a product. Its models are small, around 100 million parameters, far smaller than the LLMs behind today’s chatbots, and they’ve been tested on research datasets rather than open-ended conversation. It gives every job the same number of passes, so an easy sentence gets as much effort as a hard one. And its shorthand occasionally trips over names, numbers and accented letters, which matters when the output has to be exact. Stekampkamp, again.</p>
-
-      <h2 style="margin-top:56px"><span>Why it matters</span></h2>
+      <h2><span>What it can’t do yet</span></h2>
+      <p>NCM is a research project, not a product. Its models are small, around 100 million parameters, far smaller than the LLMs behind today’s chatbots, and they’ve been tested on research datasets rather than open-ended conversation. It gives every job the same number of passes, so an easy sentence gets as much effort as a hard one. And its shorthand occasionally trips over names, numbers and accented letters, which matters when the output has to be exact. The summary’s “Stekampkamp” is one example.</p>
+      <h2><span>Why it matters</span></h2>
       <p>People rarely write left to right in one go. We outline, draft and revise. AI learned to paint pictures that way years ago. NCM is a serious attempt to teach it to write that way too, and the early results are fast, accurate and cheaper to train: the researchers report needing roughly a quarter to a fifth as much training text as comparable diffusion models, not counting the training of the shorthand itself.</p>
       <p>The big open question is scale. So far the team has tested models up to 725 million parameters, and the results kept improving as the models grew. If that holds at chatbot size, the next AI you talk to might not type at all. It might paint.</p>
     </div>
+  </section>
 
+  <footer class="gutter">
     <div class="col notes" id="notes">
       <h2>Notes</h2>
-      <h3>The research</h3>
+      <h3 class="sc">The research</h3>
       <p>Next-Concept Modeling is the work of Hermann Kumbong, Ishan S. Khare, Iddah Mlauzi, Andrew Woen, Charles Ding, E. Kelly Buchanan, Simran Arora, Azalia Mirhoseini and Christopher Ré. Read their paper, <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">“Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation”</a> (2026), and find their code, models and examples at <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">github.com/HazyResearch/ncm</a>, released under the MIT license.</p>
-      <h3>This page</h3>
+      <h3 class="sc">This page</h3>
       <p>This story and its illustrations were made by Kevin Broadie as an independent project. It isn’t affiliated with the researchers, and the research, models and examples are theirs. The page’s source code is published at <a href="https://github.com/kbroadie/ncm-viewer" target="_blank" rel="noopener">github.com/kbroadie/ncm-viewer</a> under the MIT license, so anyone can reuse or adapt it with attribution.</p>
-      <h3>Data and methods</h3>
+      <h3 class="sc">Data and methods</h3>
       <ul>
         <li>The pass-by-pass text for the story, summary and translation was transcribed from an animation in the researchers’ code repository. Yellow highlights compare each pass with the one before it, word by word.</li>
-        <li>Slot counts per pass come from the model configuration files in the repository. Slots are drawn as plain cells; the actual codes inside them aren’t shown.</li>
-        <li>The pixel picture is drawn for this page to illustrate coarse-to-fine image generation. Some image models, such as VAR (Tian et al., 2024), grow pictures this way; popular tools like Stable Diffusion and Midjourney start from random noise instead.</li>
-        <li>In the race, only the sketch artist uses real model output. In the Sudoku scene, the puzzle is a well-known example rather than one from the paper’s test set, and NCM’s in-between grids aren’t shown because they weren’t published.</li>
+        <li>Slot counts per pass come from the model configuration files in the repository. Slots are drawn as plain cells; the codes inside them aren’t shown.</li>
+        <li>The pixel picture was drawn for this page to illustrate coarse-to-fine image generation. Some image models, such as VAR (Tian et al., 2024), grow pictures this way; popular tools like Stable Diffusion and Midjourney start from random noise instead.</li>
+        <li>In the race, only the sketch artist uses real model output. The Sudoku puzzle is a well-known example rather than one from the paper’s test set, and NCM’s in-between grids aren’t shown because they weren’t published.</li>
         <li>The memory scene assumes a 7-billion-parameter model at 16-bit precision (about 14 GB) for both approaches, purely to illustrate trip counts; NCM’s released models are much smaller. The per-token memory math follows <a href="https://zeux.io/2024/03/15/llm-inference-sol/" target="_blank" rel="noopener">Arseny Kapoulkine’s analysis</a>.</li>
         <li>Speed, quality, Sudoku, reconstruction and training figures are as reported in the paper. Hardware market details are from <a href="https://www.pcgamer.com/hardware/memory/were-facing-what-has-never-happened-before-hdd-dram-hbm-nand-all-in-severe-shortage-in-2026-says-silicon-motions-ceo-as-memory-prices-continue-to-soar" target="_blank" rel="noopener">PC Gamer</a> (November 2025).</li>
-        <li class="muted">The painter, typewriter, scratch-off card, palette and tidy-room comparisons are simplifications meant to give the right intuition.</li>
+        <li>The painter, typewriter, scratch-off card, palette and tidy-room comparisons are simplifications meant to give the right intuition.</li>
       </ul>
     </div>
-  </section>
+  </footer>
 </main>
 
 <script>
@@ -544,6 +517,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const fmt = n => n.toLocaleString("en-US");
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TASKS = {};
 
 function changed(a, b) {
   const n = a.length, m = b.length;
@@ -577,34 +551,45 @@ function renderText(t, i, marks = true) {
   });
   return html;
 }
-const TASKS = {};
 
-/* ---------- Scene engine: pinned stage, scroll progress 0..1 drives the scene ---------- */
+/* ---------- Scene engine ----------
+   A scene is a list of beats. Scrolling through the pinned scene moves from beat to beat.
+   Each beat owns its caption and draws its own graphic state, so they can't disagree.
+   Within a beat, q runs 0 to 1 over the first 75% of the beat and then holds, so the
+   final state of a beat is always visible before the next caption arrives. */
 const SCENES = [];
-function scene(id, caps, onP) {
+const CUE_ICON = '<svg viewBox="0 0 14 20" aria-hidden="true"><rect x="1" y="1" width="12" height="18" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect class="wheel" x="6" y="4.5" width="2" height="4" rx="1" fill="currentColor"/></svg>';
+function scene(id, beats) {
   const el = $(id);
-  const s = { el, caps, onP, capT: el.querySelector(".cap-t"), capK: el.querySelector(".cap-k"), prog: el.querySelector(".prog"), cap: el.querySelector(".cap"), p: -1, ci: -1 };
-  s.prog.innerHTML = caps.map(() => "<i></i>").join("");
+  el.style.setProperty("--beats", beats.length);
+  const s = { el, beats, i: -1, q: -1, cap: el.querySelector(".cap"), k: el.querySelector(".cap-k"), t: el.querySelector(".cap-t"), rail: el.querySelector(".rail"), cue: el.querySelector(".cue") };
+  s.rail.innerHTML = beats.map(() => "<i></i>").join("");
+  s.rail.setAttribute("aria-hidden", "true");
   SCENES.push(s);
   return s;
 }
-function setCap(s, i) {
-  if (i === s.ci) return;
-  const first = s.ci === -1;
-  s.ci = i;
-  [...s.prog.children].forEach((d, k) => d.classList.toggle("on", k === i));
-  const apply = () => { s.capK.textContent = s.caps[i].k; s.capT.innerHTML = s.caps[i].t; s.capT.classList.remove("fade"); };
-  if (first || reduced) apply();
-  else { s.capT.classList.add("fade"); clearTimeout(s.tm); s.tm = setTimeout(apply, 160); }
+function cueText(i, n) {
+  if (i === 0) return `${CUE_ICON}<span>Scroll down to step through · 1 of ${n}</span>`;
+  if (i === n - 1) return `${CUE_ICON}<span>${n} of ${n} · scroll on to continue</span>`;
+  return `${CUE_ICON}<span>${i + 1} of ${n}</span>`;
+}
+function showBeat(s, i) {
+  if (i === s.i) return;
+  s.i = i;
+  const b = s.beats[i], n = s.beats.length;
+  s.k.textContent = b.k;
+  s.t.innerHTML = b.t;
+  if (!reduced) { s.t.classList.remove("in"); void s.t.offsetWidth; s.t.classList.add("in"); }
+  s.cue.innerHTML = cueText(i, n);
+  [...s.rail.children].forEach((d, k) => { d.className = k === i ? "on" : (k < i ? "done" : ""); });
 }
 function sizeCaps() {
   SCENES.forEach(s => {
     s.cap.style.minHeight = "";
-    const k0 = s.capK.textContent, t0 = s.capT.innerHTML;
     let max = 0;
-    s.caps.forEach(c => { s.capK.textContent = c.k; s.capT.innerHTML = c.t; max = Math.max(max, s.cap.offsetHeight); });
-    s.capK.textContent = k0; s.capT.innerHTML = t0;
+    s.beats.forEach((b, i) => { s.k.textContent = b.k; s.t.innerHTML = b.t; s.cue.innerHTML = cueText(i, s.beats.length); max = Math.max(max, s.cap.offsetHeight); });
     s.cap.style.minHeight = max + "px";
+    const keep = s.i; s.i = -1; showBeat(s, Math.max(0, keep));
   });
 }
 function update() {
@@ -612,19 +597,21 @@ function update() {
   SCENES.forEach(s => {
     const r = s.el.getBoundingClientRect();
     const p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1);
-    if (Math.abs(p - s.p) < 0.0005) return;
-    s.p = p;
-    const n = s.caps.length;
-    setCap(s, Math.min(n - 1, Math.floor(p * n)));
-    s.onP(p);
+    const n = s.beats.length;
+    const i = Math.min(n - 1, Math.floor(p * n));
+    const q = clamp((p * n - i) / 0.75, 0, 1);
+    if (i === s.i && Math.abs(q - s.q) < 0.002) return;
+    showBeat(s, i);
+    s.q = q;
+    s.beats[i].draw(q);
   });
 }
 let raf = 0;
 const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); }); };
 window.addEventListener("scroll", schedule, { passive: true });
-window.addEventListener("resize", () => { sizeCaps(); SCENES.forEach(s => s.p = -1); schedule(); });
+window.addEventListener("resize", () => { sizeCaps(); SCENES.forEach(s => { s.q = -1; }); schedule(); });
 
-/* ---------- Scene 1: pictures ---------- */
+/* ---------- Pictures ---------- */
 const PIC = (() => {
   const W = 32, px = [];
   const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
@@ -632,7 +619,7 @@ const PIC = (() => {
   const skyTop = hex("#8EC2F0"), skyBot = hex("#DCEFFB"), sun = hex("#FFC93C"), hill = hex("#6CC08C"), hill2 = hex("#47A26E"),
         wall = hex("#F08A6C"), roof = hex("#3A3F55"), win = hex("#FFF1A8"), cloud = hex("#FFFFFF");
   for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) {
-    let c = mix(skyTop, skyBot, y / 20);
+    let c = mix(skyTop, skyBot, Math.min(1, y / 20));
     if ((x - 25) ** 2 + (y - 6) ** 2 < 17) c = sun;
     if ((y === 8 || y === 9) && x > 3 && x < 11 && !(y === 8 && (x === 4 || x === 10))) c = cloud;
     const hy = 21 + Math.round(1.6 * Math.sin(x / 4.5));
@@ -640,13 +627,14 @@ const PIC = (() => {
     if (x >= 9 && x <= 19 && y >= 16 && y <= 25) c = wall;
     if (y >= 10 && y <= 16 && Math.abs(x - 14) <= (y - 10) + 0.5) c = roof;
     if (x >= 13 && x <= 15 && y >= 21 && y <= 25) c = roof;
-    if (x >= 16 && x <= 18 && y >= 18 && y <= 20) c = win;
-    if (x >= 10 && x <= 12 && y >= 18 && y <= 20) c = win;
+    if ((x >= 16 && x <= 18 && y >= 18 && y <= 20) || (x >= 10 && x <= 12 && y >= 18 && y <= 20)) c = win;
     px.push(c);
   }
   return { W, px };
 })();
+let picRes = 0;
 function drawPic(res) {
+  if (res === picRes) return; picRes = res;
   const cv = $("picCanvas"), g = cv.getContext("2d"), W = PIC.W, b = W / res, cell = cv.width / res;
   for (let by = 0; by < res; by++) for (let bx = 0; bx < res; bx++) {
     let r = 0, gg = 0, bb = 0;
@@ -655,48 +643,36 @@ function drawPic(res) {
     g.fillStyle = `rgb(${Math.round(r / n)},${Math.round(gg / n)},${Math.round(bb / n)})`;
     g.fillRect(bx * cell, by * cell, Math.ceil(cell), Math.ceil(cell));
   }
-  const blocks = res * res;
-  $("picLbl").innerHTML = `${res} × ${res} <span>${blocks === 1 ? "block" : fmt(blocks) + " blocks"}</span>`;
+  $("picLbl").innerHTML = `${res} × ${res} <span>${res === 1 ? "1 block" : fmt(res * res) + " blocks"}</span>`;
 }
-const RES = [1, 2, 4, 8, 16, 32];
-let picRes = 0;
 scene("sc-pics", [
-  { k: "Step 1", t: "Here’s how a picture can be built the way AI image tools think about it. Start with one block of color: the average of the entire image." },
-  { k: "Steps 2 and 3", t: "Split it into 4 blocks, then 16. Now there’s sky on top and ground below. Every block gets updated at once, everywhere." },
-  { k: "Steps 4 and 5", t: "At 64 and 256 blocks, a house and a sun appear. The overall layout was decided first; the details come last." },
-  { k: "Done", t: "Six steps to a finished picture. AI image generators work in this spirit: they refine the whole image over and over rather than drawing it one pixel at a time." }
-], p => {
-  const r = RES[Math.min(RES.length - 1, Math.floor(p * RES.length))];
-  if (r !== picRes) { picRes = r; drawPic(r); }
-});
+  { k: "1 block", t: "Start with one block of color: the average of the entire picture. It’s the roughest possible draft.", draw: () => drawPic(1) },
+  { k: "4 blocks", t: "Split it into four. Already there’s sky on top and ground below.", draw: () => drawPic(2) },
+  { k: "16 blocks", t: "Sixteen blocks. Something dark sits in the middle, and the top right is brighter.", draw: () => drawPic(4) },
+  { k: "64 blocks", t: "Sixty-four. A house and a sun take shape. Every block was updated at the same time, everywhere.", draw: () => drawPic(8) },
+  { k: "256 blocks", t: "Now a roofline, windows and a door. The layout was settled first; the details come last.", draw: () => drawPic(16) },
+  { k: "Done", t: "Finished in six steps. AI image tools work in this spirit, refining the whole picture again and again instead of drawing it pixel by pixel.", draw: () => drawPic(32) }
+]);
 
-/* ---------- Scene 2: story ---------- */
-const STORY_CAPS = [
-  { at: 1, k: "Pass 1", t: "This is the model’s first draft of the entire story. Yes, all of it. It’s a period." },
-  { at: 2, k: "Pass 2", t: "“was” and “the.” Not much yet, but the model isn’t working on the first line. It’s working on the whole page, like the one block of color." },
-  { at: 4, k: "Passes 3 and 4", t: "A few dozen words, scattered. You can spot “day” and “something.” The model is blocking in the shape of the story." },
-  { at: 5, k: "Passes 5 and 6", t: "A name appears: Tim. So do “wind” and “unexpected.” The story has a hero and a plot twist before it has a single complete sentence." },
-  { at: 7, k: "Passes 7 and 8", t: "Now there’s a kite, something blowing away and “something unexpected.” The plot is all there. The grammar isn’t." },
-  { at: 9, k: "Passes 9 to 11", t: "“upon time there was little named Tim.” It reads like someone talking in their sleep. Close, though." },
-  { at: 12, k: "Pass 12", t: "Done: a story about Tim, his kite and a helpful bird, in 12 passes. An LLM would have needed more than a hundred, one per token." }
-];
-let storyPass = 0;
+/* ---------- Story ---------- */
 function setupStory() {
   const t = TASKS.tinystories;
   $("sSizer").innerHTML = renderText(t, t.levels.length - 1, false);
-  scene("sc-story", STORY_CAPS, p => {
-    const pass = clamp(Math.floor(p * 12) + 1, 1, 12);
-    if (pass === storyPass) return;
-    storyPass = pass;
-    $("sPass").textContent = pass;
-    $("sText").innerHTML = renderText(t, pass - 1);
-  });
-  const s = SCENES[SCENES.length - 1];
-  // Captions follow the pass, not equal slices of scroll.
-  s.capFor = p => { const pass = clamp(Math.floor(p * 12) + 1, 1, 12); let i = 0; STORY_CAPS.forEach((c, k) => { if (pass >= c.at) i = k; }); return i; };
+  let shown = 0;
+  const show = pass => { if (pass === shown) return; shown = pass; $("sPass").textContent = pass; $("sText").innerHTML = renderText(t, pass - 1); };
+  const beat = (pass, k, txt) => ({ k, t: txt, draw: () => show(pass) });
+  scene("sc-story", [
+    beat(1, "Pass 1", "This is the model’s first draft of the entire story. Yes, all of it. It’s a period."),
+    beat(2, "Pass 2", "“was” and “the.” Not much yet, but the model isn’t working on the first line. It’s working on the whole page, like the single block of color."),
+    beat(4, "Pass 4", "Sixteen words, scattered. You can spot “day” and “something.” The model is blocking in the shape of the story."),
+    beat(5, "Pass 5", "A name appears: Tim. So do “wind” and “unexpected.” The story has a hero and a plot twist before it has a single complete sentence."),
+    beat(7, "Pass 7", "Now there’s a kite, something blowing away and “something unexpected.” The plot is all there. The grammar isn’t."),
+    beat(9, "Pass 9", "“upon time there was little named Tim.” It reads like someone talking in their sleep. Close, though."),
+    beat(12, "Pass 12", "Done: a story about Tim, his kite and a helpful bird, in 12 passes. An LLM would have needed more than a hundred, one per token.")
+  ]);
 }
 
-/* ---------- Scene 3: race ---------- */
+/* ---------- Race ---------- */
 const DIFF = 128;
 let race = null;
 function setupRace() {
@@ -706,26 +682,21 @@ function setupRace() {
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const reveal = words.map(() => 1 + Math.floor(rnd() * (DIFF - 1)));
   reveal[Math.floor(rnd() * reveal.length)] = DIFF;
-  race = { wmt, words, reveal, total: { ar: words.length, df: DIFF, nc: wmt.levels.length } };
+  race = { wmt, words, reveal, total: { ar: words.length, df: DIFF, nc: wmt.levels.length }, sig: "" };
   $("raceSrc").textContent = (wmt.src || []).join(" ");
   const full = esc(words.join(" "));
   ["zAR", "zDF", "zNC"].forEach(id => $(id).innerHTML = full);
   scene("sc-race", [
-    { k: "The typewriter", t: "An LLM writes one word per step, in order. Each word has to wait for the one before it, so a longer answer means a longer wait." },
-    { k: "The scratch-off card", t: "A diffusion model starts with every word hidden and reveals a few at a time, in any order. It works on the whole sentence, but it needs a lot of scratching: 128 steps here." },
-    { k: "The sketch artist", t: "NCM roughs in the whole sentence, then refines all of it at once. These are the real drafts from the researchers’ translation model." },
-    { k: "All three at once", t: "Now side by side. The sketch artist finishes in 11 steps and the typewriter in 18, which flatters it. The scratch-off card is still scratching long after." }
-  ], p => {
-    if (p < .25) drawRace(Math.round(p / .25 * race.total.ar), ["ar"]);
-    else if (p < .5) drawRace(Math.round((p - .25) / .25 * DIFF), ["df"]);
-    else if (p < .7) drawRace(Math.round((p - .5) / .2 * race.total.nc), ["nc"]);
-    else drawRace(Math.round((p - .7) / .3 * DIFF), ["ar", "df", "nc"]);
-  });
+    { k: "The typewriter", t: "An LLM writes one word per step, in order. Each word waits for the one before it, so a longer answer means a longer wait. Eighteen steps here.", draw: q => drawRace(Math.round(q * race.total.ar), ["ar"]) },
+    { k: "The scratch-off card", t: "A diffusion model starts with every word hidden and reveals a few at a time, in any order. It works on the whole sentence but needs a lot of scratching: 128 steps.", draw: q => drawRace(Math.round(q * DIFF), ["df"]) },
+    { k: "The sketch artist", t: "NCM roughs in the whole sentence, then refines all of it at once. These are the real drafts from the researchers’ translation model. Eleven passes.", draw: q => drawRace(Math.round(q * race.total.nc), ["nc"]) },
+    { k: "Side by side", t: "All three together, step for step. The sketch artist finishes first, the typewriter second, and the scratch-off card keeps going long after.", draw: q => drawRace(Math.round(q * DIFF), ["ar", "df", "nc"]) }
+  ]);
 }
 function drawRace(tick, mask) {
-  const r = race, w = r.words;
+  const r = race, sig = tick + mask.join(""); if (sig === r.sig) return; r.sig = sig;
   const t = k => mask.includes(k) ? clamp(tick, 0, r.total[k]) : 0;
-  const ar = t("ar"), df = t("df"), nc = t("nc");
+  const ar = t("ar"), df = t("df"), nc = t("nc"), w = r.words;
   [["lAR", "ar"], ["lDF", "df"], ["lNC", "nc"]].forEach(([id, k]) => $(id).classList.toggle("dim", !mask.includes(k)));
   $("cAR").textContent = ar; $("dAR").textContent = ar === r.total.ar ? "done" : "";
   $("cDF").textContent = df; $("dDF").textContent = df === r.total.df ? "done" : "";
@@ -738,126 +709,95 @@ function drawRace(tick, mask) {
   $("bNC").style.width = nc / DIFF * 100 + "%";
 }
 
-/* ---------- Scene 4: slots ---------- */
+/* ---------- Slots ---------- */
 function setupSlots(sched) {
   const wmt = TASKS.wmt14, L = sched.levels, max = L[L.length - 1];
   $("slGrid").innerHTML = "<i></i>".repeat(max);
   $("slSizer").innerHTML = renderText(wmt, wmt.levels.length - 1, false);
-  let cur = -1;
-  scene("sc-slots", [
-    { k: "Pass 1", t: "The first pass fills a single slot. Unpacked, it doesn’t even make a word yet. It’s the one-block version of the sentence." },
-    { k: "Passes 2 to 4", t: "Four slots, then 8, then 14. The first real words surface, mostly “the” and “against,” the commonest pieces of the sentence." },
-    { k: "Passes 5 to 8", t: "Each pass adds slots and corrects the ones before. “US,” “Mexican” and “security” arrive. So does the mangled “drugels.”" },
-    { k: "Passes 9 to 11", t: "All 64 slots are filled on the last pass, and the shorthand unpacks into a clean English sentence. Eleven passes in all." }
-  ], p => {
-    const i = clamp(Math.floor(p * L.length), 0, L.length - 1);
-    if (i === cur) return;
-    cur = i;
-    const n = L[i], prev = i ? L[i - 1] : 0;
+  let cur = 0;
+  const show = pass => {
+    if (pass === cur) return; cur = pass;
+    const n = L[pass - 1], prev = pass > 1 ? L[pass - 2] : 0;
     [...$("slGrid").children].forEach((c, k) => { c.className = k < prev ? "old" : (k < n ? "new" : ""); });
-    $("slPass").textContent = i + 1;
-    $("slN").innerHTML = `${n}<small> of ${max}</small>`;
-    $("slText").innerHTML = renderText(wmt, i);
-  });
+    $("slPass").textContent = pass; $("slN").textContent = n;
+    $("slText").innerHTML = renderText(wmt, pass - 1);
+  };
+  const beat = (pass, k, t) => ({ k, t, draw: () => show(pass) });
+  scene("sc-slots", [
+    beat(1, "Pass 1", "The first pass fills a single slot. Unpacked, it doesn’t spell a word yet. It’s the one-block version of the sentence."),
+    beat(2, "Pass 2", "Four slots. Unpacked, they give us “the.” The commonest word in the sentence comes first."),
+    beat(4, "Pass 4", "Fourteen slots: “the security a against.” Meaningful words are starting to surface."),
+    beat(6, "Pass 6", "Twenty-six slots. “Both,” “ongoing” and “cart” arrive, the first hints of the sentence’s subject."),
+    beat(8, "Pass 8", "Forty slots. “US” and “Mexican” show up, along with the mangled “drugels.” The pieces are there but not yet in order."),
+    beat(11, "Pass 11", "All 64 slots are filled, and they unpack into a clean English sentence. Eleven passes in all.")
+  ]);
 }
 
-/* ---------- Viewer ---------- */
-let key = null, level = 0, timer = null;
+/* ---------- Try it ---------- */
+let key = null, level = 0;
 function selectTask(k) {
-  if (!TASKS[k]) k = "tinystories";
-  stopPlay();
-  key = k;
-  const t = TASKS[k];
-  document.querySelectorAll("#tabs .chip").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
+  key = TASKS[k] ? k : "tinystories";
+  const t = TASKS[key];
+  document.querySelectorAll("#tabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === key ? "true" : "false"));
   $("inLabel").textContent = t.inputLabel;
   $("src").hidden = !t.src;
   if (t.src) { $("src").setAttribute("lang", t.srcLang); $("src").innerHTML = t.src.map(esc).join("<br>"); }
   $("inNote").textContent = t.inputNote;
   $("lvMax").textContent = t.levels.length;
   $("slider").max = t.levels.length;
-  setLevel(t.levels.length - 1, false);
+  setLevel(t.levels.length - 1);
 }
-function setLevel(i, anim = true) {
+function setLevel(i) {
   const t = TASKS[key];
   level = clamp(i, 0, t.levels.length - 1);
-  $("out").classList.toggle("animate", anim && !reduced);
   $("out").innerHTML = renderText(t, level);
-  $("outLabel").innerHTML = esc(t.outputLabel) + ` <span>after pass ${level + 1} of ${t.levels.length}</span>`;
+  $("outLabel").textContent = `${t.outputLabel}, after pass ${level + 1} of ${t.levels.length}`;
   $("lvNow").textContent = level + 1;
   $("slider").value = level + 1;
   const note = t.notes && t.notes[String(level + 1)];
   $("note").hidden = !note;
   if (note) $("note").textContent = note;
-  $("prev").disabled = level === 0;
-  $("next").disabled = level === t.levels.length - 1;
-  setPlayUI(!!timer);
 }
-function setPlayUI(on) {
-  const t = TASKS[key];
-  const atEnd = t && level === t.levels.length - 1;
-  $("playText").textContent = on ? "Pause" : (atEnd ? "Replay" : "Play");
-  $("playIcon").innerHTML = on ? '<path d="M3 2h4v12H3zM9 2h4v12H9z"/>' : '<path d="M4 2l10 6-10 6z"/>';
-}
-function stopPlay() { clearInterval(timer); timer = null; if (key) setPlayUI(false); }
-$("play").addEventListener("click", () => {
-  if (timer) { stopPlay(); return; }
-  if (level === TASKS[key].levels.length - 1) setLevel(0);
-  timer = setInterval(() => { setLevel(level + 1); if (level >= TASKS[key].levels.length - 1) stopPlay(); }, 800);
-  setPlayUI(true);
-});
-$("prev").addEventListener("click", () => { stopPlay(); setLevel(level - 1); });
-$("next").addEventListener("click", () => { stopPlay(); setLevel(level + 1); });
-$("slider").addEventListener("input", e => { stopPlay(); setLevel(+e.target.value - 1); });
-$("tabs").addEventListener("click", e => { const b = e.target.closest(".chip"); if (b) selectTask(b.dataset.k); });
-$("bloop").addEventListener("click", e => {
-  const b = e.target.closest("[data-jump]"); if (!b) return;
-  const [k, p] = b.dataset.jump.split(":");
-  selectTask(k); setLevel(+p - 1);
-});
+$("slider").addEventListener("input", e => setLevel(+e.target.value - 1));
+$("tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) selectTask(b.dataset.k); });
 
-/* ---------- Scene 5: steps ---------- */
+/* ---------- Steps ---------- */
 const UNITS = {
   owt: { label: "Web pages", base: "DUO", b: 1024, n: 32 },
   lm1b: { label: "News sentences", base: "DUO", b: 128, n: 12 },
   xsum: { label: "Summaries", base: "AURORA-LM", b: 128, n: 8 }
 };
-let unitId = null, uLast = "";
-function buildUnit(id) {
-  if (unitId === id) return;
-  unitId = id;
+let unitId = null, uSig = "";
+function units(id, b, n) {
+  if (unitId !== id) {
+    unitId = id; uSig = "";
+    const u = UNITS[id];
+    $("uBaseName").textContent = `${u.label}: diffusion (${u.base})`;
+    $("uBase").innerHTML = "<i></i>".repeat(u.b);
+    $("uNcm").innerHTML = "<i></i>".repeat(u.n);
+  }
   const u = UNITS[id];
-  $("uBaseName").textContent = `${u.label}: diffusion (${u.base})`;
-  $("uBase").innerHTML = "<i></i>".repeat(u.b);
-  $("uNcm").innerHTML = "<i></i>".repeat(u.n);
-}
-function paintUnits(b, n) {
-  const u = UNITS[unitId];
   b = clamp(Math.round(b), 0, u.b); n = clamp(Math.round(n), 0, u.n);
-  const sig = unitId + b + ":" + n; if (sig === uLast) return; uLast = sig;
+  const sig = b + ":" + n; if (sig === uSig) return; uSig = sig;
   [...$("uBase").children].forEach((c, i) => c.classList.toggle("on", i < b));
   [...$("uNcm").children].forEach((c, i) => c.classList.toggle("on", i < n));
   $("uBaseN").textContent = fmt(b) + " steps";
   $("uNcmN").textContent = n + " steps";
 }
 scene("sc-steps", [
-  { k: "Writing a web page", t: "To write a passage the length of a short web page, the strongest diffusion model took 1,024 steps. Every square is one step." },
-  { k: "NCM: 32 steps", t: "NCM did the same job in 32. That little blue row is the whole thing." },
-  { k: "News sentences", t: "For single sentences from news stories: 128 steps for diffusion, 12 for NCM." },
-  { k: "Summaries", t: "For one-sentence news summaries: 128 steps against just 8." }
-], p => {
-  if (p < .25) { buildUnit("owt"); paintUnits(p / .25 * 1024, 0); }
-  else if (p < .5) { buildUnit("owt"); paintUnits(1024, (p - .25) / .25 * 32); }
-  else if (p < .75) { buildUnit("lm1b"); const q = (p - .5) / .25; paintUnits(q * 128, q * 12); }
-  else { buildUnit("xsum"); const q = Math.min(1, (p - .75) / .2); paintUnits(q * 128, q * 8); }
-});
+  { k: "Writing a web page", t: "To write a passage the length of a short web page, the strongest diffusion model took 1,024 steps. Every square is one step.", draw: q => units("owt", q * 1024, 0) },
+  { k: "NCM: 32 steps", t: "NCM did the same job in 32. That little blue row is the whole thing.", draw: q => units("owt", 1024, q * 32) },
+  { k: "News sentences", t: "For single sentences from news stories: 128 steps for diffusion, 12 for NCM.", draw: q => units("lm1b", q * 128, q * 12) },
+  { k: "Summaries", t: "For one-sentence news summaries: 128 steps against just 8.", draw: q => units("xsum", q * 128, q * 8) }
+]);
 
 /* 16 drafts illustration */
 (function () {
   const doc = (fill, star) => `<svg viewBox="0 0 26 32" aria-hidden="true"><path d="M3 2h14l6 6v21a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="${fill}"/><path d="M6 12h12M6 17h12M6 22h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>${star ? '<circle cx="20" cy="26" r="6" fill="#FFE27A" stroke="#1F2430" stroke-width="1.5"/><path d="M20 22.6l1 2 2.2.3-1.6 1.5.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.5 2.2-.3z" fill="#1F2430"/>' : ""}</svg>`;
-  $("drafts").innerHTML = `<div class="one">${doc("#EE6B4D")}<span>Diffusion model<br>1 summary in 128 steps</span></div><div class="vs">vs</div><div class="many"><div class="docs">${Array.from({length: 16}, (_, i) => doc("#3557E0", i === 5)).join("")}</div><span>NCM: 16 summaries in the same 128 steps, keep the best</span></div>`;
+  $("drafts").innerHTML = `<div class="one">${doc("#EE6B4D")}<span><b>Diffusion</b><br>1 summary in 128 steps</span></div><div class="vs">vs</div><div class="many"><div class="docs">${Array.from({length: 16}, (_, i) => doc("#3557E0", i === 5)).join("")}</div><span><b>NCM</b>: 16 summaries in the same 128 steps, then keep the best</span></div>`;
 })();
 
-/* ---------- Scene 6: sudoku ---------- */
+/* ---------- Sudoku ---------- */
 const PUZ = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
 const SOL = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
 const SUD_LEVELS = [1, 2, 4, 6, 9, 13, 18, 26, 37, 50, 67, 89];
@@ -867,7 +807,7 @@ function drawGrid(svg, cells) {
   cells.forEach((cell, i) => {
     const x = o + (i % 9) * c, y = o + Math.floor(i / 9) * c;
     if (cell.bg) h += `<rect x="${x + 1}" y="${y + 1}" width="${c - 2}" height="${c - 2}" rx="3" fill="${cell.bg}"/>`;
-    if (cell.d) h += `<text x="${x + c / 2}" y="${y + 14.5}" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="12.5" font-weight="${cell.clue ? 800 : 600}" fill="${cell.color || "#1F2430"}">${cell.d}</text>`;
+    if (cell.d) h += `<text x="${x + c / 2}" y="${y + 14.5}" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="12.5" font-weight="${cell.clue ? 800 : 500}" fill="${cell.color || "#1F2430"}">${cell.d}</text>`;
   });
   for (let k = 0; k <= 9; k++) {
     const w = k % 3 === 0 ? 2 : .75, col = k % 3 === 0 ? "#1F2430" : "#C8CFDC", p = o + k * c;
@@ -877,54 +817,52 @@ function drawGrid(svg, cells) {
 }
 $("passbar").innerHTML = "<i></i>".repeat(12);
 let sudSig = "";
-function drawSudoku(aSteps, bPasses) {
-  const sig = aSteps + ":" + bPasses; if (sig === sudSig) return; sudSig = sig;
+function sudoku(a, bp, focus) {
+  const sig = a + ":" + bp + focus; if (sig === sudSig) return; sudSig = sig;
   drawGrid($("sgA"), [...SOL].map((d, i) => {
     const clue = PUZ[i] !== "0";
-    if (i < aSteps) return { d, clue, color: clue ? "#1F2430" : "#5F6675", bg: i === aSteps - 1 ? "#E3E9FF" : null };
-    return clue ? { d: PUZ[i], clue: true, color: "#1F2430" } : {};
+    if (clue) return { d, clue: true };
+    if (i < a) return { d, color: "#5F6675", bg: i === a - 1 ? "#E3E9FF" : null };
+    return {};
   }));
-  const solved = bPasses >= 12;
+  const solved = bp >= 12;
   drawGrid($("sgB"), [...SOL].map((d, i) => {
-    const clue = PUZ[i] !== "0";
-    if (clue) return { d: PUZ[i], clue: true };
-    return solved ? { d, color: "#3557E0", bg: "#EEF2FF" } : { bg: bPasses > 0 ? "#F1F4FA" : null };
+    if (PUZ[i] !== "0") return { d: PUZ[i], clue: true };
+    return solved ? { d, color: "#3557E0", bg: "#EEF2FF" } : { bg: bp > 0 ? "#F1F4FA" : null };
   }));
-  $("sudA").textContent = aSteps;
-  $("sudB").textContent = bPasses;
-  [...$("passbar").children].forEach((c, k) => c.classList.toggle("on", k < bPasses));
-  $("sudNote").textContent = bPasses === 0 ? "each pass refines its shorthand for the whole grid"
-    : solved ? "pass 12: all 89 slots filled, grid solved" : `pass ${bPasses}: ${SUD_LEVELS[bPasses - 1]} of 89 slots filled`;
+  $("sudA").textContent = a;
+  $("sudB").textContent = bp;
+  [...$("passbar").children].forEach((c, k) => c.classList.toggle("on", k < bp));
+  $("sudNote").textContent = bp === 0 ? "each pass refines a shorthand for the whole grid" : solved ? "pass 12: all 89 slots filled, solved" : `pass ${bp}: ${SUD_LEVELS[bp - 1]} of 89 slots filled`;
+  $("sA").classList.toggle("dim", focus === "b");
+  $("sB").classList.toggle("dim", focus === "a");
 }
 scene("sc-sudoku", [
-  { k: "The puzzle", t: "Both models get the same puzzle: the bold digits are the clues. The job is to write out the finished grid." },
-  { k: "One cell at a time", t: "An LLM-style model writes the answer cell by cell, left to right, top to bottom: 81 steps, and each digit is locked in the moment it’s written." },
-  { k: "Twelve passes", t: "NCM fills rows of its shorthand instead, 1 slot, then 2, then 4, up to 89, refining its picture of the whole grid each pass. The paper didn’t publish the in-between grids, so we only show the answer once it’s done." }
-], p => {
-  const q = clamp((p - .2) / .75, 0, 1);
-  drawSudoku(Math.round(q * 81), Math.round(q * 12));
-});
+  { k: "The puzzle", t: "Both models get the same puzzle; the bold digits are the clues. The job is to write out the finished grid.", draw: () => sudoku(0, 0, "") },
+  { k: "One cell at a time", t: "An LLM-style model writes the answer cell by cell, left to right, top to bottom: 81 steps. Each digit is locked in the moment it’s written.", draw: q => sudoku(Math.round(q * 81), 0, "a") },
+  { k: "Twelve passes", t: "NCM fills rows of its shorthand instead: 1 slot, then 2, then 4, up to 89, refining the whole grid each pass. Its in-between grids weren’t published, so only the finished answer is shown.", draw: q => sudoku(81, Math.round(q * 12), "b") }
+]);
 
-/* ---------- Scene 7: memory ---------- */
+/* ---------- Memory ---------- */
 const TRIPS_AR = 128, TRIPS_NC = 12, GB = 14;
 $("tkA").innerHTML = "<i></i>".repeat(TRIPS_AR);
 $("tkB").innerHTML = "<i></i>".repeat(TRIPS_NC);
-$("tkA").style.gridTemplateColumns = "repeat(64, minmax(0, 1fr))";
-$("tkB").style.gridTemplateColumns = "repeat(64, minmax(0, 1fr))";
 let memSig = "";
-scene("sc-mem", [
-  { k: "One short story", t: "Take the 12-pass children’s story from earlier, about 128 tokens long, and imagine both models were the size of Mistral 7B." },
-  { k: "The LLM", t: "The LLM reads the whole model from memory once per token: 128 trips, nearly 1.8 terabytes of data moved for one short story." },
-  { k: "NCM", t: "NCM reads it once per pass: 12 trips. Each pass does far more math, but the math units were sitting idle anyway. Memory was the bottleneck." }
-], p => {
-  const qa = clamp((p - .3) / .35, 0, 1), qb = clamp((p - .66) / .3, 0, 1);
-  const a = Math.round(qa * TRIPS_AR), b = Math.round(qb * TRIPS_NC);
-  const sig = a + ":" + b; if (sig === memSig) return; memSig = sig;
+function mem(a, b, focus) {
+  a = Math.round(a); b = Math.round(b);
+  const sig = a + ":" + b + focus; if (sig === memSig) return; memSig = sig;
   [...$("tkA").children].forEach((c, k) => c.classList.toggle("on", k < a));
   [...$("tkB").children].forEach((c, k) => c.classList.toggle("on", k < b));
   $("mA").textContent = a + " trips"; $("mAgb").textContent = fmt(a * GB) + " GB moved";
   $("mB").textContent = b + " trips"; $("mBgb").textContent = fmt(b * GB) + " GB moved";
-});
+  $("mrA").classList.toggle("dim", focus === "b");
+  $("mrB").classList.toggle("dim", focus === "a");
+}
+scene("sc-mem", [
+  { k: "One short story", t: "Take the 12-pass children’s story from earlier, about 128 tokens long, and imagine both models were the size of Mistral 7B.", draw: () => mem(0, 0, "") },
+  { k: "The LLM", t: "The LLM reads the whole model from memory once per token: 128 trips, nearly 1.8 terabytes moved for one short story.", draw: q => mem(q * TRIPS_AR, 0, "a") },
+  { k: "NCM", t: "NCM reads it once per pass: 12 trips. Each pass does far more math, but the chip’s math units were sitting idle anyway. Memory was the bottleneck.", draw: q => mem(TRIPS_AR, q * TRIPS_NC, "b") }
+]);
 
 /* ---------- Boot ---------- */
 async function boot() {
@@ -932,7 +870,7 @@ async function boot() {
   const data = await res.json();
   for (const d of data.samples) {
     TASKS[d.id] = prepare({
-      name: d.name, task: d.task || "", levels: d.levels, notes: d.notes || null,
+      name: d.name, levels: d.levels, notes: d.notes || null,
       inputLabel: d.inputLabel || "Input", inputNote: d.inputNote || "",
       src: d.source || null, srcLang: d.sourceLang || "en", outputLabel: d.outputLabel || "Output"
     });
@@ -941,20 +879,15 @@ async function boot() {
   setupStory();
   setupRace();
   setupSlots(schedules.find(s => s.id === "wmt14"));
-  // Scenes registered before data loaded (pictures, steps, sudoku, memory) stay in page order via sorting.
-  SCENES.sort((a, b) => (a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1);
   const order = ["tinystories", "lm1b", "owt", "xsum", "wmt14", "sudoku"];
   $("schedules").innerHTML = order.map(id => schedules.find(s => s.id === id)).filter(Boolean)
-    .map(s => `<div class="sch"><b>${esc(s.label)}</b><span>${s.levels.length} passes, ${fmt(s.levels[s.levels.length - 1])} slots</span></div>`).join("");
-  $("tabs").innerHTML = data.samples.map(d => `<button class="chip" role="tab" type="button" data-k="${esc(d.id)}">${esc(d.name)}<small>${esc(d.task || "")}</small></button>`).join("");
+    .map(s => `<div class="sch"><b>${esc(s.label)}</b><span class="num">${s.levels.length} passes, ${fmt(s.levels[s.levels.length - 1])} slots</span></div>`).join("");
+  $("tabs").innerHTML = data.samples.map(d => `<button class="tab" role="tab" type="button" data-k="${esc(d.id)}">${esc(d.task || d.name)}</button>`).join("");
   selectTask("tinystories");
   sizeCaps();
   update();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { sizeCaps(); SCENES.forEach(s => s.p = -1); update(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { sizeCaps(); SCENES.forEach(s => { s.q = -1; }); update(); });
 }
-// Story captions follow passes rather than equal slices.
-const _setCap = setCap;
-setCap = function (s, i) { if (s.capFor) i = s.capFor(s.p); _setCap(s, i); };
 boot();
 </script>
 </body>
