@@ -1,0 +1,79 @@
+{
+  "source": {
+    "repo": "https://github.com/HazyResearch/ncm",
+    "paper": "https://arxiv.org/abs/2610.14162",
+    "note": "Transcribed from assets/coarse_to_fine.gif in HazyResearch/ncm (MIT license)."
+  },
+  "samples": [
+    {
+      "id": "tinystories",
+      "name": "TinyStories",
+      "tag": "story",
+      "task": "unconditional story",
+      "outputLabel": "NCM output · unconditional",
+      "levels": [
+        ".",
+        "was..... the.",
+        ", a to. inWhile came's was,... the..",
+        "a was a he with day the. was came's The, was,.\nsomething A. the! so his",
+        "Once, a He string to., his the\nwas wind the Tim The,, he do be.\"\nunexpected A Tim. the! happy, his",
+        ", was named He kite loved with One, play in.While playing wind blew black. blew, went, he do. his.Then unexpected kind Tim the It the! was He his his",
+        "a there a named. a kite loved play. day he play his the.While was a came blew black away wind and, you away. he not. because his.Then something unexpected kind saw and him It the kite! was. the his.",
+        "a, was a named. had long kite he play with sunny, he play with kite park\nWhile was a wind came the kite Tim. wind and, the too for. he not it Tim sad his home.Then something happened A bird Tim flew him The took kite feet! was. thanked the and its",
+        "upon time there was little named Tim He a long that loved to with. sunny, went play with kite the park\nhe was, big wind and the black from. The blew and, the went away for. He not it. be because missed hat.\n, unexpected happened A bird Tim and to. bird took kite with! Tim was happy He the bird. its",
+        "upon a, there was a boy Tim. He a long kite he loved play with. One day, he to play his kite in park.While he was, a wind came and the kite Tim Tim. wind blew and, but kite too too for him he could not it. be sad he missed home.\nThen something unexpected happened A kind saw Tim and to. The bird took kite with feet! was so. He the bird that. It",
+        "upon upon a, there was a boy named Tim. had a long long that loved to play play. sunny sunny,, he play play with his kite the..\nWhile was, a a big wind and blew the kite from Tim. The wind blew and but but the went too away him him. could not it it. Tim be because missed his home.\nThen, something unexpected happened A kind bird saw Tim flew him.. bird took the kite with its! Tim was so. He thanked bird bird and. its",
+        "Once upon a time, there was a little boy named Tim. He had a long kite that he loved to play with. One sunny day, he went to play with his kite in the park.\nWhile he was playing, a big wind came and blew the kite far from Tim. The wind blew and blew, but the kite went too far for him. He could not find it. Tim felt sad because he missed his kite.\nThen, something unexpected happened. A kind bird saw Tim and flew to him. The bird took the kite with its beak! Tim was so happy."
+      ]
+    },
+    {
+      "id": "xsum",
+      "name": "XSum",
+      "tag": "summary",
+      "task": "summarization",
+      "outputLabel": "NCM output · summary",
+      "sourceLabel": "Article (excerpt)",
+      "sourceLang": "en",
+      "source": [
+        "He was driven to Pretoria's Kgosi Mampuru prison where he is expected to be housed in the hospital wing.",
+        "Judge Thokozile Masipa gave Pistorius a five-year jail sentence for culpable homicide, but cleared him of murder. …"
+      ],
+      "levels": [
+        "Hart for",
+        "orius for.",
+        "Pistorius prison for Re",
+        "athlete Pist six prison for Ste Ste",
+        "athlete Oscar Pist to six has for girlfriend Steen",
+        "South athlete Pist has sentenced years prison in for girlfriend Steenkamp",
+        "South athlete Pist Pist been sentenced six prison prison prison killing girlfriend Ste Stekampkamp",
+        "South African athlete Pist Pist been sentenced to to six prison prison for killing girlfriend Re Ste Stekampkamp",
+        "South African athlete Oscar Pistorius has been sentenced to six years in prison for killing his girlfriend Reeva Steenkamp."
+      ]
+    },
+    {
+      "id": "wmt14",
+      "name": "WMT14",
+      "tag": "DE → EN",
+      "task": "German to English translation",
+      "outputLabel": "NCM output · English",
+      "sourceLabel": "German source",
+      "sourceLang": "de",
+      "source": [
+        "Sowohl die US-Behörden als auch die mexikanischen Sicherheitskräfte befinden sich in einem Dauer-Kampf gegen die Drogenkartelle."
+      ],
+      "levels": [
+        "",
+        "the.",
+        "the against.",
+        "the security a against",
+        "US and security a in.",
+        "Both and and security in ongoing against cart",
+        "Both authorities the security forces engaged a against drug.",
+        "Both US and and Mexican forces engaged in continuous against drugels.",
+        "Both US authorities the Mexican Mexican are engaged engaged a battle battle drug cart.",
+        "Both US authorities and the Mexican Mexican are engaged engaged in a battle battle drug cart..",
+        "Both the US authorities and the Mexican security forces are engaged in a continuous battle against drug cartels."
+      ]
+    }
+  ]
+}

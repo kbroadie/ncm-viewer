@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NCM Refinement Viewer</title>
+<meta name="description" content="Step through Next-Concept Modeling samples as they refine from a rough sketch to finished text, one generation level at a time.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='11' width='3' height='4' rx='.6' fill='%233446C4' opacity='.45'/%3E%3Crect x='6.5' y='7' width='3' height='8' rx='.6' fill='%233446C4' opacity='.7'/%3E%3Crect x='12' y='2' width='3' height='13' rx='.6' fill='%233446C4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: one reading column. Controls and the level strip sit above the output so they never move while text grows. */
+:root {
+  --paper: #F2F4F7;
+  --sheet: #FFFFFF;
+  --ink: #141C26;
+  --muted: #5A6878;
+  --rule: #D6DDE5;
+  --accent: #3446C4;
+  --accent-soft: #E3E7FA;
+  --mark: #FFE08A;
+  --bar: #C3CCD8;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-prose: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1319; --sheet: #151C24; --ink: #E5EBF1; --muted: #8E9CAC; --rule: #27313C;
+    --accent: #93A1FF; --accent-soft: #1F2747; --mark: #5E4A10; --bar: #34404D; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1319; --sheet: #151C24; --ink: #E5EBF1; --muted: #8E9CAC; --rule: #27313C;
+  --accent: #93A1FF; --accent-soft: #1F2747; --mark: #5E4A10; --bar: #34404D; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 22px;
+}
+.eyebrow, .label {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(30px, 7vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  margin: 6px 0 10px;
+  text-wrap: balance;
+}
+.lede { margin: 0; max-width: 62ch; color: var(--muted); }
+.lede strong { color: var(--ink); font-weight: 500; }
+
+/* Task tabs */
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--sheet);
+  padding: 4px;
+  gap: 4px;
+}
+.tab {
+  appearance: none; border: 0; background: transparent; color: var(--muted);
+  font: 500 14px/1.2 var(--f-body);
+  padding: 9px 6px 8px; border-radius: 7px; cursor: pointer;
+  display: grid; gap: 2px; text-align: center;
+}
+.tab small { font: 400 11px/1.2 var(--f-mono); letter-spacing: .02em; }
+.tab[aria-selected="true"] { background: var(--accent-soft); color: var(--ink); }
+.tab[aria-selected="true"] small { color: var(--accent); }
+.tab:focus-visible, .btn:focus-visible, .bar:focus-visible, .row:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* Main sheet */
+.sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  display: grid;
+}
+.section { padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.section + .section { border-top: 1px solid var(--rule); }
+.source {
+  font-family: var(--f-prose);
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+  max-width: 65ch;
+}
+.source p { margin: 0 0 4px; }
+.source[lang="de"] { font-style: italic; }
+
+/* Controls */
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn {
+  appearance: none; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink);
+  font: 500 14px/1 var(--f-body); height: 38px; min-width: 38px; padding: 0 12px;
+  border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--sheet); padding: 0 16px; }
+.btn svg { width: 14px; height: 14px; fill: currentColor; }
+.levelread {
+  margin-left: auto;
+  font: 500 14px/1 var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.levelread b { color: var(--ink); font-weight: 500; }
+
+/* Level strip: bar height = words at that level */
+.strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  align-items: end;
+  height: 76px;
+}
+.bar {
+  appearance: none; border: 0; background: transparent; padding: 0; cursor: pointer;
+  height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 4px; min-width: 0;
+}
+.bar .fill {
+  align-self: end; width: 100%; border-radius: 3px 3px 1px 1px; background: var(--bar);
+  min-height: 3px; transition: background .2s;
+}
+.bar .n { font: 400 10.5px/1 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar.done .fill { background: color-mix(in srgb, var(--accent) 45%, var(--bar)); }
+.bar.cur .fill { background: var(--accent); }
+.bar.cur .n { color: var(--accent); font-weight: 500; }
+
+.stats {
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  font: 400 12.5px/1.3 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.stats b { color: var(--ink); font-weight: 500; }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 14px; height: 10px; border-radius: 2px; background: var(--mark); display: inline-block; }
+
+/* Output */
+.output {
+  font-family: var(--f-prose);
+  font-size: clamp(19px, 4.4vw, 22px);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 62ch;
+  overflow-wrap: anywhere;
+  min-height: 3.2em;
+}
+.output .empty { color: var(--muted); font-style: italic; font-size: .85em; }
+mark {
+  background: var(--mark);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 .1em;
+  margin: 0 -.1em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.animate mark { animation: arrive .45s ease-out; }
+@keyframes arrive { from { background: transparent; } }
+
+/* All levels */
+details.all > summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px;
+  font: 500 14px/1.3 var(--f-body); padding: 16px 18px;
+}
+details.all > summary::-webkit-details-marker { display: none; }
+details.all > summary::before {
+  content: ""; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted);
+  transform: rotate(-45deg); transition: transform .2s; margin-right: 2px;
+}
+details.all[open] > summary::before { transform: rotate(45deg); }
+details.all > summary span { color: var(--muted); font-weight: 400; }
+.rows { display: grid; padding: 0 10px 12px; }
+.row {
+  appearance: none; border: 0; background: transparent; color: var(--muted); text-align: left; cursor: pointer;
+  display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 10px; padding: 9px 8px; border-radius: 8px;
+  font-family: var(--f-prose); font-size: 15.5px; line-height: 1.5;
+}
+.row + .row { border-top: 1px solid var(--rule); }
+.row .lv { font: 500 12px/1.9 var(--f-mono); color: var(--muted); }
+.row .tx { min-width: 0; overflow-wrap: anywhere; }
+.row.cur { background: var(--accent-soft); color: var(--ink); }
+.row.cur .lv { color: var(--accent); }
+.row mark { padding: 0 .06em; margin: 0 -.06em; }
+
+.how { display: grid; gap: 8px; max-width: 62ch; }
+.how h2 { font: 600 17px/1.3 var(--f-display); margin: 0; letter-spacing: .01em; }
+.how p { margin: 0; color: var(--muted); }
+.how p b { color: var(--ink); font-weight: 500; }
+.credit { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; }
+.credit a { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate mark { animation: none; }
+  .bar .fill, details.all > summary::before { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Next-Concept Modeling · sample viewer</div>
+    <h1>Watch text resolve, level by level</h1>
+    <p class="lede">NCM doesn't write left to right. It drafts a rough sketch, then refines it in a few passes, filling every position in a pass <strong>at once</strong>. Step through the published samples to see each pass.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Sample" id="tabs"></div>
+
+  <main class="sheet">
+    <section class="section" id="srcSection">
+      <div class="label" id="srcLabel">Source</div>
+      <div class="source" id="src"></div>
+    </section>
+
+    <section class="section">
+      <div class="controls">
+        <button class="btn" id="prev" aria-label="Previous level"><svg viewBox="0 0 16 16"><path d="M11 2 4 8l7 6z"/></svg></button>
+        <button class="btn primary" id="play"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2l10 6-10 6z"/></svg><span id="playText">Play</span></button>
+        <button class="btn" id="next" aria-label="Next level"><svg viewBox="0 0 16 16"><path d="M5 2l7 6-7 6z"/></svg></button>
+        <div class="levelread" aria-live="polite">level <b id="lvNow">1</b>/<span id="lvMax">1</span></div>
+      </div>
+      <div class="strip" id="strip" aria-label="Levels"></div>
+      <div class="stats">
+        <span><b id="stWords">0</b> words</span>
+        <span><b id="stChanged">0</b> changed</span>
+        <span class="key"><i></i>new since last level</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="label" id="outLabel">NCM output</div>
+      <p class="output" id="out"></p>
+    </section>
+
+    <details class="all" id="all">
+      <summary>All levels at once <span id="allCount"></span></summary>
+      <div class="rows" id="rows"></div>
+    </details>
+  </main>
+
+  <section class="how">
+    <h2>How to read it</h2>
+    <p>A tokenizer compresses the finished text into a stack of codes, coarse on top and fine at the bottom. The generator predicts that stack from the top down. <b>Each level is one forward pass</b>, and each level covers a longer sequence than the one before, which is why the bars grow.</p>
+    <p>Early levels hold the gist: frequent words, names, punctuation. Later levels sort out order and wording. An autoregressive model would spend one pass per token; here the whole output takes as many passes as there are levels.</p>
+    <p class="credit">Samples transcribed from <a href="https://github.com/HazyResearch/ncm" target="_blank" rel="noopener">HazyResearch/ncm</a> (MIT license), from the coarse-to-fine animation in the repo. Highlights are computed in this page by a word diff against the previous level. Paper: <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener">Kumbong et al., 2026</a>.</p>
+  </section>
+</div>
+
+<script>
+const TASKS = {};
+
+const $ = id => document.getElementById(id);
+const tok = s => s.replace(/\n/g, " \n ").split(/ +/).filter(Boolean);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// Mark words in b that are not part of the longest common subsequence with a.
+function changed(a, b) {
+  const n = a.length, m = b.length;
+  const dp = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const out = new Array(m).fill(true);
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { out[j] = false; i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++;
+    else j++;
+  }
+  return out;
+}
+
+function prepare(t) {
+  t.tokens = t.levels.map(tok);
+  t.diffs = t.tokens.map((cur, i) => i === 0 ? cur.map(() => true) : changed(t.tokens[i - 1], cur));
+  t.words = t.tokens.map(ts => ts.filter(w => w !== "\n").length);
+  t.nChanged = t.tokens.map((ts, i) => ts.filter((w, k) => w !== "\n" && t.diffs[i][k]).length);
+  return t;
+}
+
+function renderText(t, i) {
+  const ts = t.tokens[i];
+  if (!ts.length) return '<span class="empty">Nothing decoded yet at this level.</span>';
+  let html = "", prevBreak = true;
+  ts.forEach((w, k) => {
+    if (w === "\n") { html += "<br>"; prevBreak = true; return; }
+    if (!prevBreak) html += " ";
+    html += t.diffs[i][k] ? "<mark>" + esc(w) + "</mark>" : esc(w);
+    prevBreak = false;
+  });
+  return html;
+}
+
+let key = null, level = 0, timer = null, animate = false;
+
+function selectTask(k) {
+  if (!TASKS[k]) k = Object.keys(TASKS)[0];
+  stop();
+  key = k;
+  const t = TASKS[k];
+  level = t.levels.length - 1;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
+  $("srcSection").hidden = !t.src;
+  if (t.src) {
+    $("srcLabel").textContent = t.srcLabel;
+    $("src").setAttribute("lang", t.srcLang);
+    $("src").innerHTML = t.src.map(p => "<p>" + esc(p) + "</p>").join("");
+  }
+  $("outLabel").textContent = t.outLabel;
+  $("lvMax").textContent = t.levels.length;
+  $("allCount").textContent = "· " + t.levels.length + " levels";
+  const max = Math.max(...t.words);
+  $("strip").innerHTML = t.words.map((w, i) =>
+    `<button class="bar" data-i="${i}" aria-label="Level ${i + 1}, ${w} words"><span class="fill" style="height:${Math.max(4, Math.round(w / max * 100))}%"></span><span class="n">${i + 1}</span></button>`
+  ).join("");
+  $("rows").innerHTML = t.levels.map((_, i) =>
+    `<button class="row" data-i="${i}"><span class="lv">L${String(i + 1).padStart(2, "0")}</span><span class="tx">${renderText(t, i)}</span></button>`
+  ).join("");
+  animate = false;
+  render();
+  setPlayUI(false);
+}
+
+function render() {
+  const t = TASKS[key];
+  $("out").classList.toggle("animate", animate);
+  $("out").innerHTML = renderText(t, level);
+  $("lvNow").textContent = level + 1;
+  $("stWords").textContent = t.words[level];
+  $("stChanged").textContent = t.nChanged[level];
+  document.querySelectorAll(".bar").forEach((b, i) => {
+    b.classList.toggle("cur", i === level);
+    b.classList.toggle("done", i < level);
+    b.setAttribute("aria-current", i === level ? "step" : "false");
+  });
+  document.querySelectorAll(".row").forEach((r, i) => r.classList.toggle("cur", i === level));
+  $("prev").disabled = level === 0;
+  $("next").disabled = level === t.levels.length - 1;
+}
+
+function go(i) {
+  const t = TASKS[key];
+  level = Math.max(0, Math.min(t.levels.length - 1, i));
+  animate = true;
+  render();
+}
+
+function setPlayUI(on) {
+  const t = TASKS[key];
+  const atEnd = t && level === t.levels.length - 1;
+  $("playText").textContent = on ? "Pause" : (atEnd ? "Replay" : "Play");
+  $("playIcon").innerHTML = on ? '<path d="M3 2h4v12H3zM9 2h4v12H9z"/>' : '<path d="M4 2l10 6-10 6z"/>';
+}
+function stop() { clearInterval(timer); timer = null; setPlayUI(false); }
+function play() {
+  const last = TASKS[key].levels.length - 1;
+  if (level === last) go(0);
+  setPlayUI(true);
+  timer = setInterval(() => {
+    if (level >= TASKS[key].levels.length - 1) { stop(); return; }
+    go(level + 1);
+    if (level >= TASKS[key].levels.length - 1) stop();
+  }, 800);
+}
+
+$("play").addEventListener("click", () => timer ? stop() : play());
+$("prev").addEventListener("click", () => { stop(); go(level - 1); setPlayUI(false); });
+$("next").addEventListener("click", () => { stop(); go(level + 1); setPlayUI(false); });
+$("strip").addEventListener("click", e => { const b = e.target.closest(".bar"); if (b) { stop(); go(+b.dataset.i); setPlayUI(false); } });
+$("rows").addEventListener("click", e => { const r = e.target.closest(".row"); if (r) { stop(); go(+r.dataset.i); setPlayUI(false); } });
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest(".tab"); if (!b) return;
+  if (location.hash.slice(1) === b.dataset.k) selectTask(b.dataset.k);
+  else location.hash = b.dataset.k;
+});
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowLeft") { stop(); go(level - 1); setPlayUI(false); }
+  if (e.key === "ArrowRight") { stop(); go(level + 1); setPlayUI(false); }
+});
+window.addEventListener("hashchange", () => selectTask(location.hash.slice(1)));
+
+async function boot() {
+  try {
+    const res = await fetch("samples.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error(res.status + " " + res.statusText);
+    const data = await res.json();
+    for (const d of data.samples) {
+      TASKS[d.id] = prepare({
+        outLabel: d.outputLabel || "NCM output",
+        srcLabel: d.sourceLabel || null,
+        src: d.source || null,
+        srcLang: d.sourceLang || "en",
+        levels: d.levels
+      });
+    }
+    $("tabs").innerHTML = data.samples.map(d =>
+      `<button class="tab" role="tab" id="tab-${esc(d.id)}" data-k="${esc(d.id)}">${esc(d.name)}<small>${esc(d.tag || "")}</small></button>`
+    ).join("");
+    selectTask(location.hash.slice(1));
+    setPlayUI(false);
+  } catch (err) {
+    $("srcSection").hidden = true;
+    $("out").innerHTML = '<span class="empty">Couldn\u2019t load samples.json (' + esc(String(err.message || err)) + '). If you opened this file directly, serve the folder instead, for example with <code>python3 -m http.server</code>.</span>';
+  }
+}
+boot();
+</script>
+</body>
+</html>
